@@ -1,29 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/assets/favicon.63a26457.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vitalops.ai</title>
-    <script type="module" crossorigin src="/assets/index.e970f9fa.js"></script>
-    <link rel="stylesheet" href="/assets/index.c4d02591.css">
-  </head>
-  <body class="font-inter antialiased bg-white text-gray-900 tracking-tight">
-    
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <script>
-        if (localStorage.getItem('sidebar-expanded') == 'true') {
-            document.querySelector('body').classList.add('sidebar-expanded');
-        } else {
-            document.querySelector('body').classList.remove('sidebar-expanded');
-        }
-    </script>  
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitalOps AI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
 
-    <div id="root"></div>
-    
-    
-    <canvas class=
-    "background"
-    ></canvas>
-  </body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">VitalOps</div>
+            <ul class="nav-tabs">
+                <li class="nav-tab"><a href="#home">Home</a></li>
+                <li class="nav-tab"><a href="#products">Products</a></li>
+                <li class="nav-tab"><a href="#about">About</a></li>
+                <li class="nav-tab"><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>VitalOps AI</h1>
+            <p>Transforming data into intelligence. Empowering businesses with cutting-edge AI solutions.</p>
+        </div>
+    </section>
+
+    <!-- DataTune Section -->
+    <section class="datatune-section" id="products">
+        <div class="datatune-card">
+            <span class="product-label">Our Product</span>
+            <h2 class="datatune-title">DataTune</h2>
+            <p class="datatune-description">
+                Experience the future of data optimization with DataTune - our flagship AI-powered platform that transforms how businesses handle, analyze, and leverage their data.
+            </p>
+            <a href="https://www.datatune.ai" target="_blank" rel="noopener noreferrer" class="datatune-link">
+                Visit DataTune →
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="section-container">
+            <h2 class="section-title">About VitalOps</h2>
+            
+            <div class="about-content">
+                <div class="about-block">
+                    <h3>Who are we?</h3>
+                    <p>
+                        We are a team of experienced engineers with deep expertise across AI and ML research, specializing in building and deploying large language models with the right tools. Our collective experience spans over a decade in artificial intelligence, bringing together diverse domain knowledge and cutting-edge technical skills.
+                    </p>
+                </div>
+                
+                <div class="about-block">
+                    <h3>Our story</h3>
+                    <p>
+                        After working for more than a decade in the AI space, we embarked on an entrepreneurial journey to make a transformative impact in this rapidly evolving industry. Our core expertise lies in architecting and scaling applications powered by large language models. We are passionate advocates of open-source technology, believing it catalyzes breakthrough innovations and accelerates progress across the entire AI ecosystem. 🚀
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="section-container">
+            <h2 class="section-title">Get in Touch</h2>
+            
+            <div class="contact-content">
+                <p class="contact-intro">
+                    Ready to transform your business with AI? Let's start a conversation.
+                </p>
+                
+                <div class="contact-methods">
+                    <a href="mailto:hello@vitalops.ai" class="contact-card">
+                        <div class="contact-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="contact-info">
+                            <h4>Email</h4>
+                            <p>hello@vitalops.ai</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://x.com/vitalopsai" target="_blank" rel="noopener noreferrer" class="contact-card">
+                        <div class="contact-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4l11.733 16h4.267l-11.733 -16z"></path>
+                                <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>
+                            </svg>
+                        </div>
+                        <div class="contact-info">
+                            <h4>X (Twitter)</h4>
+                            <p>@vitalopsai</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (Math.random() * 20 + 20) + 's';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Nav background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(10, 10, 10, 0.95)';
+                nav.style.padding = '15px 50px';
+            } else {
+                nav.style.background = 'rgba(10, 10, 10, 0.8)';
+                nav.style.padding = '20px 50px';
+            }
+        });
+
+        // Initialize particles
+        createParticles();
+    </script>
+</body>
 </html>
