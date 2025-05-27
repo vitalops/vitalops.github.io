@@ -113,7 +113,7 @@
         // Create floating particles
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
-            const particleCount = 20;
+            const particleCount = window.innerWidth <= 768 ? 10 : 20; // Fewer particles on mobile
 
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
@@ -144,20 +144,29 @@
             });
         });
 
-        // Nav background on scroll
+        // Nav background on scroll - mobile optimized
         window.addEventListener('scroll', () => {
             const nav = document.querySelector('nav');
+            const isMobile = window.innerWidth <= 768;
+            
             if (window.scrollY > 50) {
                 nav.style.background = 'rgba(10, 10, 10, 0.95)';
-                nav.style.padding = '15px 50px';
+                nav.style.padding = isMobile ? '12px 20px' : '15px 50px';
             } else {
                 nav.style.background = 'rgba(10, 10, 10, 0.8)';
-                nav.style.padding = '20px 50px';
+                nav.style.padding = isMobile ? '15px 20px' : '20px 50px';
             }
         });
 
         // Initialize particles
         createParticles();
+
+        // Re-create particles on window resize
+        window.addEventListener('resize', () => {
+            const particlesContainer = document.getElementById('particles');
+            particlesContainer.innerHTML = '';
+            createParticles();
+        });
     </script>
 </body>
 </html>
