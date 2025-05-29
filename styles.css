@@ -28,7 +28,8 @@ body {
     background: linear-gradient(45deg, #00d4ff, #0066ff);
     border-radius: 50%;
     opacity: 0.6;
-    animation: float 20s infinite linear;
+    animation: float 3s infinite ease-out; /* Changed from linear to ease-out and reduced time */
+    animation-delay: var(--delay, 0s);
 }
 
 @keyframes float {
@@ -36,10 +37,10 @@ body {
         transform: translateY(100vh) rotate(0deg);
         opacity: 0;
     }
-    10% {
+    2% { /* Changed from 10% to 2% for faster fade-in */
         opacity: 0.6;
     }
-    90% {
+    98% { /* Changed from 90% to 98% for longer visibility */
         opacity: 0.6;
     }
     100% {
@@ -129,12 +130,11 @@ nav {
     font-size: clamp(3rem, 8vw, 8rem);
     font-weight: 900;
     margin-bottom: 30px;
-    background: linear-gradient(135deg, #ffffff 0%, #00d4ff 50%, #0066ff 100%);
+    background: linear-gradient(135deg, #00d4ff, #0066ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
-    animation: glow 3s ease-in-out infinite alternate;
+
 }
 
 @keyframes glow {
