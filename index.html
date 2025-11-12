@@ -5,6 +5,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VitalOps - AI-Powered Data Transformation</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Flagship Product Section Styles */
+        .flagship-product {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.05) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flagship-product::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .flagship-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .flagship-badge {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #8b5cf6;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .flagship-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradientFlow 8s ease-in-out infinite;
+        }
+
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .flagship-description {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            margin-bottom: 30px;
+            max-width: 800px;
+        }
+
+        .flagship-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .flagship-feature {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .flagship-feature:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+        }
+
+        .flagship-feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .flagship-feature-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .flagship-cta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .flagship-btn {
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .flagship-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .flagship-btn-secondary {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid #8b5cf6;
+            color: #8b5cf6;
+        }
+
+        .flagship-btn-secondary:hover {
+            background: rgba(139, 92, 246, 0.2);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .flagship-product {
+                padding: 60px 20px;
+            }
+
+            .flagship-features {
+                grid-template-columns: 1fr;
+            }
+
+            .flagship-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .flagship-btn {
+                width: 100%;
+                max-width: 300px;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Floating Particles -->
@@ -19,7 +177,7 @@
             </div>
             <ul class="nav-tabs">
                 <li class="nav-tab"><a href="#home">Home</a></li>
-                <li class="nav-tab"><a href="https://datatune.ai/">Datatune</a></li>
+                <li class="nav-tab"><a href="#datatune">Datatune</a></li>
                 <li class="nav-tab"><a href="#about">About</a></li>
                 <li class="nav-tab"><a href="#contact">Contact</a></li>
             </ul>
@@ -30,10 +188,56 @@
     <section class="hero" id="home">
         <div class="hero-content">
             <h1>VitalOps</h1>
-            <p>AI for tabular data</p>
+            <p>Make LLMs understand your data</p>
+            <p style="font-size: 1.2rem; margin-top: 10px; color: rgba(255, 255, 255, 0.7);">
+                Creators of <a href="#datatune" style="color: #8b5cf6; text-decoration: none; font-weight: 600; border-bottom: 2px solid #8b5cf6;">Datatune</a>
+            </p>
             <a href="https://calendly.com/abhijith-vitalops/30min" class="demo-button" target="_blank" rel="noopener noreferrer">
                Book a Demo
             </a>
+        </div>
+    </section>
+
+    <!-- Flagship Product: Datatune -->
+    <section class="flagship-product" id="datatune">
+        <div class="flagship-container">
+            <div style="text-align: center;">
+                <span class="flagship-badge">⭐ Flagship Product</span>
+                <h2 class="flagship-title">Datatune</h2>
+                <p class="flagship-description">
+                    Transform your tabular data with natural language using Large Language Models. 
+                    Datatune gives LLMs access to your actual data—enabling intelligent, context-aware 
+                    transformations at the row level that go far beyond what SQL or pandas can express.
+                </p>
+            </div>
+
+            <div class="flagship-features">
+                <div class="flagship-feature">
+                    <div class="flagship-feature-icon">🗺️</div>
+                    <div class="flagship-feature-text">Map & Transform Data</div>
+                </div>
+                <div class="flagship-feature">
+                    <div class="flagship-feature-icon">🔍</div>
+                    <div class="flagship-feature-text">Intelligent Filtering</div>
+                </div>
+                <div class="flagship-feature">
+                    <div class="flagship-feature-icon">🤖</div>
+                    <div class="flagship-feature-text">AI Agents</div>
+                </div>
+                <div class="flagship-feature">
+                    <div class="flagship-feature-icon">⚡</div>
+                    <div class="flagship-feature-text">Fast & Scalable</div>
+                </div>
+            </div>
+
+            <div class="flagship-cta">
+                <a href="https://datatune.ai/" class="flagship-btn" target="_blank" rel="noopener noreferrer">
+                    Explore Datatune
+                </a>
+                <a href="https://github.com/vitalops/datatune" class="flagship-btn flagship-btn-secondary" target="_blank" rel="noopener noreferrer">
+                    ⭐ Star on GitHub
+                </a>
+            </div>
         </div>
     </section>
 
@@ -55,16 +259,11 @@
                     <p>Perform complex transformations using just natural language</p>
                 </div>
                 
-                <div class="capability-card">
-                    <div class="capability-icon">🤖</div>
-                    <h3>Data Infrastructure for AI training</h3>
-                    <p>Train LLMs on your data with ease using simplified data infrastructure</p>
-                </div>
                 
                 <div class="capability-card">
                     <div class="capability-icon">📊</div>
                     <h3> Analytics & Insights</h3>
-                    <p>Run queries and generate analysis on your tabular data</p>
+                    <p>Run queries and generate analysis on your data</p>
                 </div>
             </div>
         </div>
@@ -242,8 +441,8 @@
             });
         }, observerOptions);
 
-        // Observe all capability cards and privacy cards
-        document.querySelectorAll('.capability-card, .privacy-card').forEach(card => {
+        // Observe all capability cards, privacy cards, and flagship features
+        document.querySelectorAll('.capability-card, .privacy-card, .flagship-feature').forEach(card => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(30px)';
             card.style.transition = 'all 0.6s ease';
