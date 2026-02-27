@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <linearGradient id="gLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#52b788"/>
+      <stop offset="100%" stop-color="#2d6a4f"/>
+    </linearGradient>
+    <linearGradient id="gRight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2d6a4f"/>
+      <stop offset="100%" stop-color="#1b4332"/>
+    </linearGradient>
+    <linearGradient id="gTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#40916c"/>
+      <stop offset="100%" stop-color="#1b4332"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#010d06" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <polygon points="80,130 420,130 345,210 155,210" fill="url(#gTop)"/>
+    <polygon points="420,130 250,420 250,345 345,210" fill="url(#gRight)"/>
+    <polygon points="250,420 80,130 155,210 250,345" fill="url(#gLeft)"/>
+    <polygon points="80,130 155,130 155,210" fill="url(#gLeft)"/>
+    <polygon points="420,130 345,130 345,210" fill="url(#gTop)"/>
+    <polygon points="250,420 250,345 310,390" fill="url(#gRight)"/>
+  </g>
+</svg>
