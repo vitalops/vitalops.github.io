@@ -36,6 +36,7 @@
 html{scroll-behavior:smooth}
 
 body{
+  -webkit-tap-highlight-color:transparent;
   font-family:'DM Sans',sans-serif;
   background:var(--bg);
   color:var(--ink);
@@ -256,7 +257,7 @@ nav.scrolled .nav-glass{margin:6px 16px 0}
   transform:translateY(-1px);
 }
 
-.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;-webkit-tap-highlight-color:rgba(0,0,0,0);touch-action:manipulation;user-select:none;-webkit-user-select:none;text-decoration:none;-webkit-appearance:none;position:relative;z-index:200}
 .hamburger span{display:block;width:20px;height:2px;background:var(--ink);border-radius:2px}
 
 /* ── HERO ── */
@@ -363,11 +364,12 @@ nav.scrolled .nav-glass{margin:6px 16px 0}
 .terminal-dot:nth-child(3){background:#4a7c59;box-shadow:0 0 0 1px rgba(60,100,70,0.30)}
 .terminal-title{margin-left:10px;font-size:.70rem;color:rgba(60,38,12,0.60);font-family:'JetBrains Mono',monospace}
 .terminal-body{
-  padding:22px;font-family:'JetBrains Mono',monospace;font-size:.78rem;
+  padding:22px;font-family:'JetBrains Mono','Courier New',Courier,monospace;font-size:.78rem;
   line-height:2.0;color:#1e1208;position:relative;z-index:1;
-  height:380px;overflow:hidden;
+  height:380px;min-height:380px;overflow:hidden;
   background:#d4aa7a;
 }
+@-webkit-keyframes lineIn{from{opacity:0;-webkit-transform:translateX(-5px)}to{opacity:1;-webkit-transform:none}}
 @keyframes lineIn{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:none}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
@@ -677,7 +679,7 @@ footer{
         <li><a href="mailto:hello@vitalops.ai">Contact</a></li>
       </ul>
       <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="nav-cta">Book a Demo</a>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <a href="javascript:void(0)" class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMenu();return false;"><span></span><span></span><span></span></a>
     </div>
   </div>
 </nav>
@@ -839,24 +841,25 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a){
 var hamburger = document.getElementById('hamburger');
 var navLinks  = document.getElementById('navLinks');
 
-hamburger.addEventListener('click', function(e){
-  e.stopPropagation();
-  navLinks.classList.toggle('open');
-});
+/* Global so inline onclick can reach it */
+window.toggleMenu = function(){
+  var nl = document.getElementById('navLinks');
+  nl.classList.toggle('open');
+}
 
-/* Close when a nav link is clicked */
+/* Also close on nav link tap */
 navLinks.querySelectorAll('a').forEach(function(a){
-  a.addEventListener('click', function(){
-    navLinks.classList.remove('open');
-  });
+  a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
 });
 
 /* Close on outside tap */
-document.addEventListener('click', function(e){
-  if(navLinks.classList.contains('open') && !navLinks.contains(e.target) && e.target !== hamburger){
-    navLinks.classList.remove('open');
+document.addEventListener('touchstart', function(e){
+  var hb = document.getElementById('hamburger');
+  var nl = document.getElementById('navLinks');
+  if(nl.classList.contains('open') && !nl.contains(e.target) && !hb.contains(e.target)){
+    nl.classList.remove('open');
   }
-});
+}, {passive:true});
 
 /* MOUSE GLOW */
 var glow = document.getElementById('mouseGlow');
@@ -942,9 +945,12 @@ var TL = [
 var tli=0, ttim=null;
 function addLine(l){
   var d=document.createElement('div');
-  d.style.cssText='animation:lineIn .18s ease both;';
   d.innerHTML = l.h==='' ? '&nbsp;' : l.h+(l.c?'&nbsp;<span style="display:inline-block;width:7px;height:13px;background:#2d5e2a;vertical-align:middle;animation:blink 1.1s step-end infinite;opacity:.8"></span>':'');
   termBody.appendChild(d);
+  /* force reflow then set animation — fixes iOS Safari */
+  void d.offsetHeight;
+  d.style.webkitAnimation = 'lineIn .18s ease both';
+  d.style.animation = 'lineIn .18s ease both';
 }
 function runTyper(){
   if(tli>=TL.length){
