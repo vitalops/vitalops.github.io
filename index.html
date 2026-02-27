@@ -136,7 +136,7 @@ body::after{
 /* ── NAV ── */
 nav{position:fixed;top:0;width:100%;z-index:100;transition:all .30s}
 .nav-glass{
-  margin:12px 16px 0;border-radius:8px;position:relative;overflow:hidden;
+  margin:12px 16px 0;border-radius:8px;position:relative;overflow:visible;
   background:rgba(240,234,216,0.72);
   border:1px solid var(--border-md);
   border-top-color:rgba(255,255,255,0.85);
@@ -603,17 +603,29 @@ footer{
   .nav-links,.nav-cta{display:none}
   .hamburger{display:flex}
   .nav-links.open{
-    display:flex;flex-direction:column;position:absolute;top:calc(100% + 8px);left:0;right:0;
-    background:rgba(240,234,216,0.96);
-    border:1px solid var(--border-md);border-radius:8px;
-    padding:14px 18px;gap:10px;
+    display:flex;flex-direction:column;
+    position:fixed;top:70px;left:10px;right:10px;
+    background:rgba(244,238,226,0.98);
+    border:1px solid var(--border-md);
+    border-top-color:rgba(255,255,255,0.85);
+    border-radius:8px;
+    padding:14px 18px;gap:4px;
     backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
     box-shadow:var(--shadow-lg);
+    z-index:200;
   }
+  .nav-links.open li a{
+    display:block;padding:10px 12px;border-radius:6px;
+    font-size:.95rem;color:var(--ink);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-links.open li:last-child a{ border-bottom:none; }
+  .nav-links.open li a:hover{ background:var(--accent-dim);color:var(--accent); }
   .datatune-grid{grid-template-columns:1fr}
   .datatune-panel{padding:32px 18px;border-radius:9px}
   .cta-card{padding:46px 18px;border-radius:9px}
-  .domain-card{flex:0 0 244px}
+  .domain-card{flex:0 0 auto;width:100%;box-sizing:border-box}
+  .domains-track{flex-direction:column;overflow-x:hidden;padding:6px 16px;width:100%;box-sizing:border-box}
   .hero{padding:120px 0 60px}
   .nav-glass{margin:8px 10px 0}
 }
@@ -824,8 +836,26 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a){
 });
 
 /* HAMBURGER */
-document.getElementById('hamburger').addEventListener('click', function(){
-  document.getElementById('navLinks').classList.toggle('open');
+var hamburger = document.getElementById('hamburger');
+var navLinks  = document.getElementById('navLinks');
+
+hamburger.addEventListener('click', function(e){
+  e.stopPropagation();
+  navLinks.classList.toggle('open');
+});
+
+/* Close when a nav link is clicked */
+navLinks.querySelectorAll('a').forEach(function(a){
+  a.addEventListener('click', function(){
+    navLinks.classList.remove('open');
+  });
+});
+
+/* Close on outside tap */
+document.addEventListener('click', function(e){
+  if(navLinks.classList.contains('open') && !navLinks.contains(e.target) && e.target !== hamburger){
+    navLinks.classList.remove('open');
+  }
 });
 
 /* MOUSE GLOW */
@@ -1361,7 +1391,7 @@ document.getElementById('greenDot').addEventListener('click',function(){
 
 /* SCROLL REVEAL */
 var observer = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){ if(e.isIntersecting) e.target.style.animationPlayState='running'; });
+  entries.forEach(function(e){ if(e.isIntersecting) e.target.style.animationPlayState='running'; });
 }, {threshold:.12});
 document.querySelectorAll('.reveal').forEach(function(el){
   el.style.animationPlayState='paused';
