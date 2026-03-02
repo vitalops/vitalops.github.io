@@ -33,6 +33,60 @@
   --blur:blur(20px) saturate(160%);
   --blur-heavy:blur(32px) saturate(180%);
   --seam:linear-gradient(90deg,transparent,rgba(255,255,255,0.55) 30%,rgba(255,255,255,0.70) 50%,rgba(255,255,255,0.55) 70%,transparent);
+
+  /* ── TESTIMONIALS ── */
+.testimonials{padding:100px 0 110px;position:relative;}
+.testimonials-header{text-align:center;margin-bottom:52px}
+.testimonials-header h2{font-family:'Libre Baskerville',serif;font-size:clamp(1.9rem,3.2vw,2.7rem);font-weight:700;letter-spacing:-.02em;}
+.testimonials-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.testi-card{
+  border-radius:8px;padding:32px 28px 24px;position:relative;overflow:hidden;
+  background:rgba(240,234,216,0.55);
+  border:1px solid var(--border);
+  border-top-color:rgba(255,255,255,0.80);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  box-shadow:0 1px 0 rgba(255,255,255,0.60) inset,var(--shadow-sm);
+  transition:all .28s;
+  display: flex;
+  flex-direction: column;
+}
+.testi-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(74,124,89,0.25);
+  box-shadow:0 1px 0 rgba(255,255,255,0.70) inset,var(--shadow-lg);
+}
+.testi-quote{
+  font-family:'Libre Baskerville',serif;
+  font-size:3.5rem;line-height:.8;
+  color:var(--accent);opacity:0.35;
+  margin-bottom:12px;
+}
+.testi-card p{
+  font-size:.90rem;color:var(--ink-2);line-height:1.80;font-weight:400;
+  font-style:italic;
+}
+.testi-footer{
+  margin-top:auto;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+  padding-top: 28px;
+}
+.testi-logo-wrap{
+  display:flex;
+  align-items:center;
+  height:36px;          /* fixed height so both slots are identical */
+  flex-shrink:0;
+}
+.testi-logo-wrap img{
+  max-height:28px;
+  width:auto;
+  object-fit:contain;
+  display:block;
+}
+
+@media(max-width:768px){
+  .testimonials-grid{grid-template-columns:1fr}
+}
 }
 
 html{scroll-behavior:smooth}
@@ -638,6 +692,18 @@ footer{
   .nav-glass{margin:8px 10px 0}
 }
 
+.testi-author{display:flex;flex-direction:column;gap:2px}
+.testi-name{font-size:.85rem;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.testi-role{font-size:.75rem;color:var(--ink-3);font-weight:400}
+.logo-stamp {
+  padding: 4px 8px;
+  background: var(--bg3);               /* slightly darker paper */
+  border: 1px solid var(--border-md);
+  border-radius: 3px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(4px);
+}
+
 </style>
 </head>
 <body>
@@ -746,6 +812,44 @@ footer{
     <div class="domain-card reveal" style="animation-delay:.21s"><span class="domain-icon">&#128722;</span><h3>E-commerce</h3><p>Customer behavior analysis, recommendation engines, and sales intelligence.</p></div>
     <div class="domain-card reveal" style="animation-delay:.28s"><span class="domain-icon">&#127891;</span><h3>Education</h3><p>Student information systems, learning analytics, and enrollment optimization.</p></div>
     <div class="domain-card reveal" style="animation-delay:.35s"><span class="domain-icon">&#128241;</span><h3>SaaS</h3><p>Cross-service data sync, usage analytics, and intelligent data pipelines.</p></div>
+  </div>
+</section>
+
+<section class="testimonials" id="testimonials">
+  <div class="container">
+    <div class="testimonials-header reveal">
+      <span class="tag">Customer Stories</span>
+      <div class="section-line section-line-center"></div>
+      <h2>Trusted by teams moving fast on data</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testi-card reveal">
+        <div class="testi-quote">&#8220;</div>
+        <p>VitalOps helped us optimise our data pipelines for the finance databases which directly translated into a smoother and more intuitive experience for our users.</p>
+        <div class="testi-footer">
+          <div class="testi-logo-wrap">
+            <img src="assets/chatfin-logo.png" alt="Chatfin.ai">
+          </div>
+          <div class="testi-author">
+            <span class="testi-name">Ashok Manthena</span>
+            <span class="testi-role">CEO, Chatfin</span>
+          </div>
+        </div>        
+      </div>
+      <div class="testi-card reveal" style="animation-delay:.10s">
+        <div class="testi-quote">&#8220;</div>
+        <p>Datatune by VitalOps has become a foundational layer in our Source-to-Pay automation stack. It helped us bring structure to messy procurement data, improve standardization across master data and events, and accelerate how quickly we can translate raw inputs into usable workflows. The team is highly responsive, pragmatic, and product-minded — and the best part is that they understand what it takes to operationalize data, not just analyze it. If you are building serious automation on top of enterprise data, Datatune is a strong core to build on.</p>
+        <div class="testi-footer">
+          <div class="testi-logo-wrap">
+            <img src="assets/straightops-logo.jpg" alt="Straightops.com">
+          </div>
+          <div class="testi-author">
+            <span class="testi-name">Ganesh Sankar</span>
+            <span class="testi-role">CEO, Straightops</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
