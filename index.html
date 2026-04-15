@@ -349,7 +349,7 @@ nav.scrolled .nav-glass{margin:6px 16px 0}
   transform:translateY(-1px);
 }
 
-.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;-webkit-tap-highlight-color:rgba(0,0,0,0);touch-action:manipulation;user-select:none;-webkit-user-select:none;text-decoration:none;-webkit-appearance:none;position:relative;z-index:200}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;-webkit-tap-highlight-color:rgba(0,0,0,0);touch-action:manipulation;user-select:none;-webkit-user-select:none;text-decoration:none;-webkit-appearance:none;appearance:none;position:relative;z-index:200}
 .hamburger span{display:block;width:20px;height:2px;background:var(--ink);border-radius:2px}
 
 /* ── HERO ── */
@@ -406,64 +406,28 @@ nav.scrolled .nav-glass{margin:6px 16px 0}
 .scroll-down svg{width:28px;height:28px;animation:arrowBob 2.4s ease-in-out infinite}
 @keyframes arrowBob{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(5px);opacity:.9}}
 
-/* ── TERMINAL ── */
-.hero-visual{position:relative;transform-style:preserve-3d;will-change:transform}
-
-/* Paper shadow under terminal */
+/* ── WORKFLOW ANIMATION ── */
+.hero-visual{position:relative;will-change:transform}
 .hero-visual::before{
-  content:'';
-  position:absolute;
+  content:'';position:absolute;
   bottom:-18px;left:12px;right:12px;height:30px;
-  background:rgba(28,26,22,0.12);
-  filter:blur(12px);
-  border-radius:50%;
-  z-index:-1;
+  background:rgba(28,26,22,0.10);
+  filter:blur(14px);border-radius:50%;z-index:-1;
 }
-
-.terminal{
-  border-radius:8px;overflow:hidden;position:relative;
-  background:#c8a878;
-  border:1px solid rgba(100,72,36,0.45);
-  border-top-color:rgba(200,175,130,0.80);
+.workflow-anim-wrap{
+  border-radius:10px;overflow:hidden;position:relative;
+  background:rgba(244,238,222,0.70);
+  border:1px solid var(--border-md);
+  border-top-color:rgba(255,255,255,0.90);
   backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
-  box-shadow:0 1px 0 rgba(210,185,145,0.55) inset,var(--shadow-lg);
-  cursor:default;
+  box-shadow:0 1px 0 rgba(255,255,255,0.75) inset,var(--shadow-lg);
+  width:100%;aspect-ratio:4/3;
 }
-.terminal::after{
+.workflow-anim-wrap::after{
   content:'';position:absolute;top:0;left:8%;right:8%;height:1px;
   background:var(--seam);z-index:4;pointer-events:none;
 }
-.terminal-scanlines{
-  position:absolute;inset:0;z-index:3;pointer-events:none;border-radius:8px;
-  background:repeating-linear-gradient(0deg,transparent,transparent 5px,rgba(0,0,0,0.04) 5px,rgba(0,0,0,0.04) 6px);
-  opacity:1;
-}
-.terminal-specular{
-  position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:8px;
-  background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,calc(var(--spec,0)*1.4)) 48%,rgba(255,255,255,calc(var(--spec,0)*0.8)) 52%,transparent 70%);
-}
-.terminal-bar{
-  display:flex;align-items:center;gap:8px;padding:11px 15px;
-  background:#b8966a;
-  border-bottom:1px solid rgba(100,72,36,0.35);
-  position:relative;z-index:1;
-  box-shadow:0 1px 0 rgba(200,175,130,0.35);
-}
-.terminal-dot{width:10px;height:10px;border-radius:50%;transition:transform .15s;cursor:pointer}
-.terminal-dot:hover{transform:scale(1.3)}
-.terminal-dot:nth-child(1){background:#d05040;box-shadow:0 0 0 1px rgba(200,60,40,0.30)}
-.terminal-dot:nth-child(2){background:#c8960a;box-shadow:0 0 0 1px rgba(180,120,0,0.30)}
-.terminal-dot:nth-child(3){background:#4a7c59;box-shadow:0 0 0 1px rgba(60,100,70,0.30)}
-.terminal-title{margin-left:10px;font-size:.70rem;color:rgba(60,38,12,0.60);font-family:'JetBrains Mono',monospace}
-.terminal-body{
-  padding:22px;font-family:'JetBrains Mono','Courier New',Courier,monospace;font-size:.78rem;
-  line-height:2.0;color:#1e1208;position:relative;z-index:1;
-  height:380px;min-height:380px;overflow:hidden;
-  background:#d4aa7a;
-}
-@-webkit-keyframes lineIn{from{opacity:0;-webkit-transform:translateX(-5px)}to{opacity:1;-webkit-transform:none}}
-@keyframes lineIn{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:none}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#workflowCanvas{display:block;width:100%;height:100%;}
 
 /* ── SECTION BAND ── */
 .section-band{
@@ -693,10 +657,11 @@ footer{
   .hero-text{order:2}
   .datatune-grid{grid-template-columns:1fr 1fr}
   .datatune-panel{padding:46px 28px}
+
   .steps{grid-template-columns:1fr;gap:38px}
   .steps::before{display:none}
   .step{max-width:340px;margin:0 auto}
-  .terminal-body{text-align:left}
+  
 }
 
 @media(max-width:680px){
@@ -787,7 +752,6 @@ footer{
       <ul class="nav-links" id="navLinks">
         <li><a href="#domains">Domains</a></li>
         <li><a href="#about">About</a></li>
-        <li><a href="#datatune">Datatune</a></li>
         <li><a href="#how">How It Works</a></li>
         <li><a href="mailto:hello@vitalops.ai">Contact</a></li>
       </ul>
@@ -800,33 +764,24 @@ footer{
 <section class="hero" id="home" style="position:relative">
   <div class="container hero-inner">
     <div class="hero-text reveal">
-      <div class="hero-tag"><span class="tag">AI-Powered Data Infrastructure</span></div>
-      <h1>Making Databases<br>
+      <div class="hero-tag"><span class="tag">Autonomous AI Agents</span></div>
+      <h1>Your team sets the bar.<br>
         <span class="hero-phrase-wrap">
-          <span class="hero-phrase ph-active">Intelligent</span>
-          <span class="hero-phrase">Autonomous</span>
-          <span class="hero-phrase">Self-Healing</span>
-          <span class="hero-phrase">Conversational</span>
-          <span class="hero-phrase">Alive</span>
+          <span class="hero-phrase ph-active">Agents meet it.</span>
+          <span class="hero-phrase">Continuously.</span>
+          <span class="hero-phrase">Without prompting.</span>
+          <span class="hero-phrase">At any scale.</span>
+          <span class="hero-phrase">Around the clock.</span>
         </span>
       </h1>
-      <p>We build AI agents that work with your data &mdash; across the domain of your choice.</p>
+      <p>VitalOps builds agent teams that run entire expert workflows to the quality standard your best people would hold. Your leads define what good looks like. Agents do the work until it gets there.</p>
       <div class="hero-btns">
         <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-fill">Schedule a Demo</a>
-        <a href="#datatune" class="btn btn-ghost">Explore Datatune &rarr;</a>
       </div>
     </div>
     <div class="hero-visual reveal" style="animation-delay:.16s">
-      <div class="terminal" id="terminal">
-        <div class="terminal-scanlines"></div>
-        <div class="terminal-specular" id="termSpecular"></div>
-        <div class="terminal-bar">
-          <div class="terminal-dot"></div>
-          <div class="terminal-dot"></div>
-          <div class="terminal-dot" id="greenDot"></div>
-          <span class="terminal-title">datatune &mdash; agent.py</span>
-        </div>
-        <div class="terminal-body" id="termBody"></div>
+      <div class="workflow-anim-wrap" id="workflowWrap">
+        <canvas id="workflowCanvas"></canvas>
       </div>
     </div>
   </div>
@@ -842,15 +797,60 @@ footer{
   <div class="container domains-header reveal">
     <span class="tag">Domains</span>
     <div class="section-line section-line-center"></div>
-    <h2>AI that speaks your industry</h2>
+    <h2>Expert workflows, running themselves</h2>
+    <p style="font-size:.96rem;color:var(--ink-2);max-width:560px;margin:14px auto 0;line-height:1.78;">Your senior people define the standard. Agents do the work, continuously, in a loop, until it's met.</p>
   </div>
   <div class="domains-track">
-    <div class="domain-card reveal"><span class="domain-icon">&#127974;</span><h3>Finance</h3><p>Fraud detection, risk analysis, and real-time transaction intelligence at scale.</p></div>
-    <div class="domain-card reveal" style="animation-delay:.07s"><span class="domain-icon">&#127973;</span><h3>Healthcare</h3><p>Patient data migration, clinical analytics, and compliant record management.</p></div>
-    <div class="domain-card reveal" style="animation-delay:.14s"><span class="domain-icon">&#127981;</span><h3>Supply Chain</h3><p>Demand forecasting, inventory optimization, and procurement automation.</p></div>
-    <div class="domain-card reveal" style="animation-delay:.21s"><span class="domain-icon">&#128722;</span><h3>E-commerce</h3><p>Customer behavior analysis, recommendation engines, and sales intelligence.</p></div>
-    <div class="domain-card reveal" style="animation-delay:.28s"><span class="domain-icon">&#127891;</span><h3>Education</h3><p>Student information systems, learning analytics, and enrollment optimization.</p></div>
-    <div class="domain-card reveal" style="animation-delay:.35s"><span class="domain-icon">&#128241;</span><h3>SaaS</h3><p>Cross-service data sync, usage analytics, and intelligent data pipelines.</p></div>
+    <div class="domain-card reveal">
+      <span class="domain-icon">⚙️</span>
+      <h3>Developer Relations</h3>
+      <p>On every release, agents generate changelogs, update affected docs, produce walkthrough videos, publish announcements, and monitor replies, all evaluated against an accuracy bar your team sets.</p>
+    </div>
+    <div class="domain-card reveal" style="animation-delay:.07s">
+      <span class="domain-icon">🔬</span>
+      <h3>ML Research</h3>
+      <p>Agents collect training data, run experiments, score results against your benchmark, identify failure modes, adjust the approach, and surface a progress report, in a continuous loop until a blocker requires you.</p>
+    </div>
+    <div class="domain-card reveal" style="animation-delay:.10s">
+      <span class="domain-icon">🧬</span>
+      <h3>Clinical Research</h3>
+      <p>Agents scan literature, draft and revise trial protocols against FDA and EMA checklists, monitor incoming data for safety signals, and trigger amendments, flagging only decisions that require a clinician.</p>
+    </div>
+    <div class="domain-card reveal" style="animation-delay:.14s">
+      <span class="domain-icon">📈</span>
+      <h3>Investment Research</h3>
+      <p>Agents update financial models when new information arrives, rewrite investment theses when assumptions break, and stress-test positions, every output held to the standard of an investment committee presentation.</p>
+    </div>
+    <div class="domain-card reveal" style="animation-delay:.17s">
+      <span class="domain-icon">📰</span>
+      <h3>Editorial & Journalism</h3>
+      <p>Agents monitor every beat around the clock, research and verify every claim against primary sources, and produce drafts evaluated against editorial standards, so editors see polished copy, not first drafts.</p>
+    </div>
+    <div class="domain-card reveal" style="animation-delay:.21s">
+      <span class="domain-icon">📋</span>
+      <h3>Underwriting</h3>
+      <p>Agents assess risk, price submissions, generate policy terms, and validate against appetite guidelines, producing a bindable quote without touching an underwriter's desk unless the risk falls outside defined parameters.</p>
+    </div>
+    <div class="domain-card reveal" style="animation-delay:.24s">
+      <span class="domain-icon">🏪</span>
+      <h3>Supply Chain Planning</h3>
+      <p>Agents forecast demand at SKU level, model inventory positions, generate and optimize replenishment orders, and re-plan automatically when actuals deviate, balancing service levels against inventory cost continuously.</p>
+    </div>
+    <div class="domain-card reveal" style="animation-delay:.28s">
+      <span class="domain-icon">🏛️</span>
+      <h3>Architectural Design</h3>
+      <p>Agents generate design options from a brief, evaluate each against building codes and structural constraints, and iterate toward the client's budget, producing client-ready walkthroughs without a visualization team.</p>
+    </div>
+    <div class="domain-card reveal" style="animation-delay:.31s">
+      <span class="domain-icon">🤝</span>
+      <h3>Customer Success</h3>
+      <p>Agents monitor every account for health signals, run onboarding sequences, generate QBRs, and handle routine questions, to the standard of your best CSM, without your team doing the monitoring.</p>
+    </div>
+    <div class="domain-card reveal" style="animation-delay:.35s">
+      <span class="domain-icon">🎓</span>
+      <h3>Learning & Development</h3>
+      <p>Agents keep every course current, detecting when products or regulations change, rewriting affected modules and assessments, and building role-specific onboarding plans within hours of a new hire being confirmed.</p>
+    </div>
   </div>
 </section>
 
@@ -892,7 +892,7 @@ footer{
   </div>
 </section>
 
-<!-- Insert this new section right after the .testimonials section (or wherever you prefer in the flow, e.g. before .datatune) -->
+<!-- About section -->
 <section class="about section-band" id="about">
   <div class="container">
     <div class="about-header reveal">
@@ -954,54 +954,163 @@ footer{
   </div>
 </section>
 
-<section class="datatune" id="datatune">
-  <div class="container">
-    <div class="datatune-panel">
-      <div class="datatune-panel-inner">
-        <div class="datatune-hero reveal">
-          <span class="tag">&#11088; Open Source</span>
-          <div class="section-line section-line-center"></div>
-          <h2>Meet <em>Datatune</em></h2>
-          <p>Agentic data transformation on infinite amounts of data. Connect any database, ask in natural language, and let AI agents handle the rest.</p>
-          <div class="datatune-btns">
-            <a href="https://datatune.ai/" target="_blank" rel="noopener noreferrer" class="btn btn-fill">Explore Datatune</a>
-            <a href="https://github.com/vitalops/datatune" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">&#11088; Star on GitHub</a>
-          </div>
-        </div>
-        <div class="datatune-grid">
-          <div class="dt-card reveal"><div class="dt-card-icon">&#129302;</div><h4>Agentic Workflows</h4><p>Autonomous AI agents that plan, execute, and iterate on complex data tasks.</p></div>
-          <div class="dt-card reveal" style="animation-delay:.07s"><div class="dt-card-icon">&#128172;</div><h4>Natural Language</h4><p>Query and transform data using plain English &mdash; no SQL required.</p></div>
-          <div class="dt-card reveal" style="animation-delay:.14s"><div class="dt-card-icon">&#9854;&#65039;</div><h4>Infinite Scale</h4><p>Process millions of rows with intelligent batching and context management.</p></div>
-          <div class="dt-card reveal" style="animation-delay:.21s"><div class="dt-card-icon">&#128299;</div><h4>Any Database</h4><p>Postgres, MySQL, MongoDB, BigQuery, Snowflake &mdash; connect anything.</p></div>
-          <div class="dt-card reveal" style="animation-delay:.28s"><div class="dt-card-icon">&#129504;</div><h4>Context-Aware</h4><p>Understands schema, relationships, and business logic for smarter operations.</p></div>
-          <div class="dt-card reveal" style="animation-delay:.35s"><div class="dt-card-icon">&#127760;</div><h4>Open Source</h4><p>Fully open, extensible, and community-driven. Build what you need.</p></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <section class="how" id="how">
   <div class="container">
     <div class="how-header reveal">
       <span class="tag">How it works</span>
       <div class="section-line section-line-center"></div>
-      <h2>From connection to insight in minutes</h2>
+      <h2>Simple to start. Built to last.</h2>
     </div>
-    <div class="steps">
-      <div class="step reveal"><div class="step-num">01</div><h4>Connect</h4><p>Point Datatune to your database. Any size, any type. We handle the rest.</p></div>
-      <div class="step reveal" style="animation-delay:.12s"><div class="step-num">02</div><h4>Ask</h4><p>Describe what you need in plain language. Our agents understand context and intent.</p></div>
-      <div class="step reveal" style="animation-delay:.24s"><div class="step-num">03</div><h4>Transform</h4><p>AI agents analyze, transform, and deliver results &mdash; with full traceability.</p></div>
+
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:52px;flex-wrap:wrap;" id="howTabs">
+      <button class="how-tab how-tab-active" data-tab="map" onclick="switchTab('map')">01 Tell us how you work</button>
+      <button class="how-tab" data-tab="build" onclick="switchTab('build')">02 We build your agents</button>
+      <button class="how-tab" data-tab="deploy" onclick="switchTab('deploy')">03 They go to work</button>
+      <button class="how-tab" data-tab="control" onclick="switchTab('control')">04 You stay in control</button>
     </div>
+
+    <div id="tab-map" class="how-tab-panel reveal">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;max-width:860px;margin:0 auto;">
+        <div>
+          <div class="step-num" style="margin:0 0 20px;">01</div>
+          <h4 style="font-family:'Libre Baskerville',serif;font-size:1.45rem;margin-bottom:14px;letter-spacing:-.02em;">Tell us how your department runs</h4>
+          <p style="font-size:.92rem;color:var(--ink-2);line-height:1.82;margin-bottom:16px;">No forms to fill. No software to learn. We sit with your team and learn exactly how work moves through your department, the normal cases, the exceptions, and the things that always seem to fall through the cracks.</p>
+          <p style="font-size:.82rem;color:var(--ink-3);line-height:1.72;">At the end of this, you have a clear picture of what's automatable and what genuinely needs a human. Your team helps define both.</p>
+        </div>
+        <div style="padding:32px 28px;background:rgba(74,124,89,0.05);border:1px solid rgba(74,124,89,0.14);border-radius:8px;">
+          <p style="font-family:'Libre Baskerville',serif;font-size:1.05rem;font-style:italic;color:var(--ink-2);line-height:1.75;margin-bottom:18px;">"We just talked through what our team does every day. VitalOps turned that into something that actually runs."</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;"><span style="color:var(--accent);font-size:.80rem;">✓</span><span style="font-size:.82rem;color:var(--ink-2);">Your team's knowledge stays with you</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><span style="color:var(--accent);font-size:.80rem;">✓</span><span style="font-size:.82rem;color:var(--ink-2);">Every edge case is accounted for</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><span style="color:var(--accent);font-size:.80rem;">✓</span><span style="font-size:.82rem;color:var(--ink-2);">You decide what agents are allowed to do</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-build" class="how-tab-panel reveal" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;max-width:860px;margin:0 auto;">
+        <div>
+          <div class="step-num" style="margin:0 0 20px;">02</div>
+          <h4 style="font-family:'Libre Baskerville',serif;font-size:1.45rem;margin-bottom:14px;letter-spacing:-.02em;">We build agents that know your work</h4>
+          <p style="font-size:.92rem;color:var(--ink-2);line-height:1.82;margin-bottom:16px;">We build a team of agents, each one responsible for a specific slice of your workflow. They connect to the tools you already use. They learn the standards your team follows. And before they touch anything real, they're tested against actual scenarios from your department.</p>
+          <p style="font-size:.82rem;color:var(--ink-3);line-height:1.72;">You see exactly how each agent behaves, and sign off before anything goes live.</p>
+        </div>
+        <div style="padding:32px 28px;background:rgba(74,124,89,0.05);border:1px solid rgba(74,124,89,0.14);border-radius:8px;">
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="padding:14px 16px;background:rgba(240,234,216,0.70);border-radius:6px;border:1px solid var(--border);">
+              <div style="font-size:.80rem;font-weight:500;color:var(--ink);margin-bottom:4px;">Works with what you already have</div>
+              <div style="font-size:.78rem;color:var(--ink-3);">Connects to your existing tools, systems, and data, nothing needs to be rebuilt or replaced.</div>
+            </div>
+            <div style="padding:14px 16px;background:rgba(240,234,216,0.70);border-radius:6px;border:1px solid var(--border);">
+              <div style="font-size:.80rem;font-weight:500;color:var(--ink);margin-bottom:4px;">Tested before it matters</div>
+              <div style="font-size:.78rem;color:var(--ink-3);">Every agent runs through realistic scenarios from your workflow, with no risk to your live operations.</div>
+            </div>
+            <div style="padding:14px 16px;background:rgba(240,234,216,0.70);border-radius:6px;border:1px solid var(--border);">
+              <div style="font-size:.80rem;font-weight:500;color:var(--ink);margin-bottom:4px;">You approve before go-live</div>
+              <div style="font-size:.78rem;color:var(--ink-3);">Nothing is deployed until you've seen it work and said yes.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-deploy" class="how-tab-panel reveal" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;max-width:860px;margin:0 auto;">
+        <div>
+          <div class="step-num" style="margin:0 0 20px;">03</div>
+          <h4 style="font-family:'Libre Baskerville',serif;font-size:1.45rem;margin-bottom:14px;letter-spacing:-.02em;">Agents start working. Your team stops chasing.</h4>
+          <p style="font-size:.92rem;color:var(--ink-2);line-height:1.82;margin-bottom:16px;">Agents run in the background, picking up tasks, handing off to each other, flagging anything that needs a person. Your team gets the outcomes without doing the work to get there.</p>
+          <p style="font-size:.82rem;color:var(--ink-3);line-height:1.72;">Everything runs in a secure environment that you control. Your data doesn't move anywhere it isn't supposed to. If your industry requires it, agents can run entirely inside your own systems.</p>
+        </div>
+        <div style="padding:32px 28px;background:rgba(74,124,89,0.05);border:1px solid rgba(74,124,89,0.14);border-radius:8px;">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="color:var(--accent);font-size:1rem;margin-top:1px;">→</span>
+              <p style="font-size:.84rem;color:var(--ink-2);line-height:1.70;">Multiple agents work in parallel, they don't wait for each other unless they have to.</p>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="color:var(--accent);font-size:1rem;margin-top:1px;">→</span>
+              <p style="font-size:.84rem;color:var(--ink-2);line-height:1.70;">When something is uncertain, they stop and ask, they don't guess.</p>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="color:var(--accent);font-size:1rem;margin-top:1px;">→</span>
+              <p style="font-size:.84rem;color:var(--ink-2);line-height:1.70;">Runs in your cloud, your data center, or ours, whichever your team requires.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-control" class="how-tab-panel reveal" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;max-width:860px;margin:0 auto;">
+        <div>
+          <div class="step-num" style="margin:0 0 20px;">04</div>
+          <h4 style="font-family:'Libre Baskerville',serif;font-size:1.45rem;margin-bottom:14px;letter-spacing:-.02em;">You always know what's happening</h4>
+          <p style="font-size:.92rem;color:var(--ink-2);line-height:1.82;margin-bottom:16px;">Every action an agent takes is recorded, not as a summary, but in full detail. You can look back at any point and see exactly what happened, what decision was made, and why. This isn't a nice-to-have, it's what makes the whole thing trustworthy.</p>
+          <p style="font-size:.82rem;color:var(--ink-3);line-height:1.72;">You also control exactly who on your team can see or change anything. Access is set by role, not by default, and you can update it at any time.</p>
+        </div>
+        <div style="padding:32px 28px;background:rgba(74,124,89,0.05);border:1px solid rgba(74,124,89,0.14);border-radius:8px;">
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="padding:14px 16px;background:rgba(240,234,216,0.70);border-radius:6px;border:1px solid var(--border);">
+              <div style="font-size:.80rem;font-weight:500;color:var(--ink);margin-bottom:4px;">Full history, always</div>
+              <div style="font-size:.78rem;color:var(--ink-3);">Nothing is ever deleted or changed after the fact. If you need to explain what happened, for a client, an audit, or your own team, it's all there.</div>
+            </div>
+            <div style="padding:14px 16px;background:rgba(240,234,216,0.70);border-radius:6px;border:1px solid var(--border);">
+              <div style="font-size:.80rem;font-weight:500;color:var(--ink);margin-bottom:4px;">Set limits on what agents can spend</div>
+              <div style="font-size:.78rem;color:var(--ink-3);">You decide how much any agent or workflow is allowed to run before it pauses and checks with you first.</div>
+            </div>
+            <div style="padding:14px 16px;background:rgba(240,234,216,0.70);border-radius:6px;border:1px solid var(--border);">
+              <div style="font-size:.80rem;font-weight:500;color:var(--ink);margin-bottom:4px;">Roll back if needed</div>
+              <div style="font-size:.78rem;color:var(--ink-3);">Every version of every agent is saved. If something changes and you want to go back, you can, without losing any history.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
+
+<style>
+.how-tab{
+  font-family:'DM Sans',sans-serif;font-size:.80rem;font-weight:500;
+  padding:9px 20px;border-radius:5px;cursor:pointer;
+  background:rgba(240,234,216,0.65);color:var(--ink-2);
+  border:1px solid var(--border-md);
+  border-top-color:rgba(255,255,255,0.80);
+  box-shadow:0 1px 0 rgba(255,255,255,0.55) inset,var(--shadow-sm);
+  transition:all .18s ease;
+}
+.how-tab:hover{background:rgba(255,252,244,0.80);color:var(--accent);border-color:var(--border-hi);}
+.how-tab-active{
+  background:var(--accent);color:#fff;
+  border-color:rgba(61,104,73,0.80);
+  border-top-color:rgba(122,170,138,0.60);
+  box-shadow:0 1px 0 rgba(255,255,255,0.25) inset,0 2px 8px rgba(74,124,89,0.28);
+}
+.how-tab-active:hover{background:var(--accent-2);color:#fff;}
+@media(max-width:680px){
+  .how-tab{font-size:.74rem;padding:8px 14px;}
+  #tab-map > div, #tab-build > div, #tab-deploy > div, #tab-control > div{grid-template-columns:1fr!important;}
+}
+</style>
+<script>
+function switchTab(tab){
+  document.querySelectorAll('.how-tab-panel').forEach(function(p){p.style.display='none';});
+  document.querySelectorAll('.how-tab').forEach(function(b){b.classList.remove('how-tab-active');});
+  document.getElementById('tab-'+tab).style.display='block';
+  document.querySelector('[data-tab="'+tab+'"]').classList.add('how-tab-active');
+}
+</script>
 
 <section class="cta" id="contact">
   <div class="container reveal">
     <div class="cta-card">
       <div class="cta-blob"></div>
-      <h2>Ready to make your data <em>work smarter</em>?</h2>
-      <p>See how VitalOps can transform your data infrastructure in a 30-minute demo.</p>
+      <h2>Ready to make your operations <em>run themselves</em>?</h2>
+      <p>See how VitalOps can deploy autonomous agents across your department in a 30-minute demo.</p>
       <div class="cta-btns">
         <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-fill">Schedule a Demo</a>
         <a href="mailto:hello@vitalops.ai" class="btn btn-ghost">Talk to Us</a>
@@ -1014,20 +1123,12 @@ footer{
   <div class="container footer-inner">
     <a href="#" class="logo" id="footerLogo"><div class="logo-mark" id="footerLogoMark"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><use href="#vitalops-logo"/></svg></div><span class="logo-name">VitalOps</span></a>
     <div class="footer-links">
-      <a href="https://datatune.ai/" target="_blank" rel="noopener noreferrer" class="footer-icon-link" aria-label="Datatune">
-        <span style="font-size:14px;line-height:1;filter:grayscale(1);opacity:0.7">🎵</span>
-        <span>Datatune</span>
-      </a>
-      <a href="https://github.com/vitalops/datatune" target="_blank" rel="noopener noreferrer" class="footer-icon-link" aria-label="GitHub">
-        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
-        <span>GitHub</span>
-      </a>
-      <a href="https://x.com/vitalopsai" target="_blank" rel="noopener noreferrer" class="footer-icon-link" aria-label="X / Twitter">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <a href="https://x.com/vitalopsai" target="_blank" rel="noopener noreferrer" class="footer-icon-link" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.843L1.254 2.25H8.08l4.258 5.63 5.906-5.63Zm-1.161 17.52h1.833L7.084 4.126H5.117Z"/></svg>
         <span>Twitter</span>
       </a>
       <a href="mailto:hello@vitalops.ai" class="footer-icon-link" aria-label="Contact">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
         <span>Contact</span>
       </a>
     </div>
@@ -1184,73 +1285,323 @@ function nextPhrase(){
 }
 setInterval(nextPhrase, 2800);
 
-/* TERMINAL TILT */
-var terminal   = document.getElementById('terminal');
-var specular   = document.getElementById('termSpecular');
-var heroVisual = document.querySelector('.hero-visual');
-var tRaf=null, tRX=0, tRY=0, cRX=0, cRY=0, hovering=false;
-function lp(a,b,t){return a+(b-a)*t;}
-function tiltLoop(){
-  tRaf=null;
-  cRX=lp(cRX,tRX,.20); cRY=lp(cRY,tRY,.20);
-  heroVisual.style.transform='perspective(600px) rotateX('+cRX+'deg) rotateY('+cRY+'deg) translate('+(cRY*1.6)+'px,'+(-cRX*1.0)+'px) scale(1.03)';
-  terminal.style.boxShadow='0 1px 0 rgba(255,255,255,0.70) inset,'+(-cRY*1.2)+'px '+(12+Math.abs(cRX))+'px 40px rgba(28,26,22,0.18)';
-  specular.style.setProperty('--spec', Math.max(0,(cRY/30)*.18+.01).toFixed(3));
-  if(Math.abs(cRX-tRX)>.05||Math.abs(cRY-tRY)>.05){ tRaf=requestAnimationFrame(tiltLoop); }
-  else{
-    cRX=tRX; cRY=tRY;
-    if(!hovering){ heroVisual.style.transform=''; terminal.style.boxShadow=''; specular.style.setProperty('--spec','0'); }
-  }
-}
-function kickTilt(){if(!tRaf) tRaf=requestAnimationFrame(tiltLoop);}
-terminal.addEventListener('mousemove',function(e){
-  var r=terminal.getBoundingClientRect();
-  tRY=-(((e.clientX-r.left)/r.width)-.5)*28;
-  tRX=(((e.clientY-r.top)/r.height)-.5)*16;
-  hovering=true; kickTilt();
-});
-terminal.addEventListener('mouseleave',function(){ tRX=0;tRY=0;hovering=false;kickTilt(); });
+})();
 
-/* TYPEWRITER - paper-toned colours */
-var termBody = document.getElementById('termBody');
-var TL = [
-  {h:'<span style="color:rgba(30,18,6,0.40)"># connect to any database</span>'},
-  {h:'<span style="color:#5c3a10">from</span> <span style="color:#1e1208">datatune</span> <span style="color:#5c3a10">import</span> <span style="color:#2d5e2a">Agent</span>'},
-  {h:''},
-  {h:'<span style="color:#1e1208">agent = </span><span style="color:#2d5e2a">Agent</span><span style="color:#1e1208">(db=</span><span style="color:#7a4a10">"postgres://..."</span><span style="color:#1e1208">)</span>'},
-  {h:''},
-  {h:'<span style="color:rgba(30,18,6,0.40)"># ask in plain English</span>'},
-  {h:'<span style="color:#1e1208">agent.</span><span style="color:#5c3a10">run</span><span style="color:#1e1208">(</span><span style="color:#7a4a10">"Find all high-risk</span>'},
-  {h:'<span style="color:#7a4a10">&nbsp;&nbsp;transactions from last quarter</span>'},
-  {h:'<span style="color:#7a4a10">&nbsp;&nbsp;and flag anomalies"</span><span style="color:#1e1208">)</span>'},
-  {h:''},
-  {h:'<span style="color:rgba(30,18,6,0.50)">running&hellip;</span>',p:900},
-  {h:'<span style="color:#2d5e2a">&rarr; 12,847 rows analyzed</span>'},
-  {h:'<span style="color:#2d5e2a">&rarr; 23 anomalies flagged &#10003;</span>',c:true}
-];
-var tli=0, ttim=null;
-function addLine(l){
-  var d=document.createElement('div');
-  d.innerHTML = l.h==='' ? '&nbsp;' : l.h+(l.c?'&nbsp;<span style="display:inline-block;width:7px;height:13px;background:#2d5e2a;vertical-align:middle;animation:blink 1.1s step-end infinite;opacity:.8"></span>':'');
-  termBody.appendChild(d);
-  /* force reflow then set animation — fixes iOS Safari */
-  void d.offsetHeight;
-  d.style.webkitAnimation = 'lineIn .18s ease both';
-  d.style.animation = 'lineIn .18s ease both';
-}
-function runTyper(){
-  if(tli>=TL.length){
-    ttim=setTimeout(function(){ termBody.innerHTML=''; tli=0; ttim=setTimeout(runTyper,300); },3200);
-    return;
-  }
-  var l=TL[tli++]; addLine(l);
-  ttim=setTimeout(runTyper, l.p||(l.h===''?80:155));
-}
-setTimeout(runTyper,900);
+/* ── WORKFLOW CANVAS ANIMATION ── */
+(function(){
+  var canvas = document.getElementById('workflowCanvas');
+  var wrap   = document.getElementById('workflowWrap');
+  if(!canvas || !wrap) return;
+  var ctx = canvas.getContext('2d');
+  var W, H, DPR = window.devicePixelRatio || 1;
 
-document.getElementById('greenDot').addEventListener('click',function(){
-  clearTimeout(ttim); termBody.innerHTML=''; tli=0; setTimeout(runTyper,120);
-});
+  function resize(){
+    var r = wrap.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width  = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', function(){ resize(); buildLayout(); }, {passive:true});
+
+  var C = {
+    ink:'rgba(28,26,22,0.82)', inkMid:'rgba(28,26,22,0.48)',
+    inkFaint:'rgba(28,26,22,0.13)', accent:'#4a7c59',
+    accentA:'rgba(74,124,89,', amber:'#b8860a', amberA:'rgba(184,134,10,',
+    paper2:'rgba(232,224,202,0.80)',
+  };
+
+  /* Each agent has a list of tools it uses during execution.
+     These surface as small fading pill labels beside the node while it works. */
+  var lead={}, agents=[], evaluator={};
+
+  var agentDefs = [
+    { label:'Research',  sub:'gathers & synthesises',
+      tools:['PubMed', 'Web Search', 'Internal Docs'] },
+    { label:'Execute',   sub:'does the core work',
+      tools:['CRM', 'Database', 'Video AI'] },
+    { label:'Publish',   sub:'delivers the output',
+      tools:['Slack', 'Email', 'CMS'] },
+  ];
+
+  function buildLayout(){
+    var px = W * 0.06, py = H * 0.08;
+    var lw = Math.min(W * 0.40, 152), lh = 44;
+    lead = { label:'Your Lead', sub:'sets the quality bar',
+             x:W/2-lw/2, y:py, w:lw, h:lh, isLead:true };
+
+    var aw = Math.min(W * 0.27, 108), ah = 42;
+    var agGap = (W - px*2 - aw*3) / 2;
+    var agY = py + lh + H * 0.21;
+    agents = agentDefs.map(function(d,i){
+      return { label:d.label, sub:d.sub, tools:d.tools,
+               x:px+i*(aw+agGap), y:agY, w:aw, h:ah,
+               state:'idle', progress:0, pulse:0,
+               toolAlphas:d.tools.map(function(){ return 0; }),
+               toolCycle:0, toolTimer:0 };
+    });
+
+    var ew = Math.min(W * 0.38, 148), eh = 42;
+    evaluator = { label:'Evaluator', sub:'checks against the bar',
+                  x:W/2-ew/2, y:agY+ah+H*0.21,
+                  w:ew, h:eh, state:'idle', progress:0, pulse:0, pass:false };
+  }
+  buildLayout();
+
+  var particles=[];
+  function pSpawn(fx,fy,tx,ty,col){
+    particles.push({fx:fx,fy:fy,tx:tx,ty:ty,x:fx,y:fy,p:0,
+      speed:0.014+Math.random()*0.008, color:col, r:1.9});
+  }
+
+  var clock=0, phase=0, phaseT=0;
+
+  function resetCycle(){
+    phase=0; phaseT=0;
+    agents.forEach(function(a){
+      a.state='idle'; a.progress=0; a.pulse=0;
+      a.toolAlphas=a.tools.map(function(){ return 0; });
+      a.toolCycle=0; a.toolTimer=0;
+    });
+    evaluator.state='idle'; evaluator.progress=0; evaluator.pulse=0; evaluator.pass=false;
+    particles=[];
+  }
+
+  /* ── Drawing helpers ── */
+  function rr(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.closePath();
+  }
+  function ncx(n){ return n.x+n.w/2; }
+  function ncy(n){ return n.y+n.h/2; }
+  function nbot(n){ return n.y+n.h; }
+  function ntop(n){ return n.y; }
+
+  function drawNode(n){
+    var isDone=n.state==='done', isWork=n.state==='working', isIdle=n.state==='idle';
+    var isPass=n.pass===true, isFail=n.pass===false&&n.state==='done';
+
+    if(isWork&&n.pulse>0){
+      ctx.save();
+      ctx.beginPath(); ctx.arc(ncx(n),ncy(n),(n.w/2+3)+n.pulse*13,0,Math.PI*2);
+      ctx.strokeStyle=C.accentA+(0.12*(1-n.pulse))+')'; ctx.lineWidth=1.2; ctx.stroke();
+      ctx.restore();
+    }
+
+    rr(n.x,n.y,n.w,n.h,5);
+    if(n.isLead)       { ctx.fillStyle='rgba(74,124,89,0.11)'; ctx.fill(); ctx.strokeStyle=C.accentA+'0.38)'; }
+    else if(isPass)    { ctx.fillStyle='rgba(74,124,89,0.09)'; ctx.fill(); ctx.strokeStyle=C.accentA+'0.32)'; }
+    else if(isFail)    { ctx.fillStyle='rgba(184,134,10,0.07)'; ctx.fill(); ctx.strokeStyle=C.amberA+'0.30)'; }
+    else if(isWork)    { ctx.fillStyle='rgba(74,124,89,0.06)'; ctx.fill(); ctx.strokeStyle=C.accentA+'0.24)'; }
+    else               { ctx.fillStyle=C.paper2; ctx.fill(); ctx.strokeStyle=C.inkFaint; }
+    ctx.lineWidth=n.isLead||isPass||isFail?1.2:0.8; ctx.stroke();
+
+    ctx.save(); ctx.textAlign='center';
+    ctx.font='500 '+(n.isLead?9.5:8.5)+'px "DM Sans",sans-serif';
+    ctx.fillStyle=isIdle&&!n.isLead?C.inkMid:C.ink;
+    ctx.fillText(n.label, ncx(n), ncy(n)-(n.sub?3.5:0));
+    if(n.sub){
+      ctx.font='400 7px "DM Sans",sans-serif';
+      ctx.fillStyle=isPass?C.accent:isFail?C.amber:C.inkMid;
+      ctx.fillText(n.sub, ncx(n), ncy(n)+8);
+    }
+    if(isPass){ ctx.font='9px sans-serif'; ctx.fillStyle=C.accent; ctx.fillText('\u2713',n.x+n.w-11,n.y+10); }
+    if(isFail){ ctx.font='9px sans-serif'; ctx.fillStyle=C.amber;  ctx.fillText('\u21ba',n.x+n.w-11,n.y+10); }
+    ctx.textAlign='left'; ctx.restore();
+
+    if(isWork&&n.progress>0){
+      var bx=n.x+5,by=n.y+n.h-5,bw=n.w-10;
+      rr(bx,by,bw,3,1.5); ctx.fillStyle=C.inkFaint; ctx.fill();
+      rr(bx,by,bw*n.progress,3,1.5); ctx.fillStyle=C.accent; ctx.fill();
+    }
+  }
+
+  /* Tool pills: drawn above or to the side of an agent while it works.
+     They cycle through the tool list, one fading in/out at a time. */
+  function drawToolPills(a, dt){
+    if(a.state!=='working') return;
+
+    a.toolTimer+=dt;
+    /* Switch active tool every ~1.6s */
+    if(a.toolTimer>1.6){
+      a.toolTimer=0;
+      a.toolCycle=(a.toolCycle+1)%a.tools.length;
+    }
+
+    a.tools.forEach(function(name, i){
+      var target = (i===a.toolCycle) ? 1 : 0;
+      a.toolAlphas[i]+=(target-a.toolAlphas[i])*0.12;
+      var alpha=a.toolAlphas[i];
+      if(alpha<0.02) return;
+
+      /* measure text */
+      ctx.font='500 7px "DM Sans",sans-serif';
+      var tw=ctx.measureText(name).width;
+      var ph=16, pw=tw+12;
+      /* position above the node, offset per tool slot so they stack cleanly */
+      var px2=ncx(a)-pw/2, py2=a.y-ph-6-(i*0);
+
+      /* pill background */
+      ctx.save();
+      ctx.globalAlpha=alpha*0.92;
+      rr(px2,py2,pw,ph,8);
+      ctx.fillStyle='rgba(60,80,130,0.10)';
+      ctx.fill();
+      ctx.strokeStyle='rgba(60,80,130,0.30)';
+      ctx.lineWidth=0.8; ctx.stroke();
+
+      /* pill text */
+      ctx.font='500 7px "DM Sans",sans-serif';
+      ctx.fillStyle='rgba(40,60,110,0.85)';
+      ctx.textAlign='center';
+      ctx.fillText(name, px2+pw/2, py2+ph/2+2.5);
+      ctx.textAlign='left';
+
+      /* small connector dot from pill to node top */
+      ctx.strokeStyle='rgba(60,80,130,0.20)';
+      ctx.lineWidth=0.7;
+      ctx.setLineDash([2,2]);
+      ctx.beginPath();
+      ctx.moveTo(px2+pw/2, py2+ph);
+      ctx.lineTo(ncx(a), ntop(a));
+      ctx.stroke(); ctx.setLineDash([]);
+
+      ctx.restore();
+    });
+  }
+
+  function drawEdge(x1,y1,x2,y2,active,done){
+    ctx.save();
+    ctx.strokeStyle=done?C.accentA+'0.36)':active?C.accentA+'0.20)':C.inkFaint;
+    ctx.lineWidth=done?1.1:active?0.9:0.6;
+    ctx.setLineDash(done||active?[]:[3,3]);
+    ctx.beginPath();
+    var mY=(y1+y2)/2;
+    ctx.moveTo(x1,y1); ctx.bezierCurveTo(x1,mY,x2,mY,x2,y2);
+    ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+  }
+
+  function drawReturnArrow(fromN,toN){
+    var x1=fromN.x, y1=ncy(fromN), x2=toN.x, y2=ncy(toN);
+    ctx.save();
+    ctx.strokeStyle=C.amberA+'0.46)'; ctx.lineWidth=1.0;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(x1,y1);
+    ctx.bezierCurveTo(x1-26,y1,x2-26,y2,x2,y2);
+    ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x2,y2); ctx.lineTo(x2+5,y2-3); ctx.moveTo(x2,y2); ctx.lineTo(x2+5,y2+3);
+    ctx.stroke(); ctx.restore();
+  }
+
+  /* ── Main loop ── */
+  var lastT=null;
+  function frame(ts){
+    if(!lastT) lastT=ts;
+    var dt=Math.min((ts-lastT)/1000,0.05); lastT=ts; clock+=dt; phaseT+=dt;
+
+    if(phase===0){
+      var idx=Math.min(Math.floor(phaseT/1.0),2);
+      agents.forEach(function(a,i){
+        if(i<=idx&&a.state==='idle'){
+          a.state='working';
+          pSpawn(ncx(lead),nbot(lead),ncx(a),ntop(a),C.accent);
+        }
+        if(a.state==='working'){
+          a.progress=Math.min(a.progress+dt*0.25,1);
+          a.pulse=(a.pulse+dt*2.4)%1;
+        }
+        if(a.progress>=1&&a.state==='working') a.state='done';
+      });
+      if(agents.every(function(a){return a.state==='done';})&&phaseT>3.5){
+        phase=1; phaseT=0;
+        evaluator.state='working';
+        agents.forEach(function(a){ pSpawn(ncx(a),nbot(a),ncx(evaluator),ntop(evaluator),C.accent); });
+      }
+    }
+
+    if(phase===1&&evaluator.state==='working'){
+      evaluator.progress=Math.min(evaluator.progress+dt*0.20,1);
+      evaluator.pulse=(evaluator.pulse+dt*2.0)%1;
+      if(evaluator.progress>=1){
+        evaluator.state='done';
+        evaluator.pass=(clock>9);
+        if(evaluator.pass){ phase=3; phaseT=0; pSpawn(ncx(evaluator),ntop(evaluator),ncx(lead),nbot(lead),C.accent); }
+        else { phase=2; phaseT=0; }
+      }
+    }
+
+    if(phase===2&&phaseT>0.9){
+      agents.forEach(function(a){
+        a.state='idle'; a.progress=0; a.pulse=0;
+        a.toolAlphas=a.tools.map(function(){ return 0; });
+        a.toolCycle=0; a.toolTimer=0;
+      });
+      evaluator.state='idle'; evaluator.progress=0; evaluator.pulse=0; evaluator.pass=false;
+      phase=0; phaseT=0;
+      agents.forEach(function(a){ pSpawn(ncx(evaluator),ntop(evaluator),ncx(a),nbot(a),C.amber); });
+    }
+
+    if(phase===3&&phaseT>2.8){ resetCycle(); clock=0; }
+
+    ctx.clearRect(0,0,W,H);
+
+    /* Edges */
+    agents.forEach(function(a){
+      drawEdge(ncx(lead),nbot(lead),ncx(a),ntop(a),
+               a.state==='working'||a.state==='done', a.state==='done');
+    });
+    agents.forEach(function(a){
+      drawEdge(ncx(a),nbot(a),ncx(evaluator),ntop(evaluator),
+               false, a.state==='done'&&evaluator.state!=='idle');
+    });
+    if(phase===2||(evaluator.pass===false&&evaluator.state==='done')){
+      drawReturnArrow(evaluator,agents[0]);
+    }
+    if(evaluator.pass===true){
+      drawEdge(ncx(evaluator),ntop(evaluator),ncx(lead),nbot(lead),false,true);
+    }
+
+    /* Tool pills (drawn before nodes so nodes sit on top) */
+    agents.forEach(function(a){ drawToolPills(a, dt); });
+
+    /* Nodes */
+    drawNode(lead);
+    agents.forEach(drawNode);
+    drawNode(evaluator);
+
+    /* Particles */
+    particles=particles.filter(function(p){
+      p.p=Math.min(p.p+p.speed,1);
+      var t=p.p, e=t<0.5?2*t*t:-1+(4-2*t)*t;
+      p.x=p.fx+(p.tx-p.fx)*e; p.y=p.fy+(p.ty-p.fy)*e-Math.sin(t*Math.PI)*10;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(1-t*0.3),0,Math.PI*2);
+      ctx.fillStyle=p.color; ctx.fill();
+      return p.p<1;
+    });
+
+    ctx.font='400 7.5px "DM Sans",sans-serif';
+    ctx.fillStyle=C.inkMid; ctx.textAlign='center';
+    ctx.fillText('agents loop until the work meets the bar', W/2, H-7);
+    ctx.textAlign='left';
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+
+
+
+/* ---- MEANINGFUL SKETCH CANVAS ---- */
+
 
 
 /* ---- MEANINGFUL SKETCH CANVAS ---- */
@@ -1352,7 +1703,7 @@ document.getElementById('greenDot').addEventListener('click',function(){
   }
 
   /* ─────────────────────────────────────────────
-     SKETCH LIBRARY — each returns a draw function
+     SKETCH LIBRARY, each returns a draw function
      ───────────────────────────────────────────── */
 
   var sketches = [
@@ -1683,14 +2034,10 @@ document.getElementById('greenDot').addEventListener('click',function(){
 
 /* SCROLL REVEAL */
 var observer = new IntersectionObserver(function(entries){
-  entries.forEach(function(e){ if(e.isIntersecting) e.target.style.animationPlayState='running'; });
-}, {threshold:.12});
-document.querySelectorAll('.reveal').forEach(function(el){
-  el.style.animationPlayState='paused';
-  observer.observe(el);
-});
+  entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('reveal'); observer.unobserve(e.target); } });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
 
-})();
 </script>
 </body>
 </html>
