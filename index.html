@@ -707,6 +707,22 @@ footer{
   backdrop-filter: blur(4px);
 }
 
+.github-card{
+  padding:32px 28px;
+  background:rgba(240,234,216,0.55);
+  border-radius:12px;
+  border:1px solid var(--border);
+  border-top-color:rgba(255,255,255,0.80);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  box-shadow:0 1px 0 rgba(255,255,255,0.60) inset,var(--shadow-sm);
+  transition:all .28s;
+}
+.github-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(74,124,89,0.25);
+  box-shadow:0 1px 0 rgba(255,255,255,0.70) inset,var(--shadow-lg);
+}
+
 </style>
 </head>
 <body>
@@ -753,6 +769,7 @@ footer{
         <li><a href="#domains">Domains</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#how">How It Works</a></li>
+        <li><a href="#github">GitHub</a></li>
         <li><a href="mailto:hello@vitalops.ai">Contact</a></li>
       </ul>
       <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="nav-cta">Book a Demo</a>
@@ -1104,6 +1121,42 @@ function switchTab(tab){
   document.querySelector('[data-tab="'+tab+'"]').classList.add('how-tab-active');
 }
 </script>
+
+<section class="section-band" id="github" style="padding-top:100px;padding-bottom:110px;">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:52px;">
+      <span class="tag">Open Source</span>
+      <div class="section-line section-line-center"></div>
+      <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.9rem,3.2vw,2.7rem);font-weight:700;letter-spacing:-.02em;">Our Open Source Projects</h2>
+      <p style="font-size:.96rem;color:var(--ink-2);max-width:540px;margin:14px auto 0;line-height:1.78;">We build tools that we open-source for the community. Click to explore on GitHub.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:800px;margin:0 auto;">
+
+      <a href="https://github.com/vitalops/openvibe" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
+        <div class="github-card reveal">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent);flex-shrink:0;"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+            <h3 style="font-family:'Libre Baskerville',serif;font-size:1.18rem;">OpenVibe</h3>
+          </div>
+          <p style="font-size:.90rem;color:var(--ink-2);line-height:1.78;margin-bottom:20px;">An open source coding agent framework. Give it a task, and it writes code, runs tests, edits files, and fixes issues — all from the command line.</p>
+          <span style="font-size:.78rem;font-weight:500;color:var(--accent);letter-spacing:.06em;">View on GitHub →</span>
+        </div>
+      </a>
+
+      <a href="https://github.com/vitalops/opendesk" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
+        <div class="github-card reveal" style="animation-delay:.10s;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent);flex-shrink:0;"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+            <h3 style="font-family:'Libre Baskerville',serif;font-size:1.18rem;">OpenDesk</h3>
+          </div>
+          <p style="font-size:.90rem;color:var(--ink-2);line-height:1.78;margin-bottom:20px;">An open source desktop automation framework that lets AI agents control computers — clicks, keyboard input, screenshots, workflow recording, and remote machine management across Mac, Linux, and Windows.</p>
+          <span style="font-size:.78rem;font-weight:500;color:var(--accent);letter-spacing:.06em;">View on GitHub →</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
 
 <section class="cta" id="contact">
   <div class="container reveal">
