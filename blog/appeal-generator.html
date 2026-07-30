@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../assets/vitalops-green-logo.svg">
+<title>Writing an insurance appeal letter that holds up | VitalOps</title>
+<meta name="description" content="How our appeal generator drafts a clean, well-sourced appeal letter from a denied claim, so the team reviews instead of writing from scratch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a href="../index.html" class="blog-nav-logo">
+      <img src="../assets/vitalops-green-logo.svg" alt="VitalOps">
+      <span>VitalOps</span>
+    </a>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="blog-nav-cta">Book a Demo</a>
+  </div>
+</nav>
+
+<article class="blog">
+  <a class="back-link" href="../index.html#usecases">&larr; Back to use cases</a>
+  <span class="blog-tag">Appeal Generator</span>
+  <h1>Writing an insurance appeal letter that holds up</h1>
+  <p class="lede">When a healthcare claim gets denied, someone on the billing team has to write an appeal letter. It is slow, repetitive, and the quality matters a lot. Our appeal generator drafts the first version, so the team reviews instead of writing from scratch.</p>
+
+  <h2>Why appeals are painful</h2>
+  <p>A good appeal letter is not a form letter. It has to reference the specific denial reason, point to the right line in the clinical record, cite the relevant policy, and explain why the claim should be approved. Each one takes thirty to ninety minutes to write well.</p>
+  <p>Most billing teams write dozens of these every week. Some get rejected because they were rushed or missed something. That means a second appeal, more time, and sometimes a claim that gets written off because the team ran out of bandwidth.</p>
+
+  <h2>What the tool does</h2>
+  <p>The team uploads the denial letter, the clinical record, and any policy reference the payer provided. The document processor reads each one. It pulls out the denial reason, the relevant clinical evidence, and the policy language that applies. Then it drafts an appeal letter that ties them together.</p>
+  <p>The draft comes back with the cited evidence highlighted, so the team can see exactly where each claim in the letter is grounded. If something looks weak, the team edits it. If the appeal is solid, they send it.</p>
+
+  <h2>How it stays grounded</h2>
+  <p>The generator does not invent policy language. It does not hallucinate clinical facts. Every line in the letter is tied back to a specific passage in one of the source documents. The team can audit the entire letter in a couple of minutes.</p>
+  <p>The tone is also consistent. The team picks the voice they want on the first run, and every letter that goes out of the office reads the same way after that.</p>
+
+  <h2>The stack underneath</h2>
+  <p>A FastAPI backend handles document upload and processing. A document processor reads each PDF, including scanned forms. An Azure OpenAI client drafts the letter. A React front end gives the team a clean review surface with the highlighted source evidence on the side. The whole thing can be deployed inside the practice's own infrastructure for HIPAA reasons.</p>
+
+  <h2>What changes for the team</h2>
+  <p>Time per appeal drops from over an hour to about ten minutes of review. The team handles more denials. The overturn rate goes up, because more appeals get written and the ones that go out are stronger. The claims that used to get written off stop getting written off.</p>
+  <p>For the patient, that means fewer bills they should not have had to pay. For the provider, it is real revenue that was being left on the table.</p>
+
+  <div class="blog-cta">
+    <h3>Drowning in claim denials?</h3>
+    <p>If your team is writing appeal letters every day, we can almost certainly speed that up. Let us show you.</p>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer">Schedule a Demo</a>
+  </div>
+
+  <div class="blog-related">
+    <h4>Related stories</h4>
+    <a href="legalmemo.html"><span>LegalMemo</span>Building a case brief without re-reading every PDF</a>
+    <a href="dental-lab.html"><span>SMYLABS</span>Running a dental lab without the spreadsheet sprawl</a>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  &copy; 2024 VitalOps. <a href="../index.html">Back to home</a>
+</footer>
+
+</body>
+</html>

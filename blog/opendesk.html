@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../assets/vitalops-green-logo.svg">
+<title>Giving an AI agent eyes and hands on your desktop | VitalOps</title>
+<meta name="description" content="How OpenDesk lets one agent control Mac, Linux, or Windows machines, locally or over an encrypted link, with no selectors and no fragile scripts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a href="../index.html" class="blog-nav-logo">
+      <img src="../assets/vitalops-green-logo.svg" alt="VitalOps">
+      <span>VitalOps</span>
+    </a>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="blog-nav-cta">Book a Demo</a>
+  </div>
+</nav>
+
+<article class="blog">
+  <a class="back-link" href="../index.html#usecases">&larr; Back to use cases</a>
+  <span class="blog-tag">OpenDesk</span>
+  <h1>Giving an AI agent eyes and hands on your desktop</h1>
+  <p class="lede">OpenDesk is a computer use framework. It lets an AI agent see the screen, move the mouse, type, scroll, and read what came back, the same way a person would. One machine or a fleet. Mac, Linux, or Windows.</p>
+
+  <h2>Why this matters</h2>
+  <p>Most enterprise software has no useful API. The browser tool the team uses every day is closed. The accounting system is locked. The internal portal would take six months of paperwork to integrate with. So the team clicks through screens by hand, and there is no way to automate any of it.</p>
+  <p>OpenDesk takes the position that the screen itself is the API. If a person can do the task, an agent can do it too. That changes what kinds of work can be automated.</p>
+
+  <h2>What the agent gets</h2>
+  <ul>
+    <li><strong>Screenshots.</strong> The agent sees the screen the way you do.</li>
+    <li><strong>Mouse and keyboard.</strong> It clicks, types, scrolls, and drags exactly as a person would.</li>
+    <li><strong>OCR.</strong> When the text is in an image, the agent can still read it.</li>
+    <li><strong>UI interaction.</strong> Accessibility APIs give the agent a structured view of buttons, fields, and menus, so it does not have to guess pixel coordinates.</li>
+    <li><strong>Workflow recording.</strong> Record a flow once and replay it. Mix recorded steps with on-the-fly decisions.</li>
+    <li><strong>Scheduling.</strong> Run a flow on a cron, on demand, or when something on the screen changes.</li>
+  </ul>
+
+  <h2>One machine or many</h2>
+  <p>The same SDK that drives the local desktop drives a remote one. Each remote machine runs a small agent that exposes its screen and inputs over an encrypted WebSocket. The team can stand up a fleet, point one controller at all of them, and run the same workflow in parallel.</p>
+  <p>That is what turns OpenDesk from a useful local tool into something that can replace a room full of operators. The pattern is one agent, twenty machines, all doing the same work.</p>
+
+  <h2>Where teams use it</h2>
+  <p>Three patterns come up again and again.</p>
+  <p><strong>Bulk operations on closed tools.</strong> A team needs to update a thousand records inside a vendor portal. The portal has no API. OpenDesk drives the portal the way the team would, one record at a time, across as many machines as needed.</p>
+  <p><strong>End-to-end QA on real apps.</strong> No selectors. No CSS paths. The agent walks the app the way a user would, takes a screenshot at each step, and flags anything that looks off. When the UI changes, the agent adapts. The tests do not break.</p>
+  <p><strong>Workflow automation across legacy systems.</strong> The classic RPA use case, without the fragility. Because the agent reads the screen with a real model behind it, small layout changes do not knock it over.</p>
+
+  <h2>How it stays safe</h2>
+  <p>The team picks what the agent is allowed to do. Read-only by default. Granular permissions on bash, file writes, network access. The full session is recorded, including every screenshot the agent took and every input it sent. If something looks wrong six weeks later, the team can replay the run and see exactly what happened.</p>
+
+  <div class="blog-cta">
+    <h3>Have a tool with no API?</h3>
+    <p>If your team is clicking through the same screens every day, OpenDesk can pick up that work without any backend changes on your side.</p>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer">Schedule a Demo</a>
+  </div>
+
+  <div class="blog-related">
+    <h4>Related stories</h4>
+    <a href="openvibe.html"><span>OpenVibe</span>Autonomous coding agents that finish the job</a>
+    <a href="temenos.html"><span>Temenos</span>Letting an agent run anything, safely</a>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  &copy; 2024 VitalOps. <a href="../index.html">Back to home</a>
+</footer>
+
+</body>
+</html>

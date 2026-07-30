@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../assets/vitalops-green-logo.svg">
+<title>Making LLMs work on millions of rows | VitalOps</title>
+<meta name="description" content="Why models cannot see large tables on their own, and how DataTune's MAP, FILTER, EXPAND, and REDUCE primitives push them across any size of dataset.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a href="../index.html" class="blog-nav-logo">
+      <img src="../assets/vitalops-green-logo.svg" alt="VitalOps">
+      <span>VitalOps</span>
+    </a>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="blog-nav-cta">Book a Demo</a>
+  </div>
+</nav>
+
+<article class="blog">
+  <a class="back-link" href="../index.html#usecases">&larr; Back to use cases</a>
+  <span class="blog-tag">DataTune</span>
+  <h1>Making LLMs work on millions of rows</h1>
+  <p class="lede">A model with a 100 million token context window still cannot read a 10 million row table. The numbers do not work out. DataTune is what we built so the model does not have to.</p>
+
+  <h2>Why this is a real limit</h2>
+  <p>Picture a mid-sized enterprise table. Ten million rows. Twenty columns. Fifty characters of text per cell on average. That is around 2.5 billion tokens of data. Even the largest context windows are roughly twenty-five times smaller. The model never gets to see the whole thing, no matter how generous the context budget gets.</p>
+  <p>So teams compromise. They feed the model a sample. Or a summary. Or just the schema. Each one of these is a different kind of lie about what is actually in the data. The model gives an answer based on a rough abstraction, and the team has no way to know whether that answer would have held up against the real rows.</p>
+
+  <h2>What DataTune does instead</h2>
+  <p>DataTune does not try to fit the whole table into one prompt. It splits the data into batches, sends those batches to the model in parallel, and lets the model do its work one batch at a time. The orchestration runs on Dask, so it scales the same way the data scales.</p>
+  <p>You write the transformation in plain English. DataTune does the rest. The model sees enough of the data, in small enough pieces, to give a real answer on every row.</p>
+
+  <h2>The four primitives</h2>
+  <p>Everything in DataTune is one of four operations.</p>
+  <ul>
+    <li><strong>MAP.</strong> Look at each row and add or transform fields. Extract a category from a product description. Pull a date out of free text. Turn a paragraph into a structured record.</li>
+    <li><strong>FILTER.</strong> Keep or drop rows based on a plain-English rule. Keep only negative reviews. Drop rows that look like test data.</li>
+    <li><strong>EXPAND.</strong> Add new rows or new context to existing ones. Split a multi-item record into one row per item. Enrich a customer record with attributes inferred from the data already on hand.</li>
+    <li><strong>REDUCE.</strong> Aggregate across rows. Summarise. Count. Roll up.</li>
+  </ul>
+  <p>Most real-world pipelines chain these together. Extract sentiment, then filter for negative reviews, then reduce into a list of top complaints. Every step runs across the full table.</p>
+
+  <h2>What it looks like in code</h2>
+  <pre style="background:rgba(28,26,22,0.05);padding:16px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.82rem;overflow-x:auto;line-height:1.6;">import datatune as dt
+from datatune.llm.llm import OpenAI
+import dask.dataframe as dd
+
+llm = OpenAI(model_name="gpt-4o-mini")
+df = dd.read_csv("products.csv")
+
+categorised = dt.map(
+    prompt="Extract Category and Subcategory from the name and description.",
+    output_fields=["Category", "Subcategory"],
+    input_fields=["Name", "Description"],
+)(llm, df)
+
+electronics = dt.filter(
+    prompt="Keep only electronics products.",
+    input_fields=["Name"],
+)(llm, categorised)
+
+result = dt.finalize(electronics).compute()
+result.to_csv("electronics.csv")</pre>
+  <p>Twelve lines, a real LLM call on every row, runs on a dataset of any size. No sampling. No summarising. No giving up on parts of the data because they did not fit.</p>
+
+  <h2>What this changes for data teams</h2>
+  <p>Teams stop reaching for hand-written rules to clean their data. They stop hiring a tagging vendor when their catalog needs new categories. They stop hand-engineering features that an LLM could pick out if it had the access. The work that used to take weeks of fragile ETL becomes a short script.</p>
+  <p>And because the pipeline is just code, every step is versioned, reviewable, and re-runnable. A new column from product takes a sentence, not a sprint.</p>
+
+  <div class="blog-cta">
+    <h3>Have a table the model cannot see?</h3>
+    <p>DataTune is open source and pip-installable. We are happy to walk through your data and help you build the first pipeline.</p>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer">Schedule a Demo</a>
+  </div>
+
+  <div class="blog-related">
+    <h4>Related stories</h4>
+    <a href="opendesk.html"><span>OpenDesk</span>Giving an AI agent eyes and hands on your desktop</a>
+    <a href="openvibe.html"><span>OpenVibe</span>Autonomous coding agents that finish the job</a>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  &copy; 2024 VitalOps. <a href="../index.html">Back to home</a>
+</footer>
+
+</body>
+</html>

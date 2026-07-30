@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../assets/vitalops-green-logo.svg">
+<title>Memory for agents that run for days, not minutes | VitalOps</title>
+<meta name="description" content="How Coherence gives long-running agents memory in one JSON file, with no embedding model, no vector database, and no surprises at recall time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a href="../index.html" class="blog-nav-logo">
+      <img src="../assets/vitalops-green-logo.svg" alt="VitalOps">
+      <span>VitalOps</span>
+    </a>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="blog-nav-cta">Book a Demo</a>
+  </div>
+</nav>
+
+<article class="blog">
+  <a class="back-link" href="../index.html#usecases">&larr; Back to use cases</a>
+  <span class="blog-tag">Coherence</span>
+  <h1>Memory for agents that run for days, not minutes</h1>
+  <p class="lede">Coherence is an embeddingless memory framework for long-running LLM agents. No vector database. No embedding model. No LLM call at ingest. The whole memory state is one JSON file you can read, grep, and version-control.</p>
+
+  <h2>What the usual stack looks like</h2>
+  <p>Most memory frameworks for agents follow the same pattern. Run an embedding model on every piece of text the agent sees. Store the vectors in a vector database. At recall time, embed the query and pull the nearest neighbours.</p>
+  <p>That works. It also drags in a lot of infrastructure. A second model for embeddings. A vector database to host and maintain. A separate query path. Bills for both the storage and the compute. And the memory itself is opaque, a pile of vectors that nobody on the team can actually read.</p>
+
+  <h2>Coherence does something simpler</h2>
+  <p>Store the text verbatim. Retrieve it with the LLM you already have. Save it all to one JSON file.</p>
+  <pre style="background:rgba(28,26,22,0.05);padding:16px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.82rem;overflow-x:auto;line-height:1.6;">from coherence import Memory
+
+mem = Memory()
+mem.ingest("Alice prefers dark mode.")
+mem.ingest("Alice's daughter is named Mira.")
+mem.ingest("Bob lives in Lisbon and dislikes anchovies.")
+
+# BM25 retrieval, no LLM call
+mem.recall("what does Alice prefer for the UI?")
+
+# LLM-selection retrieval, pass any chat function
+mem.recall("what does Alice prefer for the UI?", chat_fn=my_chat)
+
+mem.save("memory.json")
+mem = Memory.load("memory.json")</pre>
+  <p>That is the full integration. No Postgres. No pgvector. No Chroma. No embedding model deployment.</p>
+
+  <h2>How recall works without embeddings</h2>
+  <p>Coherence has two retrieval paths. The fast one is BM25, classic keyword retrieval, with no model call at all. The accurate one is LLM-selection. The model is shown a textual listing of candidate chunks and asked which ones are relevant. The model picks the IDs. The match quality comes from the model's understanding of language, not from a vector approximation of it.</p>
+  <p>BM25 is great when the query is keyword-shaped. LLM-selection is great when the query is fuzzy or paraphrased. Most workloads benefit from both.</p>
+
+  <h2>Why the JSON file matters</h2>
+  <p>The whole memory is one human-readable JSON file. You can <code>cat</code> it. You can <code>grep</code> it. You can commit it to git. You can diff it across runs. If the agent remembers something it should not, you open the file and remove it. If the agent forgot something, you open the file and add it.</p>
+  <p>That transparency is the point. Vector memories are black boxes. The team can never really tell what is in them. Coherence's memory is the text itself, sitting in a file the team owns.</p>
+
+  <h2>Where this lets agents go further</h2>
+  <p>Most agents in production today are short-lived. They run for a few minutes, then stop. The reason is partly memory. Long-lived agents need to remember what they did yesterday without dragging a database along with them.</p>
+  <p>Coherence is what we use to give an agent a persistent identity across sessions that span days. A customer support agent that remembers each user. A coding agent that remembers what it tried last night. A research agent that remembers what it has already read.</p>
+
+  <h2>Where it fits in the stack</h2>
+  <p>Coherence is the memory layer. <a href="openvibe.html" style="color:var(--accent);">OpenVibe</a> is the agent. <a href="temenos.html" style="color:var(--accent);">Temenos</a> is the sandbox. Together, they are what we use to ship agents that actually run on their own, day after day, and stay useful while they do.</p>
+
+  <div class="blog-cta">
+    <h3>Building an agent that should remember things?</h3>
+    <p>Coherence is open source and pip-installable. We are happy to help you wire it into your agent.</p>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer">Schedule a Demo</a>
+  </div>
+
+  <div class="blog-related">
+    <h4>Related stories</h4>
+    <a href="openvibe.html"><span>OpenVibe</span>Autonomous coding agents that finish the job</a>
+    <a href="temenos.html"><span>Temenos</span>Letting an agent run anything, safely</a>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  &copy; 2024 VitalOps. <a href="../index.html">Back to home</a>
+</footer>
+
+</body>
+</html>

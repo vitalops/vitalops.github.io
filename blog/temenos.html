@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../assets/vitalops-green-logo.svg">
+<title>Letting an agent run anything, safely | VitalOps</title>
+<meta name="description" content="How Temenos puts every line of agent-executed code in a sandbox, so you can run one agent or a thousand without worrying about the host.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a href="../index.html" class="blog-nav-logo">
+      <img src="../assets/vitalops-green-logo.svg" alt="VitalOps">
+      <span>VitalOps</span>
+    </a>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="blog-nav-cta">Book a Demo</a>
+  </div>
+</nav>
+
+<article class="blog">
+  <a class="back-link" href="../index.html#usecases">&larr; Back to use cases</a>
+  <span class="blog-tag">Temenos</span>
+  <h1>Letting an agent run anything, safely</h1>
+  <p class="lede">Temenos is a secure runtime for AI agents. Your agent runs on the host, where it works best. The code it executes runs inside a sandbox. The boundary holds whether you supervise one agent by hand or run a thousand of them in allow-all mode.</p>
+
+  <h2>The trust problem</h2>
+  <p>Coding agents are useful in proportion to how much they are allowed to do. An agent that has to ask permission for every shell command is slow. An agent that can do anything is fast, but a single bad output can delete files, leak secrets, or break the network.</p>
+  <p>Most teams compromise by approving every command. That works for a while. It does not scale to the point where you want twenty agents working in parallel overnight, and it stops the team from really trusting any of them.</p>
+
+  <h2>The Temenos approach</h2>
+  <p>Run the agent on the host. Run the code it executes in a box.</p>
+  <p>That single line is what Temenos is about. The agent itself stays on the host machine, where its model keys, its updates, and its tool integrations work the way they always have. The shell commands, file writes, and network calls the agent issues are routed into a sandbox where they cannot touch the host.</p>
+  <pre style="background:rgba(28,26,22,0.05);padding:16px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.82rem;overflow-x:auto;line-height:1.6;">cd ~/code/my-repo
+temenos claude   # Claude runs on the host; everything it executes runs in a box</pre>
+  <p>The sandbox is gVisor, a userspace kernel. The host filesystem is invisible to it beyond what the policy explicitly mounts. Most kernel CVE surface is intercepted before it reaches the host. Network can be cut with a single flag.</p>
+
+  <h2>How the boundary is enforced</h2>
+  <p>Temenos does not ask the agent to be careful. It removes the tools that could do damage. The native Bash, Read, Write, and Edit tools that a coding agent normally has are banned. The only execution path left is through Temenos's own MCP server. A stray <code>.mcp.json</code> cannot re-open a host-capable server.</p>
+  <p>This is the point. The dangerous capability is not discouraged. It is removed. Allow-all mode stays safe because there is no path to the host left to allow.</p>
+
+  <h2>What this unlocks</h2>
+  <ul>
+    <li><strong>Overnight swarms.</strong> Spin up a hundred agents on a hundred repos. Each one in its own box. None of them can step on each other or the host.</li>
+    <li><strong>Multi-tenant agent platforms.</strong> Run customer agents on shared infrastructure without giving them a path to each other's data.</li>
+    <li><strong>Real allow-all.</strong> The team stops approving every command. The agent moves faster. Nothing on the host gets touched.</li>
+    <li><strong>Auditability.</strong> Every command, every file write, every network call goes through Temenos. The audit log is complete and structured.</li>
+  </ul>
+
+  <h2>Boxes are first class</h2>
+  <p>Each box is named, persistent, checkpointable, and inspectable. You can <code>temenos exec</code> into one, <code>temenos shell</code> for an interactive session, <code>temenos diff</code> to see what changed, and <code>temenos audit</code> to read the full log. Everything lives in a <code>.temenos/&lt;box&gt;/</code> directory you can delete with <code>rm -rf</code> when you are done.</p>
+  <p>Background checkpointing is on by default. The box restores in tens of milliseconds the next time the same workflow runs, so a session that spans days does not pay the startup cost on every call.</p>
+
+  <h2>Where this fits</h2>
+  <p>Temenos sits underneath the agent. If you are running <a href="openvibe.html" style="color:var(--accent);">OpenVibe</a> or any other coding agent at scale, Temenos is what lets you stop manually approving and start trusting the system. Same box, any scale.</p>
+
+  <div class="blog-cta">
+    <h3>Want to run agents at scale, safely?</h3>
+    <p>Temenos is open source. We are happy to walk through how it fits with the agent stack you already have.</p>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer">Schedule a Demo</a>
+  </div>
+
+  <div class="blog-related">
+    <h4>Related stories</h4>
+    <a href="openvibe.html"><span>OpenVibe</span>Autonomous coding agents that finish the job</a>
+    <a href="coherence.html"><span>Coherence</span>Memory for agents that run for days, not minutes</a>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  &copy; 2024 VitalOps. <a href="../index.html">Back to home</a>
+</footer>
+
+</body>
+</html>

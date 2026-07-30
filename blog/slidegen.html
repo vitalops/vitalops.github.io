@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../assets/vitalops-green-logo.svg">
+<title>Turning a long PDF into a presentation in minutes | VitalOps</title>
+<meta name="description" content="How Slidegen reads a long report and turns it into a clean PPTX, so the team starts editing slides instead of starting from a blank one.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a href="../index.html" class="blog-nav-logo">
+      <img src="../assets/vitalops-green-logo.svg" alt="VitalOps">
+      <span>VitalOps</span>
+    </a>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="blog-nav-cta">Book a Demo</a>
+  </div>
+</nav>
+
+<article class="blog">
+  <a class="back-link" href="../index.html#usecases">&larr; Back to use cases</a>
+  <span class="blog-tag">Slidegen</span>
+  <h1>Turning a long PDF into a presentation in minutes</h1>
+  <p class="lede">Slidegen reads a long report and gives back a clean PPTX with the key points already on slides. Two pipelines under the hood, one in Python and one in Node, both feeding the same structured deck.</p>
+
+  <h2>Why this is a real pain point</h2>
+  <p>Most reports get read by a few people and then summarised into a deck for everyone else. The summarising work is slow, and it usually falls on someone who did not write the report. They have to read the whole thing, decide what goes on each slide, and write the speaker notes.</p>
+  <p>By the time the deck is ready, the meeting is tomorrow. Half a day is gone. And the deck is often less precise than the report, because steps got missed in the summarising.</p>
+
+  <h2>What Slidegen does</h2>
+  <p>Slidegen takes a source PDF, identifies the main sections, the key arguments, and the supporting figures. It groups them into slides, writes a title and bullet points for each, drafts the speaker notes underneath, and exports a clean PPTX.</p>
+  <p>The person opening the deck does not start from a blank canvas. They start from a complete first draft that follows the structure of the source. From there, the work is editing, not writing.</p>
+
+  <h2>Two pipelines under the hood</h2>
+  <p>Slidegen ships with two pipelines, both in the same repo.</p>
+  <ul>
+    <li><strong>Python pipeline.</strong> Best when the PDF is structured, has clear sections, and the team wants the deck to track the document closely.</li>
+    <li><strong>Node pipeline.</strong> Best when the team wants a tighter, more presentation-ready output and is happy to give Slidegen more creative freedom about which points to highlight.</li>
+  </ul>
+  <p>Both produce a real PPTX file the team can open in PowerPoint, Keynote, or Google Slides and edit normally.</p>
+
+  <h2>How the source stays traceable</h2>
+  <p>Every number on every slide can be traced back to where it came from in the source PDF. The speaker notes carry a citation. The team can verify any claim in seconds, which matters when the deck is going to people who did not read the report.</p>
+
+  <h2>What changes for the team</h2>
+  <p>A day of slide work becomes an hour of review. The same report can be turned into a five-slide executive summary or a twenty-slide internal walkthrough, just by telling Slidegen the target length and audience. The team does not have to start over for each new audience.</p>
+  <p>The bar for sharing a report also drops. If turning a report into a deck takes a day, most reports never get a deck. If it takes an hour, the team can do it for almost any report worth sharing.</p>
+
+  <div class="blog-cta">
+    <h3>Lots of reports, not enough decks?</h3>
+    <p>If your team writes long documents and spends a day turning each one into slides, Slidegen can take that day back.</p>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer">Schedule a Demo</a>
+  </div>
+
+  <div class="blog-related">
+    <h4>Related stories</h4>
+    <a href="legalmemo.html"><span>LegalMemo</span>Building a case brief without re-reading every PDF</a>
+    <a href="datatune.html"><span>DataTune</span>Making LLMs work on millions of rows</a>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  &copy; 2024 VitalOps. <a href="../index.html">Back to home</a>
+</footer>
+
+</body>
+</html>

@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="assets/vitalops-green-logo.svg">
 <link rel="shortcut icon" href="assets/vitalops-green-logo.svg">
-<title>VitalOps - AI-Powered Automation for Real Workflows</title>
-<meta name="description" content="VitalOps builds AI automation solutions for Shopify stores, desktop workflows, data pipelines, and code. Purpose-built agents that handle your most time-consuming operations.">
+<title>VitalOps - Applied AI Infrastructure</title>
+<meta name="description" content="VitalOps makes LLMs run faster, builds coding agents that hold up on public benchmarks, and automates enterprise workflows end to end. Inference optimisation, agent engineering, and production automation.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -847,11 +847,12 @@ footer{
         <li class="nav-dropdown">
           <a href="#products" class="nav-dropdown-trigger">Products <svg width="10" height="10" viewBox="0 0 10 10" style="margin-left:3px;vertical-align:middle;"><path d="M2 4l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           <div class="nav-dropdown-menu">
-            <a href="#product-shopify">Shopify Store Automation</a>
+            <a href="#product-inference">LLM Inference Optimisation</a>
             <a href="#product-rpa">Desktop Process Automation</a>
             <a href="#product-data">Intelligent Data Pipelines</a>
-            <a href="#product-code">Code Automation</a>
+            <a href="#product-code">Coding Agents</a>
             <a href="#product-qa">QA & Testing Automation</a>
+            <a href="#product-enterprise">Enterprise Automation</a>
           </div>
         </li>
         <li class="nav-dropdown">
@@ -860,6 +861,8 @@ footer{
             <a href="https://github.com/vitalops/opendesk" target="_blank" rel="noopener noreferrer">OpenDesk</a>
             <a href="https://github.com/vitalops/openvibe" target="_blank" rel="noopener noreferrer">OpenVibe</a>
             <a href="https://github.com/vitalops/datatune" target="_blank" rel="noopener noreferrer">DataTune</a>
+            <a href="https://github.com/vitalops/temenos" target="_blank" rel="noopener noreferrer">Temenos</a>
+            <a href="https://github.com/vitalops/coherence" target="_blank" rel="noopener noreferrer">Coherence</a>
           </div>
         </li>
         <li><a href="#about">About</a></li>
@@ -874,17 +877,17 @@ footer{
 <section class="hero" id="home" style="position:relative">
   <div class="container hero-inner">
     <div class="hero-text reveal">
-      <div class="hero-tag"><span class="tag">Autonomous AI Agents</span></div>
-      <h1>Your team sets the bar.<br>
+      <div class="hero-tag"><span class="tag">Applied AI Infrastructure</span></div>
+      <h1>We make AI<br>
         <span class="hero-phrase-wrap">
-          <span class="hero-phrase ph-active">Agents meet it.</span>
-          <span class="hero-phrase">Continuously.</span>
-          <span class="hero-phrase">Without prompting.</span>
-          <span class="hero-phrase">At any scale.</span>
-          <span class="hero-phrase">Around the clock.</span>
+          <span class="hero-phrase ph-active">run faster.</span>
+          <span class="hero-phrase">finish the job.</span>
+          <span class="hero-phrase">prove itself.</span>
+          <span class="hero-phrase">hold your bar.</span>
+          <span class="hero-phrase">work all night.</span>
         </span>
       </h1>
-      <p>VitalOps builds agent teams that run entire expert workflows to the quality standard your best people would hold. Your leads define what good looks like. Agents do the work until it gets there.</p>
+      <p>VitalOps works across the AI stack. We tune LLM serving so models answer sooner and push more tokens per second, we build coding agents that are measured on public benchmarks, and we run entire expert workflows to the quality bar your best people would hold.</p>
       <div class="hero-btns">
         <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-fill">Schedule a Demo</a>
       </div>
@@ -908,52 +911,58 @@ footer{
     <div class="domains-header reveal" style="text-align:center;margin-bottom:52px;">
       <span class="tag">Products</span>
       <div class="section-line section-line-center"></div>
-      <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.9rem,3.2vw,2.7rem);font-weight:700;letter-spacing:-.02em;">AI automation, built for your workflow</h2>
-      <p style="font-size:.96rem;color:var(--ink-2);max-width:560px;margin:14px auto 0;line-height:1.78;">Each product is purpose-built for a specific problem. Pick what fits. Every plan includes onboarding.</p>
+      <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.9rem,3.2vw,2.7rem);font-weight:700;letter-spacing:-.02em;">Research-grade engineering, delivered as production systems</h2>
+      <p style="font-size:.96rem;color:var(--ink-2);max-width:600px;margin:14px auto 0;line-height:1.78;">Three things we do well: making inference fast, making agents good enough to trust with real work, and putting both to work inside enterprise workflows.</p>
     </div>
 
-    <!-- Product 1: Shopify Store Automation -->
-    <div id="product-shopify" class="product-showcase reveal" style="margin-bottom:56px;">
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:1100px;margin:0 auto 64px;">
+      <div style="padding:26px 24px;background:rgba(240,234,216,0.60);border-radius:10px;border:1px solid var(--border);border-top-color:rgba(255,255,255,0.80);box-shadow:0 1px 0 rgba(255,255,255,0.60) inset,var(--shadow-sm);">
+        <div class="step-num" style="margin:0 0 16px;">01</div>
+        <h3 style="font-family:'Libre Baskerville',serif;font-size:1.10rem;font-weight:700;margin-bottom:8px;letter-spacing:-.01em;">LLM Inferencing</h3>
+        <p style="font-size:.85rem;color:var(--ink-2);line-height:1.72;">Inference speed work across the serving stack: tokens per second, time to first token, and cost per token, tuned to your model and your hardware.</p>
+      </div>
+      <div style="padding:26px 24px;background:rgba(240,234,216,0.60);border-radius:10px;border:1px solid var(--border);border-top-color:rgba(255,255,255,0.80);box-shadow:0 1px 0 rgba(255,255,255,0.60) inset,var(--shadow-sm);">
+        <div class="step-num" style="margin:0 0 16px;">02</div>
+        <h3 style="font-family:'Libre Baskerville',serif;font-size:1.10rem;font-weight:700;margin-bottom:8px;letter-spacing:-.01em;">Coding Agents</h3>
+        <p style="font-size:.85rem;color:var(--ink-2);line-height:1.72;">Agent design, harness engineering, and rigorous benchmarking, so progress is verifiable on public boards rather than self-reported.</p>
+      </div>
+      <div style="padding:26px 24px;background:rgba(240,234,216,0.60);border-radius:10px;border:1px solid var(--border);border-top-color:rgba(255,255,255,0.80);box-shadow:0 1px 0 rgba(255,255,255,0.60) inset,var(--shadow-sm);">
+        <div class="step-num" style="margin:0 0 16px;">03</div>
+        <h3 style="font-family:'Libre Baskerville',serif;font-size:1.10rem;font-weight:700;margin-bottom:8px;letter-spacing:-.01em;">Enterprise Automation</h3>
+        <p style="font-size:.85rem;color:var(--ink-2);line-height:1.72;">Agentic software for finance and supply chain, built alongside consultancies and deployed inside large enterprises.</p>
+      </div>
+    </div>
+
+    <!-- Product 1: LLM Inference Optimisation -->
+    <div id="product-inference" class="product-showcase reveal" style="margin-bottom:56px;">
       <div class="datatune-panel" style="padding:48px 40px;">
         <div class="datatune-panel-inner">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
             <div>
-              <span class="tag" style="margin-bottom:14px;">E-Commerce</span>
-              <h3 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.5rem,2.8vw,2rem);font-weight:700;letter-spacing:-.02em;margin:14px 0 12px;">Shopify Store Automation</h3>
-              <p style="font-size:.92rem;color:var(--ink-2);line-height:1.78;margin-bottom:20px;">Migrate themes between stores without breaking layouts. Bulk-update products, sync inventory across locations, and automate repetitive admin tasks, all without touching a single CSV or copy-pasting between tabs.</p>
+              <span class="tag" style="margin-bottom:14px;">Inference</span>
+              <h3 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.5rem,2.8vw,2rem);font-weight:700;letter-spacing:-.02em;margin:14px 0 12px;">LLM Inference Optimisation</h3>
+              <p style="font-size:.92rem;color:var(--ink-2);line-height:1.78;margin-bottom:20px;">We make large language models run faster on the hardware you already have. Serving-stack configuration, scheduler and kernel-level tuning, and careful ablation studies that lift tokens per second and cut the time your users spend waiting for a response.</p>
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
-                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Theme migration between stores</span></div>
-                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Bulk product & variant updates</span></div>
-                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Multi-location inventory sync</span></div>
-                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Automated order & fulfillment workflows</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Higher tokens per second on the same GPUs</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Lower time to first token and end-to-end latency</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Tuning across SGLang and vLLM serving stacks</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Numbers measured independently, not self-reported</span></div>
               </div>
-              <a href="https://docs.google.com/forms/d/e/1FAIpQLSf-go5mz81kvOkQ3RcDA3CKbURkN8A5Fym_Kk27jT9z_Kmq3w/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-fill" style="margin-top:4px;">Request Access</a>
+              <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-fill" style="margin-top:4px;">Talk to an Engineer</a>
             </div>
             <div>
               <div style="display:flex;flex-direction:column;gap:12px;">
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Starter</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">1 store, up to 500 automated actions / month</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSf-go5mz81kvOkQ3RcDA3CKbURkN8A5Fym_Kk27jT9z_Kmq3w/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Throughput tuning</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Batching, scheduling, and parallelism settings tuned per model so a single deployment serves more traffic before you add a GPU.</p>
                 </div>
                 <div style="padding:20px;background:rgba(74,124,89,0.06);border-radius:8px;border:1px solid rgba(74,124,89,0.25);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Professional</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$1,499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Up to 5 stores, unlimited actions, priority support</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSf-go5mz81kvOkQ3RcDA3CKbURkN8A5Fym_Kk27jT9z_Kmq3w/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-fill" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Latency work</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Time to first token and inter-token latency pulled down where it is felt most, in interactive and agentic traffic.</p>
                 </div>
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Enterprise</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">Custom</span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Unlimited stores, dedicated infra, SLA, on-prem</p>
-                  <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Schedule a Call</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Kernel and stack depth</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Ablation studies down to kernel and scheduler level on current NVIDIA hardware, with the winning configuration handed back to your team.</p>
                 </div>
               </div>
             </div>
@@ -962,8 +971,8 @@ footer{
       </div>
     </div>
 
-    <!-- Product 2: Desktop Process Automation (RPA) -->
-    <div id="product-rpa" class="product-showcase reveal" style="animation-delay:.10s;margin-bottom:56px;">
+    <!-- Product 1: Desktop Process Automation (RPA) -->
+    <div id="product-rpa" class="product-showcase reveal" style="margin-bottom:56px;">
       <div class="datatune-panel" style="padding:48px 40px;">
         <div class="datatune-panel-inner">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
@@ -982,28 +991,16 @@ footer{
             <div>
               <div style="display:flex;flex-direction:column;gap:12px;">
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Starter</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">1 workflow, 1 machine, up to 500 runs / month</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSd7d0na6c5krlDgLHcJQbH0sIPaiOeAzBy6w1rfAcNnOvoOkA/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">No integration work</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Agents drive the software through its own interface, so legacy tools with no API are automated the same as modern ones.</p>
                 </div>
                 <div style="padding:20px;background:rgba(74,124,89,0.06);border-radius:8px;border:1px solid rgba(74,124,89,0.25);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Professional</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$1,499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Up to 10 workflows, 5 machines, unlimited runs</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSd7d0na6c5krlDgLHcJQbH0sIPaiOeAzBy6w1rfAcNnOvoOkA/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-fill" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Fleets, not single machines</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">One agent drives many machines over an encrypted link, running the same workflow in parallel across a fleet.</p>
                 </div>
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Enterprise</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">Custom</span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Unlimited everything, on-prem, SSO, dedicated support</p>
-                  <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Schedule a Call</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Sandboxed by default</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Every action an agent takes runs inside our own sandbox runtime and is recorded in full, so nothing touches the host unchecked.</p>
                 </div>
               </div>
             </div>
@@ -1012,8 +1009,8 @@ footer{
       </div>
     </div>
 
-    <!-- Product 3: Intelligent Data Pipelines -->
-    <div id="product-data" class="product-showcase reveal" style="animation-delay:.15s;margin-bottom:56px;">
+    <!-- Product 2: Intelligent Data Pipelines -->
+    <div id="product-data" class="product-showcase reveal" style="animation-delay:.10s;margin-bottom:56px;">
       <div class="datatune-panel" style="padding:48px 40px;">
         <div class="datatune-panel-inner">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
@@ -1032,28 +1029,16 @@ footer{
             <div>
               <div style="display:flex;flex-direction:column;gap:12px;">
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Starter</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">1 pipeline, up to 100k rows / month</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSe82TsNfNvIo4B_Jx43ejCkFPobXQz2Q26VP3EFLccP7lcuzw/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Past the context window</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Row-level semantic work across datasets far larger than any model context, distributed over Dask or Spark.</p>
                 </div>
                 <div style="padding:20px;background:rgba(74,124,89,0.06);border-radius:8px;border:1px solid rgba(74,124,89,0.25);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Professional</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$1,499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Up to 10 pipelines, unlimited rows, priority support</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSe82TsNfNvIo4B_Jx43ejCkFPobXQz2Q26VP3EFLccP7lcuzw/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-fill" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Built on DataTune</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Our open source transformation library, in production with paying customers and peer-reviewed at DATA 2026.</p>
                 </div>
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Enterprise</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">Custom</span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Unlimited, private deployment, custom connectors, SLA</p>
-                  <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Schedule a Call</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Any provider, any store</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Bring your own LLM provider and your own warehouse. Nothing is locked to a single vendor or a hosted endpoint.</p>
                 </div>
               </div>
             </div>
@@ -1062,19 +1047,19 @@ footer{
       </div>
     </div>
 
-    <!-- Product 4: Code Automation -->
-    <div id="product-code" class="product-showcase reveal" style="animation-delay:.20s;margin-bottom:56px;">
+    <!-- Product: Coding Agents -->
+    <div id="product-code" class="product-showcase reveal" style="animation-delay:.15s;margin-bottom:56px;">
       <div class="datatune-panel" style="padding:48px 40px;">
         <div class="datatune-panel-inner">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
             <div>
               <span class="tag" style="margin-bottom:14px;">Developer Tools</span>
-              <h3 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.5rem,2.8vw,2rem);font-weight:700;letter-spacing:-.02em;margin:14px 0 12px;">Code Automation</h3>
-              <p style="font-size:.92rem;color:var(--ink-2);line-height:1.78;margin-bottom:20px;">Autonomous coding agents that write code, run tests, fix bugs, and refactor from the command line. Give it a task description, and it handles file edits, test execution, and debugging until the work is done.</p>
+              <h3 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.5rem,2.8vw,2rem);font-weight:700;letter-spacing:-.02em;margin:14px 0 12px;">Coding Agents</h3>
+              <p style="font-size:.92rem;color:var(--ink-2);line-height:1.78;margin-bottom:20px;">Autonomous coding agents that write code, run tests, fix bugs, and refactor from the command line, built and tuned to perform on public coding benchmarks. Most of the distance between a good model and a good agent is the harness around it: tool design, context handling, and recovery. That is the part we engineer.</p>
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Benchmarked against frontier lab agents on public boards</span></div>
                 <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Multi-step task execution with file & bash tools</span></div>
-                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Persistent sessions across runs</span></div>
-                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">MCP server integration for extended capabilities</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Persistent sessions, MCP integration, pluggable models</span></div>
                 <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Granular permission controls</span></div>
               </div>
               <a href="https://docs.google.com/forms/d/e/1FAIpQLSfrTcinA4xpc6NFHPR72exxzKM-eTPKKo1ZYQpQRLuUX1ksRA/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-fill" style="margin-top:4px;">Request Access</a>
@@ -1082,28 +1067,16 @@ footer{
             <div>
               <div style="display:flex;flex-direction:column;gap:12px;">
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Starter</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">1 repo, up to 500 agent sessions / month</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSfrTcinA4xpc6NFHPR72exxzKM-eTPKKo1ZYQpQRLuUX1ksRA/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Harness, not just model</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Tool design, context handling, and error recovery are where agents win or fail. We build that scaffolding around whichever model you use.</p>
                 </div>
                 <div style="padding:20px;background:rgba(74,124,89,0.06);border-radius:8px;border:1px solid rgba(74,124,89,0.25);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Professional</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$1,499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Unlimited repos & sessions, team access, priority support</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSfrTcinA4xpc6NFHPR72exxzKM-eTPKKo1ZYQpQRLuUX1ksRA/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-fill" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Measured, then improved</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Every change is validated on a public benchmark, so progress is verifiable outside our own reporting.</p>
                 </div>
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Enterprise</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">Custom</span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Self-hosted, custom model backends, SSO, SLA</p>
-                  <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Schedule a Call</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Yours to run</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Self-hosted, headless, and pip-installable, with your own model backends behind it.</p>
                 </div>
               </div>
             </div>
@@ -1112,8 +1085,8 @@ footer{
       </div>
     </div>
 
-    <!-- Product 5: QA & Testing -->
-    <div id="product-qa" class="product-showcase reveal" style="animation-delay:.25s;">
+    <!-- Product 4: QA & Testing -->
+    <div id="product-qa" class="product-showcase reveal" style="animation-delay:.20s;margin-bottom:56px;">
       <div class="datatune-panel" style="padding:48px 40px;">
         <div class="datatune-panel-inner">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
@@ -1132,28 +1105,54 @@ footer{
             <div>
               <div style="display:flex;flex-direction:column;gap:12px;">
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Starter</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">1 app, up to 500 test runs / month</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSfMIYvJV8f7a3UymBnP4W0ChHrG_t0j8nFDR1lT2qT7QZSCqw/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Nothing to maintain</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Agents read the screen instead of chasing selectors, so a redesign does not send your suite red overnight.</p>
                 </div>
                 <div style="padding:20px;background:rgba(74,124,89,0.06);border-radius:8px;border:1px solid rgba(74,124,89,0.25);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Professional</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">$1,499<span style="font-size:.72rem;font-weight:400;color:var(--ink-3);">/mo</span></span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Up to 10 apps, unlimited runs, CI/CD integration</p>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSfMIYvJV8f7a3UymBnP4W0ChHrG_t0j8nFDR1lT2qT7QZSCqw/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-fill" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Request Access</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Runs where you build</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Scheduled, continuous, or wired into your pipeline, on self-hosted runners if compliance requires it.</p>
                 </div>
                 <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
-                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                    <span style="font-size:.82rem;font-weight:600;color:var(--ink);">Enterprise</span>
-                    <span style="font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--ink);">Custom</span>
-                  </div>
-                  <p style="font-size:.76rem;color:var(--ink-3);margin-bottom:12px;">Unlimited, self-hosted runners, compliance, SLA</p>
-                  <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="width:100%;justify-content:center;padding:8px 16px;font-size:.80rem;">Schedule a Call</a>
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Evidence with every run</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Screenshots, steps, and decisions are captured in full, so a regression report is something you can actually act on.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product: Enterprise Automation -->
+    <div id="product-enterprise" class="product-showcase reveal" style="animation-delay:.25s;">
+      <div class="datatune-panel" style="padding:48px 40px;">
+        <div class="datatune-panel-inner">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
+            <div>
+              <span class="tag" style="margin-bottom:14px;">Enterprise</span>
+              <h3 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.5rem,2.8vw,2rem);font-weight:700;letter-spacing:-.02em;margin:14px 0 12px;">Agentic AI for Finance and Supply Chain</h3>
+              <p style="font-size:.92rem;color:var(--ink-2);line-height:1.78;margin-bottom:20px;">We build agentic SaaS with consultancies and deploy it inside large enterprises. Procurement, spend analytics, and RFP or RFI workflows, layered onto the processes and systems your teams already run, rather than asking them to start again somewhere new.</p>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Reconciliation, compliance checks, and reporting</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Supplier discovery, sourcing events, and scoring</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Multi-stage approvals with a human at every gate</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-size:.80rem;">&#10003;</span><span style="font-size:.84rem;color:var(--ink-2);">Works over messy ERP, CSV, and Excel data</span></div>
+              </div>
+              <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-fill" style="margin-top:4px;">Schedule a Call</a>
+            </div>
+            <div>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Delivered end to end</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Several SaaS applications built and shipped alongside a supply chain consultancy, in use with their enterprise clients.</p>
+                </div>
+                <div style="padding:20px;background:rgba(74,124,89,0.06);border-radius:8px;border:1px solid rgba(74,124,89,0.25);">
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Layered, not ripped out</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Agents sit on top of existing processes and systems, so nothing has to be rebuilt or replaced to get value.</p>
+                </div>
+                <div style="padding:20px;background:rgba(240,234,216,0.70);border-radius:8px;border:1px solid var(--border);">
+                  <div style="font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:6px;">Data at real scale</div>
+                  <p style="font-size:.80rem;color:var(--ink-3);line-height:1.65;">Transformations run across datasets far larger than any model context window, which is where most enterprise data actually lives.</p>
                 </div>
               </div>
             </div>
@@ -1421,8 +1420,8 @@ function switchTab(tab){
     <div class="reveal" style="text-align:center;margin-bottom:52px;">
       <span class="tag">Open Source</span>
       <div class="section-line section-line-center"></div>
-      <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.9rem,3.2vw,2.7rem);font-weight:700;letter-spacing:-.02em;">Our Open Source Projects</h2>
-      <p style="font-size:.96rem;color:var(--ink-2);max-width:540px;margin:14px auto 0;line-height:1.78;">We build tools that we open-source for the community. Click to explore on GitHub.</p>
+      <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(1.9rem,3.2vw,2.7rem);font-weight:700;letter-spacing:-.02em;">The end-to-end stack</h2>
+      <p style="font-size:.96rem;color:var(--ink-2);max-width:640px;margin:14px auto 0;line-height:1.78;">We build every layer an agent needs to actually run on its own. Memory, sandboxing, desktop control, coding, data. Put together, it is the tooling that lets you walk away from the computer and trust what happens next.</p>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1100px;margin:0 auto;">
 
@@ -1433,7 +1432,7 @@ function switchTab(tab){
             <h3 style="font-family:'Libre Baskerville',serif;font-size:1.18rem;">OpenDesk</h3>
           </div>
           <p style="font-size:.90rem;color:var(--ink-2);line-height:1.78;margin-bottom:14px;">Open source desktop automation framework. AI agents control computers with clicks, keyboard input, screenshots, OCR, workflow recording, and remote machine management across Mac, Linux, and Windows.</p>
-          <p style="font-size:.76rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;border-top:1px solid var(--border);padding-top:12px;">Powers our Shopify Store Automation, Desktop RPA, and QA Testing solutions.</p>
+          <p style="font-size:.76rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;border-top:1px solid var(--border);padding-top:12px;">Powers our Desktop RPA, QA Testing, and enterprise workflow deployments.</p>
           <span style="font-size:.78rem;font-weight:500;color:var(--accent);letter-spacing:.06em;margin-top:auto;">View on GitHub &rarr;</span>
         </div>
       </a>
@@ -1445,7 +1444,7 @@ function switchTab(tab){
             <h3 style="font-family:'Libre Baskerville',serif;font-size:1.18rem;">OpenVibe</h3>
           </div>
           <p style="font-size:.90rem;color:var(--ink-2);line-height:1.78;margin-bottom:14px;">A modular, pip-installable AI coding agent that runs headless. Automates multi-step development tasks: writing code, running tests, editing files, and fixing issues. Supports pluggable LLM backends, MCP server integration, and persistent sessions.</p>
-          <p style="font-size:.76rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;border-top:1px solid var(--border);padding-top:12px;">Powers our Code Automation solution.</p>
+          <p style="font-size:.76rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;border-top:1px solid var(--border);padding-top:12px;">Powers our Coding Agents solution.</p>
           <span style="font-size:.78rem;font-weight:500;color:var(--accent);letter-spacing:.06em;margin-top:auto;">View on GitHub &rarr;</span>
         </div>
       </a>
@@ -1462,6 +1461,30 @@ function switchTab(tab){
         </div>
       </a>
 
+      <a href="https://github.com/vitalops/temenos" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
+        <div class="github-card reveal" style="animation-delay:.28s;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent);flex-shrink:0;"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+            <h3 style="font-family:'Libre Baskerville',serif;font-size:1.18rem;">Temenos</h3>
+          </div>
+          <p style="font-size:.90rem;color:var(--ink-2);line-height:1.78;margin-bottom:14px;">A secure runtime for AI agents. Your agent runs on the host, but the code it executes runs in a sandboxed box. Run one agent or a thousand without worrying about what they touch.</p>
+          <p style="font-size:.76rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;border-top:1px solid var(--border);padding-top:12px;">Keeps every agent we ship safe by default.</p>
+          <span style="font-size:.78rem;font-weight:500;color:var(--accent);letter-spacing:.06em;margin-top:auto;">View on GitHub &rarr;</span>
+        </div>
+      </a>
+
+      <a href="https://github.com/vitalops/coherence" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
+        <div class="github-card reveal" style="animation-delay:.36s;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent);flex-shrink:0;"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+            <h3 style="font-family:'Libre Baskerville',serif;font-size:1.18rem;">Coherence</h3>
+          </div>
+          <p style="font-size:.90rem;color:var(--ink-2);line-height:1.78;margin-bottom:14px;">An embeddingless memory framework for long-running LLM agents. One JSON file, no vector database, no embedding model. Your memory is text you can read, grep, and version-control.</p>
+          <p style="font-size:.76rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;border-top:1px solid var(--border);padding-top:12px;">Gives our agents the memory they need to run for days, not minutes.</p>
+          <span style="font-size:.78rem;font-weight:500;color:var(--accent);letter-spacing:.06em;margin-top:auto;">View on GitHub &rarr;</span>
+        </div>
+      </a>
+
     </div>
   </div>
 </section>
@@ -1470,8 +1493,8 @@ function switchTab(tab){
   <div class="container reveal">
     <div class="cta-card">
       <div class="cta-blob"></div>
-      <h2>Ready to make your operations <em>run themselves</em>?</h2>
-      <p>See how VitalOps can deploy autonomous agents across your department in a 30-minute demo.</p>
+      <h2>Let's build it <em>properly</em>.</h2>
+      <p>Inference that keeps up. Agents that finish the job. Workflows that run without you. See where VitalOps fits in a 30-minute call.</p>
       <div class="cta-btns">
         <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="btn btn-fill">Schedule a Demo</a>
         <a href="mailto:hello@vitalops.ai" class="btn btn-ghost">Talk to Us</a>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../assets/vitalops-green-logo.svg">
+<title>Autonomous coding agents that finish the job | VitalOps</title>
+<meta name="description" content="How OpenVibe runs a coding agent end to end, with sessions, permissions, and the same tools a human engineer would reach for.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a href="../index.html" class="blog-nav-logo">
+      <img src="../assets/vitalops-green-logo.svg" alt="VitalOps">
+      <span>VitalOps</span>
+    </a>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="blog-nav-cta">Book a Demo</a>
+  </div>
+</nav>
+
+<article class="blog">
+  <a class="back-link" href="../index.html#usecases">&larr; Back to use cases</a>
+  <span class="blog-tag">OpenVibe</span>
+  <h1>Autonomous coding agents that finish the job</h1>
+  <p class="lede">OpenVibe is our open-source coding agent. Pip install it, give it a task in plain English, and it runs end to end. Sessions, permissions, and the same tools a human engineer would use.</p>
+
+  <h2>The shape of the problem</h2>
+  <p>Most coding assistants live inside an editor. They suggest a few lines, you accept or reject, and they step back. That is useful for the active work the engineer is already doing. It does not help with the long tail.</p>
+  <p>The long tail is the work that sits on the backlog. Dependency upgrades. Bug fixes. Tests that need to be backfilled. A migration that needs to be applied across hundreds of files. Things where the engineer would have to spend hours reading and only minutes writing.</p>
+
+  <h2>What OpenVibe does</h2>
+  <p>OpenVibe takes a task description and runs it to completion. It reads the relevant files, decides what to change, makes the change, runs the tests, fixes failures, and comes back with a pull request and a clear log of everything it did.</p>
+  <p>It can run as a long-lived server or as a one-shot command:</p>
+  <pre style="background:rgba(28,26,22,0.05);padding:16px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.82rem;overflow-x:auto;line-height:1.6;"># start the server
+openvibe serve
+
+# one-shot run
+openvibe run "fix the failing tests in the auth module"
+
+# list sessions
+openvibe session list
+openvibe session show &lt;session-id&gt;</pre>
+
+  <h2>What you keep control over</h2>
+  <ul>
+    <li><strong>Pluggable model backends.</strong> The agent talks to the model through a thin abstraction. Switch between Anthropic, OpenAI, or anything else in a config file.</li>
+    <li><strong>Permission controls.</strong> For each tool the agent can use, you decide whether it can use it freely, has to ask, or cannot use it at all. Bash. Write. Network. The defaults are conservative.</li>
+    <li><strong>Persistent sessions.</strong> Every run is recorded. You can list past sessions, replay them, or pick one up where it left off.</li>
+    <li><strong>MCP integration.</strong> Plug in any Model Context Protocol server to give the agent a new capability without changing its code.</li>
+  </ul>
+
+  <h2>How teams use it</h2>
+  <p>The pattern that has worked best is to pair OpenVibe with a queue. Bug reports come in. OpenVibe picks them up overnight. By morning, the team has a queue of pull requests to review. Most are real fixes. Some are partial work with a clear note about where the agent got stuck. The team merges what is ready and gives feedback on the rest.</p>
+  <p>Another pattern is to point OpenVibe at a long-running migration. Framework upgrades. API changes. Anything that touches many files in a repetitive way. OpenVibe goes file by file, applies the change, runs the relevant tests, and flags anything that needs human judgement.</p>
+
+  <h2>Why it is open source</h2>
+  <p>We use OpenVibe ourselves on customer projects. We open-sourced it because tools like this get better when more people are running them, and because the cost of a great coding agent should not be locked behind a per-seat SaaS price.</p>
+  <p>Engineers can run it on their own machine, with their own model keys, against their own code, without anything leaving their environment. That matters when the codebase is sensitive.</p>
+
+  <h2>Where it fits in the stack</h2>
+  <p>OpenVibe is the agent. <a href="temenos.html" style="color:var(--accent);">Temenos</a> is the sandbox we run it in when we want to run a thousand of them in parallel safely. <a href="coherence.html" style="color:var(--accent);">Coherence</a> is the memory layer for sessions that span days, not minutes. The three together are what makes autonomous coding actually feasible.</p>
+
+  <div class="blog-cta">
+    <h3>Backlog full of work that nobody gets to?</h3>
+    <p>OpenVibe is open source and pip-installable. We can help you wire it into your repo and your bug tracker.</p>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer">Schedule a Demo</a>
+  </div>
+
+  <div class="blog-related">
+    <h4>Related stories</h4>
+    <a href="temenos.html"><span>Temenos</span>Letting an agent run anything, safely</a>
+    <a href="coherence.html"><span>Coherence</span>Memory for agents that run for days, not minutes</a>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  &copy; 2024 VitalOps. <a href="../index.html">Back to home</a>
+</footer>
+
+</body>
+</html>

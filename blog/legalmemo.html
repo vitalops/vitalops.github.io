@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../assets/vitalops-green-logo.svg">
+<title>Building a case brief without re-reading every PDF | VitalOps</title>
+<meta name="description" content="How LegalMemo turns a pile of case PDFs into a structured brief, with a timeline, conflicts, admissions, and a source quote behind every fact.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a href="../index.html" class="blog-nav-logo">
+      <img src="../assets/vitalops-green-logo.svg" alt="VitalOps">
+      <span>VitalOps</span>
+    </a>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer" class="blog-nav-cta">Book a Demo</a>
+  </div>
+</nav>
+
+<article class="blog">
+  <a class="back-link" href="../index.html#usecases">&larr; Back to use cases</a>
+  <span class="blog-tag">LegalMemo</span>
+  <h1>Building a case brief without re-reading every PDF</h1>
+  <p class="lede">LegalMemo is built for litigation teams in Indian courts. Upload the case PDFs, and it gives back a structured brief with a timeline, conflicts, admissions, and a clean set of facts, each one tied to the source page it came from.</p>
+
+  <h2>What the work normally looks like</h2>
+  <p>Building a case brief is hours of work, and most of it is re-reading. An associate goes through every PDF in the matter, pulls out the facts, marks the dates, lines up the statements, and writes the brief the partner can actually use.</p>
+  <p>Every step is slow and easy to get wrong. Miss a date and the timeline is off. Miss a quote and a fact has no source. Miss a contradiction and the strategy is built on shaky ground.</p>
+
+  <h2>What LegalMemo does</h2>
+  <p>The team uploads the case PDFs. A five-stage background pipeline takes over.</p>
+  <ul>
+    <li><strong>Stage 1. Document ingestion.</strong> Every page is read, including scanned and rotated ones. A dual-track OCR pipeline using pdfplumber, Tesseract, and Claude catches what single-tool OCR misses.</li>
+    <li><strong>Stage 2. Fact extraction.</strong> Each fact is pulled out with its date, the people involved, and the exact source quote it came from in the PDF.</li>
+    <li><strong>Stage 3. Timeline.</strong> The facts are arranged into an ISO-date chronology, so the team can see how the case unfolded.</li>
+    <li><strong>Stage 4. Conflict detection.</strong> The pipeline finds places where statements contradict each other across documents.</li>
+    <li><strong>Stage 5. Admissions detection.</strong> It also catches places where a party contradicts their own earlier position, which is often the most useful kind of contradiction in court.</li>
+  </ul>
+  <p>The associate then reviews the output, resolves ambiguities, and exports a structured 15-section brief as a PDF.</p>
+
+  <h2>Why every fact has a quote</h2>
+  <p>A brief that cannot be sourced is a liability. Every fact LegalMemo extracts comes with the exact quote and a pointer to the page it came from. Click any fact and the source viewer opens the original PDF at the right page, with the bounding box drawn around the quote.</p>
+  <p>That is the part that makes it usable in actual practice. The partner gets a thorough brief, and every claim in it is one click away from the original text.</p>
+
+  <h2>What the team gets back</h2>
+  <p>Briefs that used to take a week take a day. The associate spends their time on the parts that need a lawyer's judgement, conflict resolution and strategy, not on careful reading. The partner gets a brief that is more thorough, with the receipts already attached.</p>
+  <p>The case file also becomes searchable. Months later, when someone needs a specific fact or a specific contradiction, it is already there, indexed and sourced.</p>
+
+  <h2>The stack underneath</h2>
+  <p>LegalMemo runs on FastAPI with a React front end. Celery and Redis handle the background pipeline. Supabase stores the PDFs and the structured outputs. The LLM layer is provider-agnostic. The whole thing is built to be deployed on the team's own infrastructure if the firm requires it.</p>
+
+  <div class="blog-cta">
+    <h3>Litigation team drowning in PDFs?</h3>
+    <p>LegalMemo is built for Indian courts but the pipeline works on any large legal document set. Let us show you what it could do for your matters.</p>
+    <a href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener noreferrer">Schedule a Demo</a>
+  </div>
+
+  <div class="blog-related">
+    <h4>Related stories</h4>
+    <a href="appeal-generator.html"><span>Appeal Generator</span>Writing an insurance appeal letter that holds up</a>
+    <a href="slidegen.html"><span>Slidegen</span>Turning a long PDF into a presentation in minutes</a>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  &copy; 2024 VitalOps. <a href="../index.html">Back to home</a>
+</footer>
+
+</body>
+</html>
