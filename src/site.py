@@ -701,8 +701,6 @@ footer.site{padding:28px 0 40px;font-size:13px;color:var(--ink3)}
 .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
 .foot-links{display:flex;gap:18px;flex-wrap:wrap}.foot-links a{padding:4px 0}
 .foot-links a:hover{color:var(--ink)}
-.foot-legal{flex-basis:100%;font-style:normal;font-size:12.5px;line-height:1.6;color:var(--ink3);margin-top:8px}
-.foot-legal .flag{display:inline-block;width:16px;height:11px;vertical-align:-1px;margin-left:3px;border-radius:1.5px;box-shadow:0 0 0 1px var(--line2)}
 
 /* ════════ App screens (product UI, self-contained) ════════ */
 .mock{position:relative;aspect-ratio:16/10;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg);box-shadow:0 1px 2px rgba(15,23,42,.06),0 16px 40px -12px rgba(15,23,42,.14);font-size:12px;line-height:1.4;color:var(--ink);font-family:var(--font);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:default;font-variant-numeric:tabular-nums}
@@ -1324,8 +1322,7 @@ __JSONLD__
 <footer class="site"><div class="wrap foot">
   <a class="logo" href="#top"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps</a>
   <div class="foot-links"><a href="#tour">Walkthrough</a><a href="#services">Services</a><a href="#stack">Stack</a><a href="https://github.com/vitalops" target="_blank" rel="noopener">GitHub</a><a href="https://x.com/vitalopsai" target="_blank" rel="noopener">X</a><a href="mailto:hello@vitalops.ai">Contact</a></div>
-  <span>© <span id="yr">2026</span> VitalOps Technologies Pvt Ltd</span>
-  <address class="foot-legal">VitalOps Technologies Pvt Ltd<br>Asset Greenford, 9B, Metro Gardens Road<br>Aluva 683106, Ernakulam, Kerala, India <svg class="flag" viewBox="0 0 18 12" aria-label="India" role="img"><rect width="18" height="4" fill="#ff9933"/><rect y="4" width="18" height="4" fill="#fff"/><rect y="8" width="18" height="4" fill="#138808"/><circle cx="9" cy="6" r="1.6" fill="none" stroke="#000080" stroke-width=".55"/><circle cx="9" cy="6" r=".35" fill="#000080"/></svg></address>
+  <span>© <span id="yr">2026</span> VitalOps Inc</span>
 </div></footer>
 
 <script>
@@ -1468,11 +1465,9 @@ def jsonld(page):
     strip = lambda x: _h.unescape(re.sub(r"<[^>]+>", "", x)).strip()
     faqs = [{"@type": "Question", "name": strip(q), "acceptedAnswer": {"@type": "Answer", "text": strip(a)}}
             for q, a in re.findall(r"<details><summary>(.*?)</summary><p>(.*?)</p></details>", page, re.S)]
-    org = {"@type": "Organization", "@id": "https://vitalops.ai/#org", "name": "VitalOps", "legalName": "VitalOps Technologies Pvt Ltd",
+    org = {"@type": "Organization", "@id": "https://vitalops.ai/#org", "name": "VitalOps", "legalName": "VitalOps Inc",
            "url": "https://vitalops.ai/", "logo": "https://vitalops.ai/assets/icon-512.png", "email": "hello@vitalops.ai",
-           "sameAs": ["https://github.com/vitalops", "https://x.com/vitalopsai"],
-           "address": {"@type": "PostalAddress", "streetAddress": "Asset Greenford, 9B, Metro Gardens Road", "addressLocality": "Aluva",
-                       "addressRegion": "Kerala", "postalCode": "683106", "addressCountry": "IN"}}
+           "sameAs": ["https://github.com/vitalops", "https://x.com/vitalopsai"]}
     site = {"@type": "WebSite", "@id": "https://vitalops.ai/#site", "url": "https://vitalops.ai/", "name": "VitalOps", "publisher": {"@id": "https://vitalops.ai/#org"}}
     graph = [org, site] + ([{"@type": "FAQPage", "mainEntity": faqs}] if faqs else [])
     return '<script type="application/ld+json">' + json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False) + '</script>'
