@@ -55,8 +55,23 @@
     '.vlab-head .hwcar-track{padding:4px 4px}',
     '.vlab-head .hwcar-ar{background:#0f1730;border-color:#263252;color:#c3cbdc}',
     '.vlab-wrap{scroll-margin-top:74px}',
-    '.vlab-tabs{display:flex;flex-wrap:nowrap;gap:8px;margin:0 0 10px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;padding:2px 2px;cursor:grab;user-select:none;-webkit-user-select:none;min-height:38px;align-items:center}',
-    '.vlab-tabs.dragging{cursor:grabbing;scroll-snap-type:none}',
+    '.vlab-tabwrap{position:relative;margin:0 0 10px}',
+    '.vlab-tabs{display:flex;flex-wrap:nowrap;gap:8px;margin:0;overflow-x:auto;scrollbar-width:none;padding:2px 2px;cursor:grab;user-select:none;-webkit-user-select:none;min-height:38px;align-items:center;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}',
+    '.vlab-tabs.dragging{cursor:grabbing}',
+    /* edge hints: a fade and a chevron on whichever side still has tabs out of view */
+    '.vlab-tabwrap::before,.vlab-tabwrap::after{content:"";position:absolute;top:0;bottom:0;width:84px;pointer-events:none;opacity:0;transition:opacity .25s;z-index:2}',
+    '.vlab-tabwrap::before{left:0;background:linear-gradient(90deg,var(--bg) 34%,transparent)}',
+    '.vlab-tabwrap::after{right:0;background:linear-gradient(270deg,var(--bg) 58%,transparent)}',
+    '.vlab-tabwrap.more-l::before,.vlab-tabwrap.more-r::after{opacity:1}',
+    '.vlab-tabhint{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;pointer-events:none;opacity:0;transition:opacity .25s;box-shadow:0 2px 8px rgba(15,23,42,.25)}',
+    '.vlab-tabhint svg{width:13px;height:13px}',
+    '.vlab-tabhint.l{left:4px}.vlab-tabhint.r{right:46px}',
+    '.vlab-tabwrap.more-l .vlab-tabhint.l,.vlab-tabwrap.more-r .vlab-tabhint.r{opacity:1;animation:vlab-nudge 1.6s ease-in-out 2}',
+    '@keyframes vlab-nudge{0%,100%{transform:translateY(-50%)}50%{transform:translateY(-50%) translateX(var(--nx,3px))}}',
+    '.vlab-tabhint.l{--nx:-3px}',
+    '.vlab-full .vlab-tabwrap{margin:0;background:#0d1428;border-bottom:1px solid #1f2a44}',
+    '.vlab-full .vlab-tabwrap::before{background:linear-gradient(90deg,#0d1428 34%,transparent)}.vlab-full .vlab-tabwrap::after{background:linear-gradient(270deg,#0d1428 58%,transparent)}',
+    '@media (prefers-reduced-motion:reduce){.vlab-tabhint{animation:none!important}}',
     '.vlab-tabs::-webkit-scrollbar{display:none}',
     '.vlab-tab{scroll-snap-align:center;flex:none}',
     '.vlab-tab{appearance:none;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--white);font:600 14px/1 var(--font);color:var(--ink2);cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s,background .15s}',
@@ -67,7 +82,7 @@
     '@media(max-width:600px){.vlab-tabs{gap:6px}.vlab-tab{padding:8px 11px;font-size:13px}}',
     /* full screen: the wrapper covers the window, the tabs turn dark and join the panel */
     '.vlab-wrap.vlab-full{position:fixed;inset:0;z-index:120;margin:0;display:flex;flex-direction:column;background:#0b1020}',
-    '.vlab-full .vlab-tabs{margin:0;padding:8px 10px;background:#0d1428;border-bottom:1px solid #1f2a44}',
+
     '.vlab-full .vlab-tab{background:#0f1730;border-color:#263252;color:#c3cbdc}.vlab-full .vlab-tab:hover{color:#fff;border-color:#3b50a8}',
     '.vlab-full .vlab-tab[aria-selected=true]{background:var(--brand);border-color:var(--brand);color:#fff}',
     '.vlab-full .vlab{flex:1;min-height:0;border:0;border-radius:0;display:flex;flex-direction:column}',
@@ -79,8 +94,8 @@
     '.vlab-fs:focus-visible{outline:2px solid var(--brand);outline-offset:2px}',
     '.vlab-full .vlab-fs{position:fixed;top:10px;right:10px;background:#0f1730;border-color:#263252;color:#c3cbdc}.vlab-full .vlab-fs:hover{border-color:#3b50a8;color:#fff}',
     /* the tab row fades out under the floating button so a scrolled row never collides with it */
-    '.vlab-tabs{padding-right:48px;mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent calc(100% - 4px));-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent calc(100% - 4px))}',
-    '.vlab-full .vlab-tabs{padding-right:56px}',
+    '.vlab-tabs{padding-right:48px}',
+    '.vlab-full .vlab-tabs{padding:8px 56px 8px 10px}',
 
     '.vlab-body{position:relative;height:var(--lab-h,640px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2a365a #0b1020}',
     '.vlab-panel{padding:10px}',
@@ -147,7 +162,12 @@
       if (i) p.hidden = true;
       var m = document.createElement('div'); m.setAttribute('data-lab', t); p.appendChild(m); body.appendChild(p); panels[t] = { btn: b, panel: p };
     });
-    root.appendChild(bar); HW.dragScroll(bar);
+    var tw = document.createElement('div'); tw.className = 'vlab-tabwrap';
+    tw.innerHTML = '<span class="vlab-tabhint l" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></span><span class="vlab-tabhint r" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>';
+    tw.insertBefore(bar, tw.firstChild); root.appendChild(tw); HW.dragScroll(bar);
+    function edges() { var l = bar.scrollLeft > 4, r = bar.scrollLeft + bar.clientWidth < bar.scrollWidth - 52; tw.classList.toggle('more-l', l); tw.classList.toggle('more-r', r); }
+    bar.addEventListener('scroll', edges, { passive: true }); addEventListener('resize', edges);
+    setTimeout(edges, 0);
     box.appendChild(head); box.appendChild(body);
     var note = document.createElement('div'); note.className = 'vlab-note';
     note.innerHTML = '<span>Estimates from public specifications; the formulas are under "How this is calculated" in each demo. Not measurements of a VitalOps product.</span>';
@@ -158,6 +178,7 @@
       active = t;
       tabs.forEach(function (k) { var on = k === t; panels[k].btn.setAttribute('aria-selected', on); panels[k].btn.tabIndex = on ? 0 : -1; panels[k].panel.hidden = !on; });
       if (bar.scrollWidth > bar.clientWidth + 2) { var bt = panels[t].btn, left = bt.offsetLeft + bt.offsetWidth / 2 - bar.clientWidth / 2; bar.scrollTo({ left: Math.max(0, left), behavior: (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth' }); }
+      setTimeout(edges, 400);
       var kind = TABS[t].kind; car.setKind(kind, kind === 'device' ? state.device : state.gpu);
       body.scrollTop = 0;
       if (focus) panels[t].btn.focus();
@@ -169,12 +190,12 @@
     function fromHash() { var h = location.hash.replace('#', ''); if (panels[h]) { show(h); setTimeout(function () { root.scrollIntoView({ block: 'start', behavior: 'auto' }); }, 0); } }
     bar.addEventListener('click', function (e) { if (e.target.closest('.vlab-tab') && history.replaceState) history.replaceState(null, '', '#' + active); });
     addEventListener('hashchange', fromHash); fromHash();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fit(); fromHash(); });   /* web fonts arrive after the first layout and move the page */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fit(); fromHash(); edges(); });   /* web fonts arrive after the first layout and move the page */
     /* height: the panel fits the window under the site header; the demo scrolls inside if it is taller */
     /* the whole shell fits the window under the site header, with a little air; the demo scrolls inside if it is taller */
     function fit() {
       if (root.classList.contains('vlab-full')) { box.style.removeProperty('--lab-h'); return; }
-      var h = Math.max(360, Math.min(960, innerHeight - 62 - 12 - head.offsetHeight - bar.offsetHeight - 10 - note.offsetHeight));
+      var h = Math.max(360, Math.min(960, innerHeight - 62 - 12 - head.offsetHeight - tw.offsetHeight - 10 - note.offsetHeight));
       box.style.setProperty('--lab-h', h + 'px');
     }
     function setFull(on) {
