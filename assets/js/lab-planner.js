@@ -1,28 +1,20 @@
 /* Capacity planner: a first-order roofline estimate of what a model needs to serve
-   a given load. Renders into every [data-lab="planner"]. No libraries, no network. */
+   a given load. Renders into every [data-lab="planner"]. No libraries, no network.
+   GPU specifications and the hardware card come from assets/js/hw.js (window.VO_HW). */
 (function () {
   'use strict';
 
   var MODELS = [
-    // total / active params (B), layers, KV heads, head dim; kvPerLayer overrides (MLA)
-    { id: 'llama8',   name: 'Llama-3.1-8B',        total: 8.03,  active: 8.03,  layers: 32, kvh: 8,  hd: 128 },
-    { id: 'mistral24',name: 'Mistral-Small-24B',   total: 23.6,  active: 23.6,  layers: 40, kvh: 8,  hd: 128 },
-    { id: 'gemma27',  name: 'Gemma-3-27B',         total: 27.4,  active: 27.4,  layers: 62, kvh: 16, hd: 128 },
-    { id: 'qwen32',   name: 'Qwen3-32B',           total: 32.8,  active: 32.8,  layers: 64, kvh: 8,  hd: 128 },
-    { id: 'llama70',  name: 'Llama-3.3-70B',       total: 70.6,  active: 70.6,  layers: 80, kvh: 8,  hd: 128 },
-    { id: 'qwen235',  name: 'Qwen3-235B-A22B (MoE)', total: 235, active: 22,    layers: 94, kvh: 4,  hd: 128 },
-    { id: 'dsv3',     name: 'DeepSeek-V3 (MoE, MLA)', total: 671, active: 37,   layers: 61, kvPerLayer: 576 }
+    // total / active params (B), layers, KV heads, head dim, hidden size; kvPerLayer overrides (MLA)
+    { id: 'llama8',   name: 'Llama-3.1-8B',        total: 8.03,  active: 8.03,  layers: 32, kvh: 8,  hd: 128, h: 4096 },
+    { id: 'mistral24',name: 'Mistral-Small-24B',   total: 23.6,  active: 23.6,  layers: 40, kvh: 8,  hd: 128, h: 5120 },
+    { id: 'gemma27',  name: 'Gemma-3-27B',         total: 27.4,  active: 27.4,  layers: 62, kvh: 16, hd: 128, h: 5376 },
+    { id: 'qwen32',   name: 'Qwen3-32B',           total: 32.8,  active: 32.8,  layers: 64, kvh: 8,  hd: 128, h: 5120 },
+    { id: 'llama70',  name: 'Llama-3.3-70B',       total: 70.6,  active: 70.6,  layers: 80, kvh: 8,  hd: 128, h: 8192 },
+    { id: 'qwen235',  name: 'Qwen3-235B-A22B (MoE)', total: 235, active: 22,    layers: 94, kvh: 4,  hd: 128, h: 4096 },
+    { id: 'dsv3',     name: 'DeepSeek-V3 (MoE, MLA)', total: 671, active: 37,   layers: 61, kvPerLayer: 576, h: 7168 }
   ];
-  var GPUS = [
-    // memory GB, bandwidth TB/s, dense TFLOPS bf16 / fp8, $/GPU-hour default
-    { id: 'h100',  name: 'H100 SXM 80 GB',  mem: 80,  bw: 3.35,  bf16: 989,  fp8: 1979, price: 2.50 },
-    { id: 'h200',  name: 'H200 141 GB',     mem: 141, bw: 4.8,   bf16: 989,  fp8: 1979, price: 3.50 },
-    { id: 'b200',  name: 'B200 180 GB',     mem: 180, bw: 8.0,   bf16: 2250, fp8: 4500, price: 5.50 },
-    { id: 'mi300', name: 'MI300X 192 GB',   mem: 192, bw: 5.3,   bf16: 1307, fp8: 2615, price: 2.50 },
-    { id: 'a100',  name: 'A100 80 GB',      mem: 80,  bw: 2.039, bf16: 312,  fp8: 0,    price: 1.60 },
-    { id: 'l40s',  name: 'L40S 48 GB',      mem: 48,  bw: 0.864, bf16: 362,  fp8: 733,  price: 1.00 },
-    { id: 'r5090', name: 'RTX 5090 32 GB',  mem: 32,  bw: 1.79,  bf16: 209,  fp8: 419,  price: 0.70 }
-  ];
+  var GPU_ORDER = ['h100', 'h200', 'b200', 'mi300x', 'a100', 'l40s', 'rtx5090'];
   var WPREC = [['bf16', 2], ['fp8', 1], ['int4', 0.5625]];
   var KVPREC = [['bf16', 2], ['fp8', 1]];
   var USERS = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
@@ -30,7 +22,9 @@
   var OUTPUT = [100, 200, 300, 500, 1000, 2000, 4000];
   var SLO = [200, 300, 500, 800, 1200, 2000, 3000];
   var TPS = [1, 2, 4, 8];
-  var BW_EFF = 0.75, FLOP_EFF = 0.5, PREFILL_EFF = 0.6, MAX_BATCH = 512;
+  var BW_EFF = 0.75, FLOP_EFF = 0.5, PREFILL_EFF = 0.6, MAX_BATCH = 512, GiB = 1073741824;
+  var LAT_FAST = 8e-6, LAT_PCIE = 25e-6;                 // all-reduce latency assumptions: NVLink / Infinity Fabric, PCIe
+  var C_W = 'var(--brand)', C_KV = '#0f9d8f', C_ACT = 'var(--ink4)', C_COMM = '#b45309', C_PRE = '#8b5cf6';
 
   var CSS = [
     '.lp{font-family:var(--font);color:var(--ink2);background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);display:grid;grid-template-columns:320px minmax(0,1fr);overflow:hidden;text-align:left;line-height:1.45;font-size:14px}',
@@ -71,16 +65,17 @@
     '.lp-kpi span.lp-ok{color:var(--ok)}.lp-kpi span.lp-bad{color:var(--bad)}',
     '.lp-alert{font-size:13px;border-radius:8px;padding:9px 12px;background:#fff7ed;color:var(--warn);border:1px solid #fed7aa}',
     '.lp-alert.lp-err{background:#fff1f2;color:var(--bad);border-color:#fecdd3}',
+    '.lp-mid{display:grid;grid-template-columns:276px minmax(0,1fr);gap:16px;align-items:start}',
+    '.lp-r{display:flex;flex-direction:column;gap:16px;min-width:0}',
+    '.lp-card .hwc-kv{font-size:11.5px}',
     '.lp-sec{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:8px}',
     '.lp-sec span{font-weight:400;color:var(--ink3);font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;text-align:right}',
-    '.lp-bar{display:flex;height:26px;border-radius:6px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--line2) 0 6px,var(--white) 6px 12px);border:1px solid var(--line)}',
-    '.lp-bar i{display:block;height:100%;transition:width .35s ease;min-width:0}',
-    '.lp-c-w{background:var(--brand)}.lp-c-kv{background:var(--brand2);opacity:.55}.lp-c-act{background:var(--ink4)}',
+    '.lp-stk{display:flex;height:26px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--line2)}',
+    '.lp-stk i{display:block;height:100%;transition:width .35s ease;min-width:0}',
     '.lp-leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:12px;color:var(--ink3)}',
     '.lp-leg span{display:inline-flex;align-items:center;gap:6px}',
     '.lp-leg em{font-style:normal;font-family:var(--mono);color:var(--ink);font-variant-numeric:tabular-nums}',
     '.lp-leg i{width:10px;height:10px;border-radius:2px;display:inline-block}',
-    '.lp-leg i.lp-c-free{background:repeating-linear-gradient(135deg,var(--line) 0 3px,var(--white) 3px 6px);border:1px solid var(--line)}',
     '.lp-chart svg{display:block;width:100%;height:auto}',
     '.lp-chart .lp-grid{stroke:var(--line2)}',
     '.lp-chart text{font-family:var(--mono);font-size:10px;fill:var(--ink4)}',
@@ -91,7 +86,7 @@
     '.lp-chart .lp-dot{fill:var(--white);stroke:var(--brand);stroke-width:2}',
     '.lp-chart .lp-dot2{fill:var(--white);stroke:var(--ink3);stroke-width:1.5}',
     '.lp-chart .lp-oplab{fill:var(--brand);font-weight:500}',
-    '.lp-tbl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}',
+    '.lp-tbl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}',
     '.lp-tbl div{padding:8px 0;border-bottom:1px solid var(--line2);min-width:0;padding-right:10px}',
     '.lp-tbl dt{font-size:11.5px;color:var(--ink3)}',
     '.lp-tbl dd{margin:0;font-family:var(--mono);font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
@@ -100,10 +95,11 @@
     '.lp-how ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}',
     '.lp-how code{font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--line2);padding:1px 4px;border-radius:4px;overflow-wrap:anywhere}',
     '.lp-note{font-size:12px;color:var(--ink3);margin-top:8px}',
-    '@media (max-width:1040px){.lp-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.lp-kpi:nth-child(4){border-left:0}.lp-kpi:nth-child(n+4){border-top:1px solid var(--line)}}',
+    '@media (max-width:1100px){.lp-mid{grid-template-columns:minmax(0,1fr)}.lp-card .hwc{grid-template-columns:minmax(150px,220px) minmax(0,1fr)}.lp-card .hwc-ph{aspect-ratio:auto;min-height:100%}}',
+    '@media (max-width:1040px){.lp-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.lp-kpi:nth-child(4){border-left:0}.lp-kpi:nth-child(n+4){border-top:1px solid var(--line)}.lp-tbl{grid-template-columns:repeat(3,minmax(0,1fr))}}',
     '@media (max-width:860px){.lp{grid-template-columns:minmax(0,1fr)}.lp-ctl{border-right:0;border-bottom:1px solid var(--line)}}',
-    '@media (max-width:520px){.lp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-kpi{border-left:1px solid var(--line)!important;border-top:1px solid var(--line)}.lp-kpi:nth-child(odd){border-left:0!important}.lp-kpi:nth-child(-n+2){border-top:0}.lp-kpi:first-child{grid-column:1/-1;border-left:0!important}.lp-kpi:nth-child(2){border-left:0!important;border-top:1px solid var(--line)}.lp-kpi:nth-child(3){border-top:1px solid var(--line)}.lp-tbl{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-out{padding:16px}.lp-ctl{padding:16px}}',
-    '@media (prefers-reduced-motion:reduce){.lp-bar i{transition:none}}'
+    '@media (max-width:520px){.lp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-kpi{border-left:1px solid var(--line)!important;border-top:1px solid var(--line)}.lp-kpi:nth-child(odd){border-left:0!important}.lp-kpi:nth-child(-n+2){border-top:0}.lp-kpi:first-child{grid-column:1/-1;border-left:0!important}.lp-kpi:nth-child(2){border-left:0!important;border-top:1px solid var(--line)}.lp-kpi:nth-child(3){border-top:1px solid var(--line)}.lp-tbl{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-out{padding:16px}.lp-ctl{padding:16px}.lp-card .hwc{grid-template-columns:minmax(0,1fr)}.lp-card .hwc-ph{aspect-ratio:3/2;min-height:0}}',
+    '@media (prefers-reduced-motion:reduce){.lp-stk i{transition:none}}'
   ].join('\n');
 
   function injectCSS() {
@@ -112,6 +108,7 @@
     document.head.appendChild(s);
   }
 
+  var HW = window.VO_HW;
   function fmtN(v) {
     if (!isFinite(v)) return '—';
     if (v >= 100) return Math.round(v).toLocaleString('en-GB');
@@ -119,10 +116,12 @@
     return v.toFixed(2);
   }
   function fmtTok(n) { return n >= 1024 ? (n / 1024) + 'k' : String(n); }
-  function fmtGB(b) { var g = b / 1e9; return g >= 100 ? Math.round(g) + ' GB' : g >= 10 ? g.toFixed(1) + ' GB' : g >= 1 ? g.toFixed(2) + ' GB' : Math.round(g * 1000) + ' MB'; }
+  var fmtGB = function (b) { return HW.gb(b); };
   function fmtMs(s) { return s >= 1 ? s.toFixed(2) + ' s' : Math.round(s * 1000) + ' ms'; }
+  function ms(s) { var v = s * 1000; return (v >= 100 ? Math.round(v) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ms'; }
   function fmtUSD(v) { return v >= 1000 ? '$' + Math.round(v).toLocaleString('en-GB') : v >= 10 ? '$' + v.toFixed(0) : '$' + v.toFixed(2); }
   function byId(arr, id) { for (var i = 0; i < arr.length; i++) if (arr[i].id === id) return arr[i]; return arr[0]; }
+  function isPCIe(g) { return /PCIe/i.test(g.link.name); }
 
   /* ---------- the model ---------- */
   function kvBytesPerToken(m, kvb) {
@@ -135,30 +134,45 @@
     var p = m.active / m.total;
     return m.total * 1e9 * wb * (1 - Math.pow(1 - p, b));
   }
-  function flops(g, wname) { return (wname !== 'bf16' && g.fp8 ? g.fp8 : g.bf16) * 1e12; }
+  // the dense tensor-core rate the matmuls run at for this weight format
+  function rate(g, wname) {
+    var f = g.flops;
+    if (wname === 'bf16') return { tf: f.bf16, as: 'bf16' };
+    if (wname === 'int4' && f.fp4) return { tf: f.fp4, as: 'fp4' };
+    if (f.fp8) return { tf: f.fp8, as: 'fp8' };
+    return { tf: f.bf16, as: 'bf16' };
+  }
+  // tensor-parallel all-reduces: two per layer; a ring all-reduce moves 2(TP-1)/TP of the tensor through each GPU's link
+  function commTime(m, g, tp, tokens) {
+    if (tp < 2) return 0;
+    var bytes = tokens * m.h * 2 * 2 * (tp - 1) / tp;
+    var lat = isPCIe(g) ? LAT_PCIE : LAT_FAST;
+    return m.layers * 2 * (bytes / (g.link.gbps * 1e9) + lat);
+  }
 
   // per-replica figures at batch b, tensor-parallel tp
   function perf(s, tp, b) {
     var m = s.m, g = s.g, wb = s.wb, kvTok = s.kvTok;
     var ctxAvg = s.inTok + s.outTok / 2;
     var bw = g.bw * 1e12 * BW_EFF * tp;
-    var F = flops(g, s.wname) * tp;
-    var comm = tp > 1 ? 1 + 0.06 * Math.log2(tp) : 1;
-    var tMem = (weightsRead(m, wb, b) + b * ctxAvg * kvTok) / bw;
+    var F = s.rate.tf * 1e12 * tp;
+    var tW = weightsRead(m, wb, b) / bw, tKV = b * ctxAvg * kvTok / bw;
+    var tMem = tW + tKV;
     var tCmp = 2 * m.active * 1e9 * b / (F * FLOP_EFF);
-    var tStep = Math.max(tMem, tCmp) * comm;
-    var r = 1 / tStep;                                  // tok/s per stream, decode only
-    var tPre = 2 * m.active * 1e9 / (F * PREFILL_EFF) * comm; // s per prompt token
-    var k = b * s.inTok * tPre / s.outTok;              // prefill share couples to decode rate
+    var tComm = commTime(m, g, tp, b);
+    var tStep = Math.max(tMem, tCmp) + tComm;
+    var r = 1 / tStep;                                                   // tok/s per stream, decode only
+    var tPrompt = s.inTok * 2 * m.active * 1e9 / (F * PREFILL_EFF) + commTime(m, g, tp, s.inTok); // s per prompt
+    var k = b * tPrompt / s.outTok;                                       // prefill share, amortised per decode step
     var rEff = r / (1 + k * r);
-    var ttft = s.inTok * tPre + tStep;
-    return { tStep: tStep, user: rEff, agg: rEff * b, ttft: ttft, memBound: tMem >= tCmp };
+    var ttft = tPrompt + tStep;
+    return { tStep: tStep, tW: tW, tKV: tKV, tCmp: tCmp, tComm: tComm, tPre: k, user: rEff, agg: rEff * b, ttft: ttft, memBound: tMem >= tCmp };
   }
 
   function plan(s) {
     var g = s.g, m = s.m;
-    var memB = g.mem * 1e9;
-    var act = (0.08 * g.mem + 1.5) * 1e9;               // activations, CUDA graphs, allocator slack
+    var memB = g.mem * GiB;
+    var act = 0.08 * memB + 1.5 * GiB;                  // activations, CUDA graphs, allocator slack
     var weights = m.total * 1e9 * s.wb;
     var perReq = s.kvTok * (s.inTok + s.outTok);
     var opts = [];
@@ -199,8 +213,9 @@
   var uid = 0;
   function mount(root) {
     if (root.__lp) return; root.__lp = true;
+    if (!HW) { root.innerHTML = '<p class="lp-note">The hardware catalogue (hw.js) did not load.</p>'; return; }
     var u = 'lp' + (++uid) + '-';
-    var st = { model: 'qwen32', w: 'fp8', kv: 'fp8', gpu: 'h100', price: 2.5, users: 6, inp: 3, out: 2, slo: 2 };
+    var st = { model: 'qwen32', w: 'fp8', kv: 'fp8', gpu: 'h100', price: HW.gpus.h100.price, users: 6, inp: 3, out: 2, slo: 2 };
     root.innerHTML =
       '<div class="lp">' +
       '<div class="lp-ctl">' +
@@ -209,8 +224,8 @@
           MODELS.map(function (m) { return '<option value="' + m.id + '"' + (m.id === st.model ? ' selected' : '') + '>' + m.name + '</option>'; }).join('') + '</select></div>' +
         '<div class="lp-row2">' + seg(u + 'w', WPREC, st.w, 'Weights') + seg(u + 'kv', KVPREC, st.kv, 'KV cache') + '</div>' +
         '<div class="lp-f"><label for="' + u + 'g">GPU</label><select class="lp-sel" id="' + u + 'g" data-k="gpu">' +
-          GPUS.map(function (g) { return '<option value="' + g.id + '"' + (g.id === st.gpu ? ' selected' : '') + '>' + g.name + '</option>'; }).join('') + '</select></div>' +
-        '<div class="lp-f lp-inl"><label for="' + u + 'p">Price per GPU-hour</label><span class="lp-usd"><input class="lp-num" id="' + u + 'p" data-k="price" type="number" min="0" step="0.05" value="2.50" inputmode="decimal"></span></div>' +
+          GPU_ORDER.map(function (k) { var g = HW.gpus[k]; return '<option value="' + k + '"' + (k === st.gpu ? ' selected' : '') + '>' + g.name + ' · ' + g.mem + ' GB</option>'; }).join('') + '</select></div>' +
+        '<div class="lp-f lp-inl"><label for="' + u + 'p">Price per GPU-hour</label><span class="lp-usd"><input class="lp-num" id="' + u + 'p" data-k="price" type="number" min="0" step="0.05" value="' + st.price.toFixed(2) + '" inputmode="decimal"></span></div>' +
         range(u + 'users', 'Concurrent requests', USERS, st.users, String) +
         range(u + 'inp', 'Prompt tokens', PROMPT, st.inp, fmtTok) +
         range(u + 'out', 'Output tokens', OUTPUT, st.out, String) +
@@ -225,33 +240,39 @@
           '<div class="lp-kpi"><small>Per 1M output tokens</small><b data-x="cpm">—</b><span data-x="month">—</span></div>' +
         '</div>' +
         '<div data-x="alert"></div>' +
-        '<div><div class="lp-sec">Memory per GPU<span data-x="memcap">—</span></div>' +
-          '<div class="lp-bar" role="img" data-x="bar"><i class="lp-c-w"></i><i class="lp-c-kv"></i><i class="lp-c-act"></i></div>' +
-          '<div class="lp-leg"><span><i class="lp-c-w"></i>Weights <em data-x="lw">—</em></span><span><i class="lp-c-kv"></i>KV cache <em data-x="lkv">—</em></span><span><i class="lp-c-act"></i>Activations and runtime <em data-x="lact">—</em></span><span><i class="lp-c-free"></i>Free <em data-x="lfree">—</em></span></div></div>' +
-        '<div class="lp-chart"><div class="lp-sec">Throughput against batch size, one replica<span data-x="regime">—</span></div><div data-x="chart"></div>' +
-          '<div class="lp-leg"><span><i class="lp-c-w"></i>Aggregate tok/s (left axis)</span><span><i style="background:none;border-top:2px dashed var(--ink3);height:0;width:14px"></i>Per-user tok/s (right axis)</span></div></div>' +
+        '<div class="lp-mid"><div class="lp-card" data-x="card"></div><div class="lp-r">' +
+          '<div><div class="lp-sec">Time per output token, one stream<span data-x="steplab">—</span></div>' +
+            '<div class="lp-stk" role="img" data-x="stk"><i style="background:' + C_W + '"></i><i style="background:' + C_KV + '"></i><i style="background:' + C_COMM + '"></i><i style="background:' + C_PRE + '"></i></div>' +
+            '<div class="lp-leg"><span><i style="background:' + C_W + '"></i><span data-x="l1n">Weights read</span> <em data-x="l1">—</em></span><span data-x="l2s"><i style="background:' + C_KV + '"></i>KV cache read <em data-x="l2">—</em></span><span><i style="background:' + C_COMM + '"></i>TP all-reduces <em data-x="l3">—</em></span><span><i style="background:' + C_PRE + '"></i>Prefill share <em data-x="l4">—</em></span></div></div>' +
+          '<div class="lp-chart"><div class="lp-sec">Throughput against batch size, one replica<span data-x="regime">—</span></div><div data-x="chart"></div>' +
+            '<div class="lp-leg"><span><i style="background:' + C_W + '"></i>Aggregate tok/s (left axis)</span><span><i style="background:none;border-top:2px dashed var(--ink3);height:0;width:14px"></i>Per-user tok/s (right axis)</span></div></div>' +
+        '</div></div>' +
         '<dl class="lp-tbl" style="margin:0">' +
           '<div><dt>Tensor parallel × replicas</dt><dd data-x="tp">—</dd></div>' +
           '<div><dt>Batch per replica</dt><dd data-x="batch">—</dd></div>' +
           '<div><dt>Requests per second</dt><dd data-x="rps">—</dd></div>' +
+          '<div><dt>Matmul rate used</dt><dd data-x="rate">—</dd></div>' +
           '<div><dt>KV cache per request</dt><dd data-x="kvreq">—</dd></div>' +
           '<div><dt>KV cache, all requests</dt><dd data-x="kvall">—</dd></div>' +
           '<div><dt>Decode step</dt><dd data-x="step">—</dd></div>' +
+          '<div><dt>Of which communication</dt><dd data-x="comm">—</dd></div>' +
         '</dl>' +
         '<details class="lp-how"><summary>How this is calculated</summary><ul>' +
-          '<li>Weights take <code>params × bytes</code> (bf16 2, fp8 1, int4 0.56 with group scales), split across the tensor-parallel group. Each GPU also holds <code>8% of memory + 1.5 GB</code> for activations, CUDA graphs and allocator slack; what is left holds the KV cache.</li>' +
+          '<li>Weights take <code>params × bytes</code> (bf16 2, fp8 1, int4 0.56 with group scales), split across the tensor-parallel group. Each GPU also holds <code>8% of memory + 1.5 GB</code> for activations, CUDA graphs and allocator slack; what is left holds the KV cache. GB means 2<sup>30</sup> bytes, as the driver reports it. The memory drawing shows the GPU\'s HBM stacks (or GDDR channels); memory is interleaved across them, so every stack holds the same share.</li>' +
           '<li>KV cache per token is <code>2 × layers × KV heads × head dim × bytes</code> (DeepSeek-V3 caches a 576-wide latent per layer). Each request reserves room for prompt plus output.</li>' +
-          '<li>A decode step is memory bound: <code>(weight bytes read + batch × avg context × KV bytes) ÷ (bandwidth × 0.75)</code>, with a compute floor of <code>2 × active params × batch ÷ (FLOPS × 0.5)</code>. For MoE models, the weight bytes read grow with the experts the batch touches.</li>' +
-          '<li>Prefill is compute bound at 60% of dense FLOPS (fp8 rate for fp8 and int4 weights where the GPU has it). Prefill time is taken out of decode time, so long prompts lower per-user speed. TTFT is one prompt\'s prefill plus one decode step, with no queueing.</li>' +
-          '<li>Tensor parallelism adds <code>6% × log2(TP)</code> for communication. The planner picks the layout that meets the TTFT target with the fewest GPUs.</li>' +
-          '<li>Not modelled: prefix caching, speculative decoding, chunked-prefill scheduling, quantisation accuracy, queueing under bursty traffic. That is what an Optimize run measures.</li>' +
+          '<li>A decode step is memory bound: <code>(weight bytes read + batch × avg context × KV bytes) ÷ (bandwidth × 0.75)</code>, with a compute floor of <code>2 × active params × batch ÷ (FLOPS × 0.5)</code>. For MoE models, the weight bytes read grow with the experts the batch touches. The 0.75 and 0.5 are assumed efficiencies against the datasheet peak.</li>' +
+          '<li>The matmul rate is the GPU\'s dense tensor-core figure for the weight format: bf16 at the bf16 rate; fp8 at the fp8 rate where the GPU has one, otherwise dequantised and run at bf16 (A100); int4 at the fp4 rate on Blackwell, otherwise dequantised to fp8 or bf16.</li>' +
+          '<li>Tensor parallelism adds two all-reduces per layer per step over <code>batch × hidden × 2 bytes</code>. With a ring all-reduce each GPU sends and receives <code>2(TP−1)/TP</code> of that through its link, so communication per step is <code>layers × 2 × (bytes ÷ link bandwidth + latency)</code>, with an assumed all-reduce latency of 8 µs over NVLink or Infinity Fabric and 25 µs over PCIe. It is not overlapped with compute here. This is why TP over PCIe (L40S, RTX 5090) costs so much more than over NVLink.</li>' +
+          '<li>Prefill is compute bound at 60% of the same matmul rate, plus its own all-reduces. Prefill time is taken out of decode time, so long prompts lower per-user speed; the stacked bar shows that share amortised per output token. TTFT is one prompt\'s prefill plus one decode step, with no queueing.</li>' +
+          '<li>The planner tries TP 1, 2, 4 and 8 and picks the layout that meets the TTFT target with the fewest GPUs. Not modelled: prefix caching, speculative decoding, chunked-prefill scheduling, quantisation accuracy, queueing under bursty traffic. That is what an Optimize run measures.</li>' +
         '</ul></details>' +
         '<p class="lp-note" style="margin:0">A first-order estimate from public hardware specs. Optimize measures the real number on your model, traffic and hardware.</p>' +
       '</div></div>';
 
     var $ = function (sel) { return root.querySelector(sel); };
     var X = {}; [].forEach.call(root.querySelectorAll('[data-x]'), function (e) { X[e.getAttribute('data-x')] = e; });
-    var barI = X.bar.querySelectorAll('i');
+    var stkI = X.stk.querySelectorAll('i');
+    var cardGPU = null, memBar = null;
 
     root.addEventListener('click', function (e) {
       var b = e.target.closest('.lp-seg button'); if (!b || !root.contains(b)) return;
@@ -263,32 +284,71 @@
     root.addEventListener('input', function (e) {
       var t = e.target, k = t.getAttribute('data-k'), r = t.getAttribute('data-r');
       if (k === 'model') st.model = t.value;
-      else if (k === 'gpu') { st.gpu = t.value; st.price = byId(GPUS, st.gpu).price; $('#' + u + 'p').value = st.price.toFixed(2); }
+      else if (k === 'gpu') { st.gpu = t.value; st.price = HW.gpus[st.gpu].price; $('#' + u + 'p').value = st.price.toFixed(2); }
       else if (k === 'price') { var v = parseFloat(t.value); st.price = isFinite(v) && v >= 0 ? v : 0; }
       else if (r) { st[r.slice(u.length)] = +t.value; }
       update();
     });
+
+    // the hardware card: rebuilt when the GPU or the weight format changes; the memory stacks inside it update in place
+    function buildCard(g, rt, wname) {
+      var fallback = rt.as !== wname && !(wname === 'int4' && rt.as === 'fp4');
+      var rows = [
+        ['Memory', g.stacks + ' × ' + g.stackGB + ' GB ' + g.memType],
+        ['Bandwidth', HW.fmt(g.bw, 2) + ' TB/s'],
+        ['Dense ' + rt.as, HW.fmt(rt.tf) + ' TFLOPS'],
+        [g.cus ? 'Compute units' : 'SMs', HW.fmt(g.cus || g.sms)],
+        ['Interconnect', HW.esc(g.link.name) + ' · ' + g.link.gbps + ' GB/s'],
+        ['Power', g.tdp + ' W']
+      ];
+      var note = fallback ? (wname === 'fp8' ? 'No fp8 tensor cores: fp8 weights are dequantised and the matmuls run at the bf16 rate.' : 'int4 weights are dequantised to ' + rt.as + ' for the matmuls.') : (wname === 'int4' && rt.as === 'fp4' ? 'int4 weights run as NVFP4 at the fp4 tensor-core rate.' : '');
+      var c = HW.card(g, { rows: rows, sub: HW.arch[g.arch].name, note: note });
+      X.card.innerHTML = ''; X.card.appendChild(c);
+      memBar = null;
+    }
+    function setMem(g, w, kv, act, tp) {
+      var parts = [{ label: 'Weights', bytes: w, color: C_W }, { label: 'KV cache', bytes: kv, color: C_KV }, { label: 'Activations and runtime', bytes: act, color: C_ACT }];
+      var slot = X.card.querySelector('.hwc-slot');
+      if (!memBar) {
+        slot.innerHTML = '<div class="lp-sec" style="margin-bottom:6px">Memory per GPU<span data-x="memcap"></span></div>';
+        memBar = HW.memoryBar(g, parts); slot.appendChild(memBar);
+      } else {
+        var cap = g.mem * GiB, stacks = memBar.querySelectorAll('.hwm-st');
+        [].forEach.call(stacks, function (s) {
+          var x = 0, is = s.querySelectorAll('i');
+          parts.forEach(function (p, i) { var wd = Math.max(0, p.bytes) / cap * 100; is[i].style.left = x + '%'; is[i].style.width = wd + '%'; x += wd; });
+        });
+        var lg = memBar.querySelectorAll('.hwm-lg span'), used = w + kv + act;
+        parts.forEach(function (p, i) { lg[i].textContent = p.label + ' ' + fmtGB(p.bytes); });
+        lg[3].textContent = 'free ' + fmtGB(Math.max(0, cap - used));
+        memBar.setAttribute('aria-label', fmtGB(used) + ' of ' + g.mem + ' GB used');
+      }
+      slot.querySelector('[data-x="memcap"]').textContent = g.mem + ' GB' + (tp > 1 ? ' · TP' + tp : '');
+    }
 
     function update() {
       [['users', USERS, String], ['inp', PROMPT, fmtTok], ['out', OUTPUT, String], ['slo', SLO, function (v) { return v + ' ms'; }]].forEach(function (a) {
         var inp = $('#' + u + a[0]); inp.style.setProperty('--p', (st[a[0]] / (a[1].length - 1) * 100) + '%');
         root.querySelector('[data-o="' + u + a[0] + '"]').textContent = a[2](a[1][st[a[0]]]);
       });
-      var m = byId(MODELS, st.model), g = byId(GPUS, st.gpu);
+      var m = byId(MODELS, st.model), g = HW.gpus[st.gpu];
       var wb = WPREC.filter(function (x) { return x[0] === st.w; })[0][1];
       var kvb = KVPREC.filter(function (x) { return x[0] === st.kv; })[0][1];
-      var s = { m: m, g: g, wb: wb, wname: st.w, kvTok: kvBytesPerToken(m, kvb), users: USERS[st.users], inTok: PROMPT[st.inp], outTok: OUTPUT[st.out], slo: SLO[st.slo] };
+      var rt = rate(g, st.w);
+      if (cardGPU !== st.gpu + '/' + st.w) { cardGPU = st.gpu + '/' + st.w; buildCard(g, rt, st.w); }
+      var s = { m: m, g: g, wb: wb, wname: st.w, rate: rt, kvTok: kvBytesPerToken(m, kvb), users: USERS[st.users], inTok: PROMPT[st.inp], outTok: OUTPUT[st.out], slo: SLO[st.slo] };
       var r = plan(s);
+      X.rate.textContent = HW.fmt(rt.tf) + ' TFLOPS ' + rt.as;
       var alert = '';
       if (r.fail) {
         X.gpus.textContent = '> 8'; X.layout.textContent = 'does not fit one node';
-        ['user', 'agg', 'ttft', 'cpm', 'tp', 'batch', 'rps', 'kvall', 'step'].forEach(function (k) { X[k].textContent = '—'; });
+        ['user', 'agg', 'ttft', 'cpm', 'tp', 'batch', 'rps', 'kvall', 'step', 'comm'].forEach(function (k) { X[k].textContent = '—'; });
         X.slo.textContent = ''; X.month.textContent = ''; X.slo.className = '';
         X.kvreq.textContent = fmtGB(s.kvTok * (s.inTok + s.outTok));
         X.alert.innerHTML = '<div class="lp-alert lp-err">' + fmtGB(r.weights) + ' of weights plus the KV cache don\'t fit on 8 × ' + g.name + '. Choose lower-precision weights, a larger GPU, or shorter contexts.</div>';
         var wPer8 = r.weights / 8;
-        setBar(Math.min(wPer8, r.memB), 0, Math.min(r.act, Math.max(0, r.memB - wPer8)), r.memB, 8);
-        X.lw.textContent = fmtGB(wPer8) + ' needed';
+        setMem(g, Math.min(wPer8, r.memB), 0, Math.min(r.act, Math.max(0, r.memB - wPer8)), 8);
+        setStack(null);
         X.chart.innerHTML = ''; X.regime.textContent = '';
         return;
       }
@@ -309,26 +369,32 @@
       X.rps.textContent = fmtN(p.agg * r.replicas / s.outTok);
       X.kvreq.textContent = fmtGB(r.perReq);
       X.kvall.textContent = fmtGB(r.perReq * s.users);
-      X.step.textContent = (p.tStep * 1000).toFixed(1) + ' ms';
+      X.step.textContent = ms(p.tStep);
+      X.comm.textContent = r.tp > 1 ? ms(p.tComm) + ' (' + Math.round(p.tComm / p.tStep * 100) + '%)' : 'none, TP1';
       if (!r.sloOk) alert = '<div class="lp-alert">No layout up to TP8 prefills a ' + fmtTok(s.inTok) + '-token prompt within ' + s.slo + ' ms on ' + g.name + '. Shown: the fastest layout. Prefix caching or a faster GPU would close the gap.</div>';
       X.alert.innerHTML = alert;
-      setBar(r.wPer, r.kvPer, r.act, r.memB, r.tp);
+      setMem(g, r.wPer, r.kvPer, r.act, r.tp);
+      setStack(p);
       X.regime.textContent = p.memBound ? 'memory-bandwidth bound' : 'compute bound';
       chart(s, r);
     }
 
-    function setBar(w, kv, act, mem, tp) {
-      var free = Math.max(0, mem - w - kv - act);
-      var pct = function (v) { return (Math.max(0, v) / mem * 100).toFixed(2) + '%'; };
-      barI[0].style.width = pct(w); barI[1].style.width = pct(kv); barI[2].style.width = pct(act);
-      X.lw.textContent = fmtGB(w); X.lkv.textContent = fmtGB(kv); X.lact.textContent = fmtGB(act); X.lfree.textContent = fmtGB(free);
-      X.memcap.textContent = fmtGB(mem) + ' per GPU' + (tp > 1 ? ', TP' + tp : '');
-      X.bar.setAttribute('aria-label', 'Weights ' + fmtGB(w) + ', KV cache ' + fmtGB(kv) + ', activations ' + fmtGB(act) + ', free ' + fmtGB(free) + ' of ' + fmtGB(mem));
+    // stacked bar: how the time per output token splits at the operating point
+    function setStack(p) {
+      if (!p) { [].forEach.call(stkI, function (i) { i.style.width = '0%'; }); X.steplab.textContent = '—'; ['l1', 'l2', 'l3', 'l4'].forEach(function (k) { X[k].textContent = '—'; }); return; }
+      var a = p.memBound ? p.tW : p.tCmp, b = p.memBound ? p.tKV : 0, total = a + b + p.tComm + p.tPre;
+      var seg = [a, b, p.tComm, p.tPre];
+      seg.forEach(function (v, i) { stkI[i].style.width = (v / total * 100).toFixed(2) + '%'; });
+      X.l1n.textContent = p.memBound ? 'Weights read' : 'Matmuls (compute bound)';
+      X.l2s.style.display = p.memBound ? '' : 'none';
+      X.l1.textContent = ms(a); X.l2.textContent = ms(b); X.l3.textContent = ms(p.tComm); X.l4.textContent = ms(p.tPre);
+      X.steplab.textContent = ms(total) + ' = ' + fmtN(1 / total) + ' tok/s';
+      X.stk.setAttribute('aria-label', 'Per output token: ' + X.l1n.textContent + ' ' + ms(a) + (p.memBound ? ', KV read ' + ms(b) : '') + ', communication ' + ms(p.tComm) + ', prefill share ' + ms(p.tPre));
     }
 
     function nice(v) { var e = Math.pow(10, Math.floor(Math.log10(v))), f = v / e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * e; }
     function chart(s, r) {
-      var W = Math.round(Math.max(300, Math.min(640, X.chart.clientWidth || 600))), H = Math.round(Math.max(180, W * 0.34)), L = 40, R = 34, T = 12, B = 26;
+      var W = Math.round(Math.max(300, Math.min(640, X.chart.clientWidth || 600))), H = Math.round(Math.max(180, W * 0.36)), L = 40, R = 34, T = 12, B = 26;
       var maxB = Math.max(2, r.maxB), n = 48, pts = [];
       for (var i = 0; i <= n; i++) { var b = Math.max(1, Math.round(Math.exp(Math.log(maxB) * i / n))); if (!pts.length || pts[pts.length - 1].b !== b) pts.push({ b: b, p: perf(s, r.tp, b) }); }
       var aMax = nice(Math.max.apply(null, pts.map(function (q) { return q.p.agg; })) * 1.08);

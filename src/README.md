@@ -15,7 +15,8 @@ python3 src/build.py          # writes every page; needs only Python 3
 | `pages.py` | The company site: navigation, footer, the home page, product, solution and demo pages, and the Plan screen. Writes the shared CSS and JS with a content hash on each link. |
 | `pages.css`, `pages.js` | Styles and the small nav and lifecycle script for those pages. |
 | `photo_credits.json` | Source and licence of each photo under `assets/photos/`; the credits page is built from it. |
-| `../assets/js/lab-*.js` | The five live demos (planner, batching, quant, specdec, edgefit). Hand-written, self-contained; each mounts on `[data-lab="name"]`. |
+| `../assets/js/hw.js` | The hardware catalogue the demos share: public specs per GPU and device, the compute-capability rules for the occupancy calculator, the photo card and the memory drawing. Every figure is from a datasheet or is marked as an assumption. |
+| `../assets/js/lab-*.js` | The six live demos (planner, batching, kernel, quant, specdec, edgefit). Hand-written; each mounts on `[data-lab="name"]` and reads `window.VO_HW`. |
 | `icons/` | Lucide icons and brand marks, inlined as an SVG sprite that holds only the icons the page uses. See `icons/LICENSES.md`. |
 | `og.html` | Source of the social card. |
 | `tools/render_icons.py` | Renders the PNG favicons, the Apple touch icon and `assets/og.png` from `assets/vo-mark.svg` and `og.html`. |

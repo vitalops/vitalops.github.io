@@ -1,0 +1,138 @@
+/* Hardware catalogue shared by the live demos (assets/js/hw.js).
+   Public specifications only; every figure below comes from the vendor's datasheet or the CUDA
+   programming guide's compute-capability table, and the notes say where a figure is an assumption.
+   Nothing here is a measurement of any VitalOps product.
+
+   window.VO_HW = { gpus, devices, arch, photos, card(key, opts), memoryBar(spec, parts), fmt }
+*/
+(function () {
+  'use strict';
+  var ROOT = (function () {
+    var s = document.currentScript && document.currentScript.src;
+    return s ? s.replace(/assets\/js\/hw\.js.*$/, '') : '';
+  })();
+
+  /* ── compute-capability rules used by the occupancy calculator (CUDA programming guide, table "Technical specifications per compute capability") ── */
+  var ARCH = {
+    sm_80:  { name: 'Ampere (sm_80)',    regsPerSM: 65536, regAllocUnit: 256, warpAllocGran: 4, maxRegsPerThread: 255, maxWarpsPerSM: 64, maxThreadsPerSM: 2048, maxBlocksPerSM: 32, smemPerSM: 164 * 1024, smemPerBlockMax: 163 * 1024, smemAllocUnit: 128, smemReservedPerBlock: 1024, warpSize: 32 },
+    sm_87:  { name: 'Ampere (sm_87)',    regsPerSM: 65536, regAllocUnit: 256, warpAllocGran: 4, maxRegsPerThread: 255, maxWarpsPerSM: 48, maxThreadsPerSM: 1536, maxBlocksPerSM: 16, smemPerSM: 164 * 1024, smemPerBlockMax: 163 * 1024, smemAllocUnit: 128, smemReservedPerBlock: 1024, warpSize: 32 },
+    sm_89:  { name: 'Ada (sm_89)',       regsPerSM: 65536, regAllocUnit: 256, warpAllocGran: 4, maxRegsPerThread: 255, maxWarpsPerSM: 48, maxThreadsPerSM: 1536, maxBlocksPerSM: 24, smemPerSM: 100 * 1024, smemPerBlockMax: 99 * 1024,  smemAllocUnit: 128, smemReservedPerBlock: 1024, warpSize: 32 },
+    sm_90:  { name: 'Hopper (sm_90)',    regsPerSM: 65536, regAllocUnit: 256, warpAllocGran: 4, maxRegsPerThread: 255, maxWarpsPerSM: 64, maxThreadsPerSM: 2048, maxBlocksPerSM: 32, smemPerSM: 228 * 1024, smemPerBlockMax: 227 * 1024, smemAllocUnit: 128, smemReservedPerBlock: 1024, warpSize: 32 },
+    sm_100: { name: 'Blackwell (sm_100)', regsPerSM: 65536, regAllocUnit: 256, warpAllocGran: 4, maxRegsPerThread: 255, maxWarpsPerSM: 64, maxThreadsPerSM: 2048, maxBlocksPerSM: 32, smemPerSM: 228 * 1024, smemPerBlockMax: 227 * 1024, smemAllocUnit: 128, smemReservedPerBlock: 1024, warpSize: 32 },
+    sm_120: { name: 'Blackwell (sm_120)', regsPerSM: 65536, regAllocUnit: 256, warpAllocGran: 4, maxRegsPerThread: 255, maxWarpsPerSM: 48, maxThreadsPerSM: 1536, maxBlocksPerSM: 24, smemPerSM: 100 * 1024, smemPerBlockMax: 99 * 1024,  smemAllocUnit: 128, smemReservedPerBlock: 1024, warpSize: 32 },
+    /* CDNA3: a compute unit has four SIMDs, each with a 512-register (128 KB) VGPR file and at most 8 waves; wave64. */
+    cdna3:  { name: 'CDNA 3 (gfx942)', amd: true, vgprPerSIMD: 512, vgprAllocUnit: 8, maxVgprPerWave: 512, maxWavesPerSIMD: 8, simdsPerCU: 4, ldsPerCU: 64 * 1024, ldsAllocUnit: 512, maxWorkgroupsPerCU: 32, warpSize: 64 }
+  };
+
+  /* ── data-centre and workstation GPUs ──
+     mem: GB usable. stacks: HBM stacks (or GDDR channels) and GB each, for the memory drawing. bw: TB/s peak. flops: dense TFLOPS by dtype (fp32 is the vector rate, the rest tensor-core rates).
+     link: interconnect usable per direction, GB/s (NVLink figure is the per-GPU total split in two directions; PCIe is the Gen x16 figure).
+     latency: assumed DRAM latency in ns for the Little's-law estimate (microbenchmarks put HBM3 at roughly 600-800 ns; GDDR a little lower). price: default $/GPU-hour, editable in the demos. */
+  var GPUS = {
+    h100:  { name: 'H100 SXM',  vendor: 'nvidia', arch: 'sm_90',  sms: 132, mem: 80,  memType: 'HBM3',   stacks: 5, stackGB: 16,  bw: 3.35, flops: { fp32: 67, bf16: 989,  fp8: 1979, int8: 1979 },           l2: 50, link: { name: 'NVLink 4', gbps: 450 }, tdp: 700, latency: 650, price: 2.50, photo: 'h100', photoNote: 'H100 PCIe card pictured (same GH100 die as the SXM module).' },
+    h200:  { name: 'H200 SXM',  vendor: 'nvidia', arch: 'sm_90',  sms: 132, mem: 141, memType: 'HBM3e',  stacks: 6, stackGB: 24,  bw: 4.8,  flops: { fp32: 67, bf16: 989,  fp8: 1979, int8: 1979 },           l2: 50, link: { name: 'NVLink 4', gbps: 450 }, tdp: 700, latency: 650, price: 3.50, photo: 'h100', photoNote: 'H100 card pictured; no licensed H200 photo (same die, HBM3e).' },
+    b200:  { name: 'B200',      vendor: 'nvidia', arch: 'sm_100', sms: 148, mem: 180, memType: 'HBM3e',  stacks: 8, stackGB: 24,  bw: 8.0,  flops: { fp32: 80, bf16: 2250, fp8: 4500, int8: 4500, fp4: 9000 }, l2: 126, link: { name: 'NVLink 5', gbps: 900 }, tdp: 1000, latency: 700, price: 5.50, photo: 'b200', photoNote: 'DGX B200 system front pictured; the GPU itself sits inside.' },
+    a100:  { name: 'A100 SXM 80 GB', vendor: 'nvidia', arch: 'sm_80', sms: 108, mem: 80, memType: 'HBM2e', stacks: 5, stackGB: 16, bw: 2.0, flops: { fp32: 19.5, bf16: 312, int8: 624 },                   l2: 40, link: { name: 'NVLink 3', gbps: 300 }, tdp: 400, latency: 550, price: 1.60, photo: 'a100', photoNote: 'A100 PCIe card pictured.' },
+    l40s:  { name: 'L40S',      vendor: 'nvidia', arch: 'sm_89',  sms: 142, mem: 48,  memType: 'GDDR6',  stacks: 12, stackGB: 4,  bw: 0.864, flops: { fp32: 91.6, bf16: 362, fp8: 733, int8: 733 },             l2: 96, link: { name: 'PCIe 4.0 x16', gbps: 25 }, tdp: 350, latency: 550, price: 1.00, photo: null, photoNote: 'No licensed photo. Dual-slot PCIe card.' },
+    rtx5090: { name: 'RTX 5090', vendor: 'nvidia', arch: 'sm_120', sms: 170, mem: 32, memType: 'GDDR7', stacks: 16, stackGB: 2, bw: 1.79, flops: { fp32: 104.8, bf16: 209, fp8: 419, int8: 419, fp4: 838 },      l2: 96, link: { name: 'PCIe 5.0 x16', gbps: 50 }, tdp: 575, latency: 550, price: 0.70, photo: 'rtx5090', photoNote: 'Palit GameRock board pictured; memory and compute are the same GB202 on every board.' },
+    mi300x: { name: 'MI300X',   vendor: 'amd',    arch: 'cdna3',  cus: 304, mem: 192, memType: 'HBM3',   stacks: 8, stackGB: 24,  bw: 5.3,  flops: { fp32: 163.4, bf16: 1307, fp8: 2615, int8: 2615 },           l2: 256, link: { name: 'Infinity Fabric', gbps: 448 }, tdp: 750, latency: 850, price: 2.50, photo: null, photoNote: 'No licensed photo. OAM module.' },
+    /* Jetson modules share LPDDR5 between CPU and GPU; "mem" is the whole module. */
+    agx_orin: { name: 'Jetson AGX Orin 64 GB', vendor: 'nvidia', arch: 'sm_87', sms: 16, mem: 64, memType: 'LPDDR5', stacks: 8, stackGB: 8, bw: 0.2048, flops: { fp32: 5.3, bf16: 42, int8: 85 }, l2: 4, link: { name: 'PCIe 4.0 x8', gbps: 12 }, tdp: 60, latency: 450, price: 0, photo: 'agx-orin', photoNote: 'AGX Orin Developer Kit pictured.' }
+  };
+
+  /* ── edge devices for the fit demo. usable: GB one process can expect (assumption, see note). bw: GB/s. ── */
+  var DEVICES = {
+    orin_nano: { name: 'Jetson Orin Nano Super 8 GB', mem: 8,  usable: 6.2, bw: 102,  kind: 'Jetson, 1024 CUDA cores, sm_87', photo: 'orin-nx', photoNote: 'Orin NX module pictured; Orin Nano uses the same module format.', eff: 0.65, note: 'Usable memory assumes JetPack with the desktop disabled.' },
+    orin_nx:   { name: 'Jetson Orin NX 16 GB',        mem: 16, usable: 13.5, bw: 102,  kind: 'Jetson, 1024 CUDA cores, sm_87', photo: 'orin-nx', photoNote: 'Orin NX module on a carrier board.', eff: 0.65 },
+    agx_orin:  { name: 'Jetson AGX Orin 64 GB',       mem: 64, usable: 58,  bw: 204.8, kind: 'Jetson, 2048 CUDA cores, sm_87', photo: 'agx-orin', photoNote: 'AGX Orin Developer Kit.', eff: 0.65 },
+    pi5:       { name: 'Raspberry Pi 5 8 GB',         mem: 8,  usable: 6.5, bw: 17,   kind: 'Arm Cortex-A76 ×4, LPDDR4X', photo: 'pi5', photoNote: 'Raspberry Pi 5 board.', eff: 0.6, note: 'CPU inference; a Hailo module does not run language models.' },
+    iphone16:  { name: 'iPhone 16 Pro 8 GB',          mem: 8,  usable: 4.5, bw: 60,   kind: 'A18 Pro, LPDDR5X', photo: 'iphone16pro', photoNote: 'iPhone 16 Pro.', eff: 0.6, note: 'iOS limits one app to roughly 4-5 GB before it is killed.' },
+    pixel9:    { name: 'Pixel 9 Pro 16 GB',           mem: 16, usable: 8,   bw: 68,   kind: 'Tensor G4, LPDDR5X', photo: 'pixel9pro', photoNote: 'Pixel 9 and 9 Pro.', eff: 0.6, note: 'Android keeps a large share for the system and other apps.' },
+    s25u:      { name: 'Galaxy S25 Ultra 12 GB',      mem: 12, usable: 7,   bw: 77,   kind: 'Snapdragon 8 Elite, LPDDR5X', photo: 's25-ultra', photoNote: 'Galaxy S25 Ultra.', eff: 0.6 },
+    mba:       { name: 'MacBook Air M3 16 GB',        mem: 16, usable: 12,  bw: 100,  kind: 'Apple M3, unified memory', photo: 'macbook-air', photoNote: 'MacBook Air (M2 model pictured; the M3 chassis is identical).', eff: 0.7 }
+  };
+
+  var PHOTOS = {
+    h100: 'h100', a100: 'a100', b200: 'b200', rtx5090: 'rtx5090', 'agx-orin': 'agx-orin', 'orin-nx': 'orin-nx', pi5: 'pi5', iphone16pro: 'iphone16pro', pixel9pro: 'pixel9pro', 'macbook-air': 'macbook-air', 's25-ultra': 's25-ultra'
+  };
+  function photoURL(key) { return key && PHOTOS[key] ? ROOT + 'assets/photos/hw/' + PHOTOS[key] + '.webp' : null; }
+
+  /* ── formatting ── */
+  function fmt(n, d) { return Number(n).toLocaleString('en-GB', { maximumFractionDigits: d == null ? 0 : d, minimumFractionDigits: d == null ? 0 : d }); }
+  function gb(bytes) { var g = bytes / 1073741824; return g >= 100 ? fmt(g, 0) + ' GB' : g >= 10 ? fmt(g, 1) + ' GB' : g >= 1 ? fmt(g, 2) + ' GB' : fmt(bytes / 1048576, 0) + ' MB'; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  /* ── the hardware card: photo (or a labelled silhouette), name, spec rows, and a slot for a drawing ── */
+  var CSS_ID = 'vo-hw-css';
+  function css() {
+    if (document.getElementById(CSS_ID)) return;
+    var s = document.createElement('style'); s.id = CSS_ID;
+    s.textContent = [
+      '.hwc{display:grid;grid-template-columns:minmax(0,1fr);border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;font-family:var(--font)}',
+      '.hwc-ph{position:relative;aspect-ratio:3/2;background:#0b1020;overflow:hidden}',
+      '.hwc-ph img{width:100%;height:100%;object-fit:cover;display:block}',
+      '.hwc-ph.none{display:grid;place-items:center;color:#94a3b8}',
+      '.hwc-ph.none svg{width:60%;height:auto;opacity:.8}',
+      '.hwc-ph .hwc-tag{position:absolute;left:8px;bottom:8px;font:500 10.5px/1.35 var(--mono);color:#e2e8f0;background:rgba(7,10,24,.72);padding:3px 7px;border-radius:5px;max-width:calc(100% - 16px);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
+      '.hwc-b{padding:10px 12px 12px}',
+      '.hwc-b b{display:block;font-size:14px;color:var(--ink);letter-spacing:-.01em}',
+      '.hwc-b small{display:block;font-size:11.5px;color:var(--ink3);margin-top:1px}',
+      '.hwc-kv{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;row-gap:3px;margin-top:8px;font-size:11.5px}',
+      '.hwc-kv dt{color:var(--ink3)}.hwc-kv dd{margin:0;font-family:var(--mono);color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}',
+      '.hwc-slot{margin-top:10px}',
+      '.hwc-note{font-size:10.5px;color:var(--ink4);margin-top:8px;line-height:1.4}',
+      /* memory drawing: one block per HBM stack or GDDR channel; fill is interleaved, so every stack shows the same share */
+      '.hwm{display:grid;gap:4px}',
+      '.hwm-row{display:grid;gap:3px}',
+      '.hwm-st{position:relative;height:18px;border:1px solid var(--line);border-radius:3px;background:var(--line2);overflow:hidden}',
+      '.hwm-st i{position:absolute;top:0;bottom:0;left:0;display:block;transition:width .35s ease}',
+      '.hwm-lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--ink3)}',
+      '.hwm-lg span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c);box-shadow:inset 0 0 0 1px rgba(15,23,42,.18)}',
+      '@media (prefers-reduced-motion:reduce){.hwm-st i{transition:none}}'
+    ].join('\n');
+    document.head.appendChild(s);
+  }
+
+  function silhouette(kind) {
+    if (kind === 'oam') return '<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="10" y="8" width="100" height="54" rx="3"/><rect x="38" y="22" width="44" height="26" rx="2"/><path d="M14 62v4M30 62v4M46 62v4M62 62v4M78 62v4M94 62v4M106 62v4"/></svg>';
+    return '<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14h104v40H8z"/><path d="M18 54v8h60v-8"/><circle cx="36" cy="34" r="12"/><circle cx="74" cy="34" r="12"/><path d="M8 20h-4v28h4"/></svg>';
+  }
+
+  function card(spec, opts) {
+    css(); opts = opts || {};
+    var el = document.createElement('div'); el.className = 'hwc' + (opts.cls ? ' ' + opts.cls : '');
+    var url = photoURL(spec.photo);
+    var ph = url ? '<div class="hwc-ph"><img src="' + url + '" alt="" loading="lazy"><span class="hwc-tag">' + esc(spec.photoNote || spec.name) + '</span></div>'
+                 : '<div class="hwc-ph none">' + silhouette(spec.arch === 'cdna3' ? 'oam' : 'card') + '<span class="hwc-tag">' + esc(spec.photoNote || 'No licensed photo') + '</span></div>';
+    var rows = (opts.rows || []).map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + r[1] + '</dd>'; }).join('');
+    el.innerHTML = ph + '<div class="hwc-b"><b>' + esc(spec.name) + '</b>' + (opts.sub ? '<small>' + esc(opts.sub) + '</small>' : '') +
+      (rows ? '<dl class="hwc-kv">' + rows + '</dl>' : '') + '<div class="hwc-slot"></div>' + (opts.note ? '<p class="hwc-note">' + esc(opts.note) + '</p>' : '') + '</div>';
+    return el;
+  }
+
+  /* Draws the GPU's memory as its stacks. parts: [{label, bytes, color}] in order; the total capacity is spec.mem GB.
+     Memory is interleaved across stacks, so each stack shows the same proportions; that is how the hardware places it. */
+  function memoryBar(spec, parts) {
+    css();
+    var cap = spec.mem * 1073741824, n = spec.stacks || 1, perRow = n > 8 ? Math.ceil(n / 2) : n;
+    var wrap = document.createElement('div'); wrap.className = 'hwm';
+    var rows = Math.ceil(n / perRow), html = '';
+    for (var r = 0; r < rows; r++) {
+      html += '<div class="hwm-row" style="grid-template-columns:repeat(' + perRow + ',minmax(0,1fr))">';
+      for (var k = 0; k < perRow && r * perRow + k < n; k++) {
+        var x = 0, segs = '';
+        parts.forEach(function (p) { var w = Math.max(0, p.bytes) / cap * 100; segs += '<i style="left:' + x + '%;width:' + w + '%;background:' + p.color + '"></i>'; x += w; });
+        html += '<div class="hwm-st" title="' + esc((spec.memType || 'memory') + ' ' + (spec.stackGB || '') + ' GB') + '">' + segs + '</div>';
+      }
+      html += '</div>';
+    }
+    var used = parts.reduce(function (a, p) { return a + p.bytes; }, 0);
+    html += '<div class="hwm-lg">' + parts.map(function (p) { return '<span style="--c:' + p.color + '">' + esc(p.label) + ' ' + gb(p.bytes) + '</span>'; }).join('') +
+      '<span style="--c:var(--line2)">free ' + gb(Math.max(0, cap - used)) + '</span></div>';
+    wrap.innerHTML = html;
+    wrap.setAttribute('aria-label', n + ' × ' + (spec.stackGB || '') + ' GB ' + (spec.memType || '') + ', ' + gb(used) + ' of ' + spec.mem + ' GB used');
+    return wrap;
+  }
+
+  window.VO_HW = { gpus: GPUS, devices: DEVICES, arch: ARCH, photoURL: photoURL, card: card, memoryBar: memoryBar, fmt: fmt, gb: gb, esc: esc };
+})();

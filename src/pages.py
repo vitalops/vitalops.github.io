@@ -41,6 +41,7 @@ DEMOS = {
  "quant":    ("Quantisation lab", "Compare FP8, INT4 and NVFP4 error on a layer with outlier weights.", "boxes"),
  "specdec":  ("Speculative decoding", "See how acceptance rate and draft length affect the speed-up.", "zap"),
  "edgefit":  ("Edge fit", "Check whether a model fits on a Jetson, a phone or a Raspberry Pi.", "smartphone"),
+ "kernel":   ("Kernel lab", "Occupancy, register pressure and achievable bandwidth, per GPU architecture.", "cpu"),
 }
 
 # ───────────────────────── shell ─────────────────────────
@@ -163,8 +164,8 @@ def page(path, title, desc, cur, body, faqs=(), demos=(), cta_args=None, ctaband
     root = "../" * path.count("/") if path else ""
     out = head(title, desc, root, path, jsonld(faqs)) + G["DEFS"] + "__SPRITE__" + nav(root, cur)
     out += '\n<main id="main" tabindex="-1">\n' + body.replace("{R}", root) + (faq(faqs) if faqs else "") + (cta(*(cta_args or ())) if ctaband else "") + "\n</main>\n" + footer(root)
-    js = ["assets/js/site.js", "assets/js/play.js"] + [f"assets/js/lab-{d}.js" for d in demos]
-    out += "".join(f'\n<script src="{root}{asset(j)}"{" defer" if "lab-" in j else ""}></script>' for j in js) + "\n</body>\n</html>\n"
+    js = ["assets/js/site.js", "assets/js/play.js"] + (["assets/js/hw.js"] if demos else []) + [f"assets/js/lab-{d}.js" for d in demos]
+    out += "".join(f'\n<script src="{root}{asset(j)}"{" defer" if "lab-" in j or "hw.js" in j else ""}></script>' for j in js) + "\n</body>\n</html>\n"
     PAGES.append((path, out))
 
 def write_all():
@@ -380,6 +381,7 @@ def product_pages():
               ("02 · Kernel IDE", "Kernel editor with an agent", "The agent edits the CUDA or Triton source, recompiles, reads the new SASS and simulates it. The best version is tested on a real GPU before a pull request is opened.", g["SCREEN_IDE"],
                [("check", "Source, SASS and terminal in one window."), ("check", "Accepted changes are always tested on real hardware."), ("check", "Pull requests include the benchmark numbers.")])],
         flow=True,
+        demo=("kernel", "Register pressure, per architecture", "Pick a GPU and a kernel. The occupancy comes from the CUDA occupancy-calculator rules for that architecture, the achievable bandwidth from Little's law, and the bound from a roofline. Sim goes further by interpreting the SASS; this shows the mechanics."),
         feats=[("gauge", "Three levels of detail", "Static analysis takes milliseconds, sampled simulation takes seconds and cycle-level simulation takes hours. Use the fast ones to narrow the candidates down and the slow one to choose between the last few."),
                ("badge-check", "Reports its own error", "Each run reports how closely its ranking matches real hardware, and the top candidates are tested on a real GPU before anything ships."),
                ("git-branch", "Works in CI", "Runs on GitHub Actions or any CPU runner, so a build can fail when a kernel gets slower on a GPU you don't own.")],
@@ -570,17 +572,18 @@ def home():
 
 # ───────────────────────── other pages ─────────────────────────
 def lab_page():
-    order = ["planner", "batching", "quant", "specdec", "edgefit"]
+    order = ["planner", "batching", "kernel", "quant", "specdec", "edgefit"]
     sub = "".join(f'<a href="#{k}">{ic(DEMOS[k][2])}{DEMOS[k][0]}</a>' for k in order)
     intro = {"planner": "Estimates how many GPUs you need and the cost per million tokens. It assumes decode is limited by memory bandwidth and prefill by compute, which is where Plan starts before running a full simulation.",
              "batching": "Simulates a model server using static batching, continuous batching, chunked prefill and prefix caching on chat, RAG and agent traffic.",
              "quant": "Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights. You can see the effect of group size and outlier protection.",
              "specdec": "A draft model proposes several tokens and the main model checks them in one pass. Adjust the acceptance rate and draft length to find the best setting.",
+             "kernel": "Occupancy from the CUDA occupancy-calculator rules for each architecture, the register file and shared memory drawn to scale, spills under a register cap, achievable bandwidth from Little's law and a roofline for the chosen kernel.",
              "edgefit": "Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi. You can also check whether on-device fine-tuning would fit."}
     body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. For real numbers on your own model and hardware, you would use the products.</p><nav class="lsub" aria-label="Demos">{sub}</nav></div></section>"""
     for k in order:
-        body += lab_block(k, k=f"{DEMOS[k][0]}", h2={"planner": "How many GPUs do you need?", "batching": "How batching affects latency", "quant": "Quantisation, up close", "specdec": "Speculative decoding", "edgefit": "Will it fit on the device?"}[k], lede=intro[k], id_=k)
-    page("lab/", "Live demos | VitalOps", "Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a quantisation lab, a speculative decoding race and an edge memory fit.", "lab", body, demos=order,
+        body += lab_block(k, k=f"{DEMOS[k][0]}", h2={"planner": "How many GPUs do you need?", "batching": "How batching affects latency", "quant": "Quantisation, up close", "specdec": "Speculative decoding", "edgefit": "Will it fit on the device?", "kernel": "Register pressure and occupancy, per GPU"}[k], lede=intro[k], id_=k)
+    page("lab/", "Live demos | VitalOps", "Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a kernel occupancy lab, a quantisation lab, a speculative decoding race and an edge memory fit.", "lab", body, demos=order,
          cta_args=("Want real numbers?", "These demos give rough estimates. On a review call we'll look at your actual model and hardware and tell you what's realistic."))
 
 def platform_page():
@@ -657,7 +660,7 @@ def company_page():
 def credits_page():
     cr = json.load(open(os.path.join(HERE, "photo_credits.json")))
     rows = "".join(f'<li><img src="{{R}}assets/photos/{c["file"]}" alt="" loading="lazy"><div><b>{H.escape(c["title"])}</b><span>{H.escape(c["author"])} · {c["license"]} · <a href="{c["page"]}" target="_blank" rel="noopener">source</a></span></div></li>' for c in cr)
-    body = f'<section class="lhero"><div class="wrap"><span class="k">Credits</span><h1>Photo credits</h1><p class="lede">Photographs from Wikimedia Commons, used under the licences listed and resized for the web. The office photographs are from Pexels under the Pexels licence. Product screens are illustrations; numbers on them are examples.</p><ul class="credits">{rows}</ul></div></section>'
+    body = f'<section class="lhero"><div class="wrap"><span class="k">Credits</span><h1>Photo credits</h1><p class="lede">Photographs from Wikimedia Commons, used under the licences listed, cropped and resized for the web. The office photographs are from Pexels under the Pexels licence. Product screens are illustrations; numbers on them are examples. The hardware photographs in the live demos are listed here too; where no licensed photo of a part exists, the demo shows a labelled outline instead.</p><ul class="credits">{rows}</ul></div></section>'
     page("credits/", "Photo credits | VitalOps", "Photo credits for vitalops.ai.", "credits", body, ctaband=False)
 
 # ───────────────────────── assets ─────────────────────────

@@ -1,20 +1,11 @@
 /* Edge fit: which model fits a device's memory, how fast it decodes, and whether an
-   on-device QLoRA fine-tune fits too. Renders into every [data-lab="edgefit"]. */
+   on-device QLoRA fine-tune fits too. Renders into every [data-lab="edgefit"].
+   Device specifications and the hardware card come from assets/js/hw.js (window.VO_HW). */
 (function () {
   'use strict';
 
-  var DEVICES = [
-    // total GB, usable GB for the model process, memory bandwidth GB/s, bandwidth efficiency
-    { id: 'jnano', name: 'Jetson Orin Nano Super 8 GB', total: 8,   usable: 6.2,  bw: 102,  eff: 0.7 },
-    { id: 'jnx',   name: 'Jetson Orin NX 16 GB',        total: 16,  usable: 13.5, bw: 102,  eff: 0.7 },
-    { id: 'jagx',  name: 'Jetson AGX Orin 64 GB',       total: 64,  usable: 58,   bw: 204.8, eff: 0.7 },
-    { id: 'thor',  name: 'Jetson AGX Thor 128 GB',      total: 128, usable: 118,  bw: 273,  eff: 0.7 },
-    { id: 'rpi5',  name: 'Raspberry Pi 5 8 GB',         total: 8,   usable: 6.5,  bw: 17,   eff: 0.6 },
-    { id: 'iph',   name: 'iPhone 16 Pro 8 GB',          total: 8,   usable: 4.5,  bw: 60,   eff: 0.65 },
-    { id: 'pixel', name: 'Pixel 9 Pro 16 GB',           total: 16,  usable: 8,    bw: 68,   eff: 0.6 },
-    { id: 's8e',   name: 'Snapdragon 8 Elite phone 12 GB', total: 12, usable: 6.5, bw: 85,  eff: 0.65 },
-    { id: 'mba',   name: 'MacBook Air M3 16 GB',        total: 16,  usable: 11,   bw: 100,  eff: 0.7 }
-  ];
+  var HW = window.VO_HW;
+  var DEV_ORDER = ['orin_nano', 'orin_nx', 'agx_orin', 'pi5', 'iphone16', 'pixel9', 's25u', 'mba'];
   var LADDER = [
     // Qwen2.5-class shapes: params (B), layers, KV heads, head dim, hidden, MLP width
     { id: '0.5', label: '0.5B', p: 0.49, L: 24, kvh: 2, hd: 64,  h: 896,  I: 4864 },
@@ -68,6 +59,14 @@
     '.le input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--white);border:2px solid var(--brand)}',
     '.le button:focus-visible,.le select:focus-visible,.le input:focus-visible,.le summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px}',
     '.le-out{padding:18px 20px;display:flex;flex-direction:column;gap:18px;min-width:0}',
+    '.le-mid{display:grid;grid-template-columns:276px minmax(0,1fr);gap:16px;align-items:start}',
+    '.le-r{display:flex;flex-direction:column;gap:18px;min-width:0}',
+    '.le-card .hwc-slot .le-sec{margin-bottom:6px}',
+    '.le-card .le-leg{font-size:11.5px;gap:4px 12px}',
+    '.le-bb{display:flex;height:22px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--line2)}',
+    '.le-bb i{display:block;height:100%;transition:width .35s ease;min-width:0}',
+    '.le-math{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:12px;row-gap:3px;font-size:12px;color:var(--ink3);margin-top:8px}',
+    '.le-math dd{margin:0;font-family:var(--mono);color:var(--ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}',
     '.le-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}',
     '.le-kpi{padding:10px 12px;border-left:1px solid var(--line);min-width:0}',
     '.le-kpi:first-child{border-left:0}',
@@ -99,10 +98,11 @@
     '.le-how ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}',
     '.le-how code{font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--line2);padding:1px 4px;border-radius:4px;overflow-wrap:anywhere}',
     '.le-note{font-size:12px;color:var(--ink3);margin:0}',
+    '@media (max-width:1100px){.le-mid{grid-template-columns:minmax(0,1fr)}.le-card .hwc{grid-template-columns:minmax(150px,220px) minmax(0,1fr)}.le-card .hwc-ph{aspect-ratio:auto;min-height:100%}}',
     '@media (max-width:1040px){.le-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.le-kpi:nth-child(3){border-left:0}.le-kpi:nth-child(n+3){border-top:1px solid var(--line)}}',
     '@media (max-width:860px){.le{grid-template-columns:minmax(0,1fr)}.le-ctl{border-right:0;border-bottom:1px solid var(--line)}}',
-    '@media (max-width:520px){.le-out,.le-ctl{padding:16px}.le-kpi b{font-size:18px}}',
-    '@media (prefers-reduced-motion:reduce){.le-bar i,.le-lim{transition:none}}'
+    '@media (max-width:520px){.le-out,.le-ctl{padding:16px}.le-kpi b{font-size:18px}.le-card .hwc{grid-template-columns:minmax(0,1fr)}.le-card .hwc-ph{aspect-ratio:3/2;min-height:0}}',
+    '@media (prefers-reduced-motion:reduce){.le-bar i,.le-lim,.le-bb i{transition:none}}'
   ].join('\n');
 
   function injectCSS() {
@@ -113,11 +113,12 @@
   function gb(b) { var g = b / 1e9; return g >= 10 ? g.toFixed(1) + ' GB' : g >= 1 ? g.toFixed(2) + ' GB' : Math.round(g * 1000) + ' MB'; }
   function tok(n) { return n >= 1024 ? (n / 1024) + 'k' : String(n); }
   function byId(a, id) { for (var i = 0; i < a.length; i++) if (a[i].id === id) return a[i]; return a[0]; }
+  function dev(id) { return HW.devices[id] || HW.devices[DEV_ORDER[0]]; }
 
   /* ---------- the model ---------- */
   function bytesPerParam(prec) { return prec === 'fp16' ? 2 : prec === 'int8' ? 1.0625 : 0.5625; }
   function calc(st, m) {
-    var d = byId(DEVICES, st.device);
+    var d = dev(st.device);
     var bpp = bytesPerParam(st.prec);
     var keep = st.prec === 'int4p' ? (m.L - 2) / m.L : 1;
     var layers = m.L * keep;
@@ -129,7 +130,9 @@
     var rt = 0.3e9 + 0.05 * (weights + vision);           // compute buffers, scratch, runtime
     var need = weights + vision + kv + rt;
     var usable = d.usable * 1e9;
-    var tps = d.bw * 1e9 * d.eff / (weights + kvTok * ctx / 2);
+    var kvRead = kvTok * ctx / 2;                           // KV read per token, averaged over the generation
+    var tps = d.bw * 1e9 * d.eff / (weights + kvRead);
+    var tpsEnd = d.bw * 1e9 * d.eff / (weights + kvTok * ctx);
     // QLoRA: 4-bit base, rank-16 adapters on every linear layer, fp32 Adam, gradient checkpointing
     var adapter = RANK * layers * (8 * m.h + 3 * m.I);
     var tBase = m.p * 1e9 * keep * 0.5625;
@@ -137,7 +140,7 @@
     var tAct = layers * TRAIN_SEQ * m.h * 2 + TRAIN_SEQ * (18 * m.h + 4 * m.I) * 2 + TRAIN_SEQ * VOCAB * 4;
     var tRt = 0.4e9;
     var train = tBase + vision + tAdapt + tAct + tRt;
-    return { d: d, weights: weights, vision: vision, kv: kv, rt: rt, need: need, usable: usable, total: d.total * 1e9, fits: need <= usable, tps: tps, ctx: ctx,
+    return { d: d, weights: weights, vision: vision, kv: kv, rt: rt, need: need, usable: usable, total: d.mem * 1e9, fits: need <= usable, tps: tps, tpsEnd: tpsEnd, kvRead: kvRead, kvTok: kvTok, ctx: ctx,
       adapter: adapter, tBase: tBase, tAdapt: tAdapt, tAct: tAct, tRt: tRt, train: train, trainFits: train <= usable };
   }
   function byId2(a, id) { for (var i = 0; i < a.length; i++) if (a[i][0] === id) return a[i][1]; return a[0][1]; }
@@ -146,12 +149,13 @@
   function mount(root) {
     if (root.__le) return; root.__le = true;
     var u = 'le' + (++uid) + '-';
-    var st = { device: 'jnano', model: '3', prec: 'int4', ctx: 2, kv: 'fp16', vlm: true, train: true };
+    if (!HW) { root.innerHTML = '<p class="le-note">The hardware catalogue (hw.js) did not load.</p>'; return; }
+    var st = { device: 'orin_nano', model: '3', prec: 'int4', ctx: 2, kv: 'fp16', vlm: true, train: true };
     root.innerHTML =
       '<div class="le"><div class="le-ctl">' +
         '<div class="le-hd"><i></i>Edge fit</div>' +
         '<div class="le-f"><label for="' + u + 'd">Device</label><select class="le-sel" id="' + u + 'd" data-k="device">' +
-          DEVICES.map(function (d) { return '<option value="' + d.id + '"' + (d.id === st.device ? ' selected' : '') + '>' + d.name + '</option>'; }).join('') + '</select></div>' +
+          DEV_ORDER.map(function (k) { var d = HW.devices[k]; return '<option value="' + k + '"' + (k === st.device ? ' selected' : '') + '>' + d.name + '</option>'; }).join('') + '</select></div>' +
         '<div class="le-f"><span class="le-lab" id="' + u + 'pl">Weights</span><div class="le-seg" role="group" aria-labelledby="' + u + 'pl" data-seg="prec">' +
           PREC.map(function (p) { return '<button type="button" data-v="' + p[0] + '" aria-pressed="' + (p[0] === st.prec) + '"' + (p[0] === 'int4p' ? ' title="int4 with two transformer layers pruned"' : '') + '>' + p[1] + '</button>'; }).join('') + '</div></div>' +
         '<div class="le-f"><span class="le-lab" id="' + u + 'ml">Model size <output>Qwen2.5-class</output></span><div class="le-lad" role="group" aria-labelledby="' + u + 'ml" data-x="lad">' +
@@ -169,26 +173,42 @@
           '<div class="le-kpi"><small>Memory needed</small><b data-x="need">—</b><span data-x="needs">—</span></div>' +
           '<div class="le-kpi"><small>Largest that fits</small><b data-x="best">—</b><span data-x="bests">—</span></div>' +
         '</div>' +
-        '<div><div class="le-sec">Inference memory<span data-x="cap">—</span></div>' +
-          '<div class="le-bw"><div class="le-bar" role="img" data-x="bar"><i class="le-c-w"></i><i class="le-c-v"></i><i class="le-c-kv"></i><i class="le-c-rt"></i><i class="le-c-over"></i></div><div class="le-lim" data-x="lim"><span>usable</span></div></div>' +
-          '<div class="le-leg"><span><i class="le-c-w"></i>Weights <em data-x="lw"></em></span><span data-x="lvs"><i class="le-c-v"></i>Vision encoder <em data-x="lv"></em></span><span><i class="le-c-kv"></i>KV cache <em data-x="lkv"></em></span><span><i class="le-c-rt"></i>Runtime buffers <em data-x="lrt"></em></span><span><i class="le-c-os"></i>OS and apps <em data-x="los"></em></span></div></div>' +
-        '<div data-x="trs" hidden><div class="le-sec">Fine-tuning memory<span data-x="tcap">—</span></div>' +
-          '<div class="le-bw"><div class="le-bar" role="img" data-x="tbar"><i class="le-c-w"></i><i class="le-c-v"></i><i class="le-c-tr"></i><i class="le-c-kv"></i><i class="le-c-rt"></i><i class="le-c-over"></i></div><div class="le-lim" data-x="tlim"><span>usable</span></div></div>' +
-          '<div class="le-leg"><span><i class="le-c-w"></i>4-bit base <em data-x="tw"></em></span><span data-x="tvs"><i class="le-c-v"></i>Vision encoder <em data-x="tv"></em></span><span><i class="le-c-tr"></i>Adapter, gradients, optimiser <em data-x="ta"></em></span><span><i class="le-c-kv"></i>Activations <em data-x="tact"></em></span><span><i class="le-c-rt"></i>Runtime <em data-x="trt"></em></span></div></div>' +
+        '<div class="le-mid"><div class="le-card" data-x="card"></div><div class="le-r">' +
+          '<div><div class="le-sec">Where the bandwidth goes, per token<span data-x="bwlab">—</span></div>' +
+            '<div class="le-bb" role="img" data-x="bb"><i class="le-c-w"></i><i class="le-c-kv"></i></div>' +
+            '<div class="le-leg"><span><i class="le-c-w"></i>Weights <em data-x="bw1"></em></span><span><i class="le-c-kv"></i>KV cache, average over the answer <em data-x="bw2"></em></span></div>' +
+            '<dl class="le-math"><dt>Bytes read per token</dt><dd data-x="m1">—</dd><dt>Effective bandwidth</dt><dd data-x="m2">—</dd><dt>Decode speed</dt><dd data-x="m3">—</dd><dt>At the end of the context</dt><dd data-x="m4">—</dd></dl></div>' +
+          '<div data-x="trs" hidden><div class="le-sec">Fine-tuning memory<span data-x="tcap">—</span></div>' +
+            '<div class="le-bw"><div class="le-bar" role="img" data-x="tbar"><i class="le-c-w"></i><i class="le-c-v"></i><i class="le-c-tr"></i><i class="le-c-kv"></i><i class="le-c-rt"></i><i class="le-c-over"></i></div><div class="le-lim" data-x="tlim"><span>usable</span></div></div>' +
+            '<div class="le-leg"><span><i class="le-c-w"></i>4-bit base <em data-x="tw"></em></span><span data-x="tvs"><i class="le-c-v"></i>Vision encoder <em data-x="tv"></em></span><span><i class="le-c-tr"></i>Adapter, gradients, optimiser <em data-x="ta"></em></span><span><i class="le-c-kv"></i>Activations <em data-x="tact"></em></span><span><i class="le-c-rt"></i>Runtime <em data-x="trt"></em></span></div></div>' +
+        '</div></div>' +
         '<div data-x="msg"></div>' +
         '<details class="le-how"><summary>How this is calculated</summary><ul>' +
           '<li>Weights take <code>params × bytes</code>: fp16 2, int8 1.06, int4 0.56 (group-wise scales included). "int4 −2L" also drops two transformer layers, which is what pruning buys before accuracy is re-checked.</li>' +
           '<li>KV cache is <code>2 × layers × KV heads × head dim × bytes × context</code>, using Qwen2.5-class shapes. The vision encoder (0.6B) stays in fp16 for fp16 weights and int8 otherwise; one image adds ~1k tokens of context.</li>' +
           '<li>Runtime buffers are <code>0.3 GB + 5% of weights</code>. "Usable" is what the device leaves a single process after the OS and other apps; phones get much less than their RAM.</li>' +
-          '<li>Decode speed is bandwidth bound: <code>bandwidth × efficiency ÷ (weight bytes + KV bytes read per token)</code>, at 60–70% efficiency depending on the device.</li>' +
+          '<li>Decode speed is bandwidth bound: <code>bandwidth × efficiency ÷ (weight bytes + KV bytes read per token)</code>, at 60–70% of the datasheet bandwidth depending on the device (an assumption; the card shows the figure used). The KV read is averaged over the answer, so it is half the context; the figure for the end of the context is the worst case. The vision encoder runs once per image, not per token, so it is not in the per-token bytes.</li>' +
           '<li>QLoRA keeps the base in 4-bit and trains rank-16 adapters on every linear layer: 16 bytes per adapter parameter (weight, gradient, fp32 master copy, two Adam moments), checkpointed activations for 512-token samples, and fp32 logits over a 152k vocabulary.</li>' +
-          '<li>Not modelled: accuracy loss from quantisation and pruning, thermals, NPU operator coverage. Edge measures all three on the device before anything ships.</li>' +
+          '<li>"Usable" memory is an assumption per device, shown on the card with its reason. Devices without a licensed photo show a labelled outline.</li>' +
+          '<li>Not modelled: accuracy loss from quantisation and pruning, thermals, NPU operator coverage, CPU-only compute limits on the Raspberry Pi. Edge measures all of these on the device before anything ships.</li>' +
         '</ul></details>' +
         '<p class="le-note">A first-order estimate from public device specs. Edge measures the real fit, speed and accuracy on your device.</p>' +
       '</div></div>';
 
     var X = {}; [].forEach.call(root.querySelectorAll('[data-x]'), function (e) { X[e.getAttribute('data-x')] = e; });
     var ctxIn = root.querySelector('[data-k="ctx"]');
+    var cardDev = null;
+    // the device card: photo, the specs the estimate uses, and the inference-memory bar in its slot
+    function buildCard(d) {
+      var rows = [['Memory', d.mem + ' GB'], ['Usable by the model', d.usable + ' GB'], ['Memory bandwidth', d.bw + ' GB/s'], ['Bandwidth efficiency', Math.round(d.eff * 100) + '% assumed']];
+      var c = HW.card(d, { rows: rows, sub: d.kind, note: d.note || '' });
+      c.querySelector('.hwc-slot').innerHTML =
+        '<div class="le-sec">Inference memory<span data-x="cap">—</span></div>' +
+        '<div class="le-bw"><div class="le-bar" role="img" data-x="bar"><i class="le-c-w"></i><i class="le-c-v"></i><i class="le-c-kv"></i><i class="le-c-rt"></i><i class="le-c-over"></i></div><div class="le-lim" data-x="lim"><span>usable</span></div></div>' +
+        '<div class="le-leg"><span><i class="le-c-w"></i>Weights <em data-x="lw"></em></span><span data-x="lvs"><i class="le-c-v"></i>Vision encoder <em data-x="lv"></em></span><span><i class="le-c-kv"></i>KV cache <em data-x="lkv"></em></span><span><i class="le-c-rt"></i>Runtime buffers <em data-x="lrt"></em></span><span><i class="le-c-os"></i>OS and apps <em data-x="los"></em></span></div>';
+      X.card.innerHTML = ''; X.card.appendChild(c);
+      [].forEach.call(c.querySelectorAll('[data-x]'), function (e) { X[e.getAttribute('data-x')] = e; });
+    }
 
     root.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b || !root.contains(b)) return;
@@ -237,6 +257,7 @@
         em.textContent = best && best.id === id ? 'largest fit' : ok ? 'fits' : r.fits ? 'no training' : 'too big';
       });
       var r = all[m.id], d = r.d;
+      if (cardDev !== st.device) { cardDev = st.device; buildCard(d); }
       X.fitk.className = 'le-kpi ' + (r.fits ? 'le-ok' : 'le-no');
       X.fit.textContent = r.fits ? 'Fits' : 'Too big';
       X.fits.textContent = r.fits ? gb(r.usable - r.need) + ' headroom' : gb(r.need - r.usable) + ' over';
@@ -245,11 +266,21 @@
       X.needs.textContent = 'of ' + d.usable + ' GB usable';
       X.best.textContent = best ? best.label : 'None';
       X.bests.innerHTML = best ? (best.id === m.id ? 'selected' : '<button type="button" class="le-use" data-use="' + best.id + '">Use ' + best.label + '</button>') : 'try int4 or a shorter context';
-      X.cap.textContent = d.total + ' GB on device · ' + d.usable + ' GB usable';
+      X.cap.textContent = 'of ' + d.usable + ' GB';
       setBar(X.bar, X.lim, [r.weights, r.vision, r.kv, r.rt], r.usable, r.total);
       X.bar.setAttribute('aria-label', 'Needs ' + gb(r.need) + ' of ' + d.usable + ' GB usable');
       X.lw.textContent = gb(r.weights); X.lv.textContent = gb(r.vision); X.lvs.hidden = !st.vlm; X.lkv.textContent = gb(r.kv); X.lrt.textContent = gb(r.rt);
       X.los.textContent = gb(r.total - r.usable);
+      var bytesTok = r.weights + r.kvRead, effBW = d.bw * 1e9 * d.eff;
+      X.bb.querySelectorAll('i')[0].style.width = (r.weights / bytesTok * 100).toFixed(2) + '%';
+      X.bb.querySelectorAll('i')[1].style.width = (r.kvRead / bytesTok * 100).toFixed(2) + '%';
+      X.bb.setAttribute('aria-label', 'Per token: weights ' + gb(r.weights) + ', KV cache ' + gb(r.kvRead));
+      X.bw1.textContent = gb(r.weights); X.bw2.textContent = gb(r.kvRead);
+      X.bwlab.textContent = gb(bytesTok) + ' per token';
+      X.m1.textContent = gb(r.weights) + ' + ' + gb(r.kvRead) + ' = ' + gb(bytesTok);
+      X.m2.textContent = d.bw + ' GB/s × ' + d.eff.toFixed(2) + ' = ' + Math.round(effBW / 1e9) + ' GB/s';
+      X.m3.textContent = Math.round(effBW / 1e9) + ' GB/s ÷ ' + gb(bytesTok) + ' = ' + (r.tps >= 100 ? Math.round(r.tps) : r.tps.toFixed(1)) + ' tok/s';
+      X.m4.textContent = (r.tpsEnd >= 100 ? Math.round(r.tpsEnd) : r.tpsEnd.toFixed(1)) + ' tok/s at ' + tok(r.ctx) + ' tokens of KV';
       X.trs.hidden = !st.train;
       if (st.train) {
         X.tcap.textContent = gb(r.train) + ' of ' + d.usable + ' GB usable';

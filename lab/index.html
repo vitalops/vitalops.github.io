@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
 <title>Live demos | VitalOps</title>
-<meta name="description" content="Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a quantisation lab, a speculative decoding race and an edge memory fit.">
+<meta name="description" content="Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a kernel occupancy lab, a quantisation lab, a speculative decoding race and an edge memory fit.">
 <link rel="canonical" href="https://vitalops.ai/lab/">
 <meta name="theme-color" content="#f5f6fa">
 <link rel="icon" type="image/svg+xml" href="../assets/vo-mark.svg">
@@ -15,7 +15,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="VitalOps">
 <meta property="og:title" content="Live demos | VitalOps">
-<meta property="og:description" content="Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a quantisation lab, a speculative decoding race and an edge memory fit.">
+<meta property="og:description" content="Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a kernel occupancy lab, a quantisation lab, a speculative decoding race and an edge memory fit.">
 <meta property="og:url" content="https://vitalops.ai/lab/">
 <meta property="og:image" content="https://vitalops.ai/assets/og.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/vo.css?v=26229a5a1b"><link rel="stylesheet" href="../assets/css/pages.css?v=e4b53a3ac9">
+<link rel="stylesheet" href="../assets/css/vo.css?v=26229a5a1b"><link rel="stylesheet" href="../assets/css/pages.css?v=b8d02b27e5">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -49,12 +49,15 @@
   </div>
 </div></header>
 <main id="main" tabindex="-1">
-<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. For real numbers on your own model and hardware, you would use the products.</p><nav class="lsub" aria-label="Demos"><a href="#planner"><svg class="ic"><use href="#i-gauge"/></svg>Capacity planner</a><a href="#batching"><svg class="ic"><use href="#i-layers"/></svg>Batching simulator</a><a href="#quant"><svg class="ic"><use href="#i-boxes"/></svg>Quantisation lab</a><a href="#specdec"><svg class="ic"><use href="#i-zap"/></svg>Speculative decoding</a><a href="#edgefit"><svg class="ic"><use href="#i-smartphone"/></svg>Edge fit</a></nav></div></section><section class="labsec" id="planner"><div class="wrap">
+<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. For real numbers on your own model and hardware, you would use the products.</p><nav class="lsub" aria-label="Demos"><a href="#planner"><svg class="ic"><use href="#i-gauge"/></svg>Capacity planner</a><a href="#batching"><svg class="ic"><use href="#i-layers"/></svg>Batching simulator</a><a href="#kernel"><svg class="ic"><use href="#i-cpu"/></svg>Kernel lab</a><a href="#quant"><svg class="ic"><use href="#i-boxes"/></svg>Quantisation lab</a><a href="#specdec"><svg class="ic"><use href="#i-zap"/></svg>Speculative decoding</a><a href="#edgefit"><svg class="ic"><use href="#i-smartphone"/></svg>Edge fit</a></nav></div></section><section class="labsec" id="planner"><div class="wrap">
   <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Capacity planner</span><h2>How many GPUs do you need?</h2><p class="lede">Estimates how many GPUs you need and the cost per million tokens. It assumes decode is limited by memory bandwidth and prefill by compute, which is where Plan starts before running a full simulation.</p></div></div>
   <div class="lab" data-lab="planner"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section><section class="labsec" id="batching"><div class="wrap">
   <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Batching simulator</span><h2>How batching affects latency</h2><p class="lede">Simulates a model server using static batching, continuous batching, chunked prefill and prefix caching on chat, RAG and agent traffic.</p></div></div>
   <div class="lab" data-lab="batching"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
+</div></section><section class="labsec" id="kernel"><div class="wrap">
+  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Kernel lab</span><h2>Register pressure and occupancy, per GPU</h2><p class="lede">Occupancy from the CUDA occupancy-calculator rules for each architecture, the register file and shared memory drawn to scale, spills under a register cap, achievable bandwidth from Little's law and a roofline for the chosen kernel.</p></div></div>
+  <div class="lab" data-lab="kernel"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section><section class="labsec" id="quant"><div class="wrap">
   <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Quantisation lab</span><h2>Quantisation, up close</h2><p class="lede">Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights. You can see the effect of group size and outlier protection.</p></div></div>
   <div class="lab" data-lab="quant"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
@@ -88,10 +91,12 @@
 </div></footer>
 <script src="../assets/js/site.js?v=3267f0f221"></script>
 <script src="../assets/js/play.js?v=e82dc5384d"></script>
-<script src="../assets/js/lab-planner.js?v=d5ec1521e3" defer></script>
-<script src="../assets/js/lab-batching.js?v=ec420f157e" defer></script>
+<script src="../assets/js/hw.js?v=3257897f13" defer></script>
+<script src="../assets/js/lab-planner.js?v=3e50c0820d" defer></script>
+<script src="../assets/js/lab-batching.js?v=b62e7451a4" defer></script>
+<script src="../assets/js/lab-kernel.js?v=586e6c6192" defer></script>
 <script src="../assets/js/lab-quant.js?v=656b2a6b2d" defer></script>
 <script src="../assets/js/lab-specdec.js?v=853d0d55ad" defer></script>
-<script src="../assets/js/lab-edgefit.js?v=543227e723" defer></script>
+<script src="../assets/js/lab-edgefit.js?v=645e043baa" defer></script>
 </body>
 </html>

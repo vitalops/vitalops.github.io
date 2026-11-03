@@ -1,12 +1,149 @@
 [
- {"file": "racks-teal.webp", "title": "BSC MareNostrum 5", "author": "Steve Jurvetson", "license": "CC BY 4.0", "page": "https://commons.wikimedia.org/wiki/File:BSC_MareNostrum_5_(54686085845).jpg"},
- {"file": "racks-dark.webp", "title": "BSC-MareNostrum-B", "author": "Vcarceler", "license": "CC BY-SA 3.0", "page": "https://commons.wikimedia.org/wiki/File:BSC-MareNostrum-B.JPG"},
- {"file": "racks-art.webp", "title": "TSUBAME4.0", "author": "Fukumoto", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:TSUBAME4.0_P5160975.jpg"},
- {"file": "gpu-cluster.webp", "title": "The CSIRO GPU cluster at the data centre", "author": "CSIRO", "license": "CC BY 3.0", "page": "https://commons.wikimedia.org/wiki/File:CSIRO_ScienceImage_11313_The_CSIRO_GPU_cluster_at_the_data_centre.jpg"},
- {"file": "robot-stage.webp", "title": "Spot Robot Dog, Web Summit 2025", "author": "Web Summit", "license": "CC BY 4.0", "page": "https://commons.wikimedia.org/wiki/File:Spot_Robot_Dog_Web_Summit_2025_(54919262503).jpg"},
- {"file": "robot-plant.webp", "title": "ANYbotics robot dog ANYmal", "author": "ANYbotics", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:ANYbotics_robot_dog_ANYmal.jpg"},
- {"file": "pi-hailo.webp", "title": "Raspberry Pi 5 Hailo AI Accelerator Module", "author": "RetroEditor", "license": "CC BY 4.0", "page": "https://commons.wikimedia.org/wiki/File:Raspberry_Pi_5_Hailo_AI_Accelerator_Module.jpg"},
- {"file": "jetson-board.webp", "title": "Nvidia Jetson Orin NX on a motherboard, Computex 2025", "author": "4300streetcar", "license": "CC BY 4.0", "page": "https://commons.wikimedia.org/wiki/File:Nvidia_Jetson_Orin_NX_on_a_motherboard_Computex_2025.jpg"},
- {"file": "aisle-white.webp", "title": "Racks, Amravati Data Center", "author": "PiDatacenters", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Racks_Amravati_Data_Center.jpg"},
- {"file": "technician.webp", "title": "Technician with laptop working on server rack at NERSC", "author": "Derrick Coetzee", "license": "CC0", "page": "https://commons.wikimedia.org/wiki/File:Technician_with_laptop_working_on_server_rack_at_NERSC.jpg"}
+ {
+  "file": "racks-teal.webp",
+  "title": "BSC MareNostrum 5",
+  "author": "Steve Jurvetson",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:BSC_MareNostrum_5_(54686085845).jpg"
+ },
+ {
+  "file": "racks-dark.webp",
+  "title": "BSC-MareNostrum-B",
+  "author": "Vcarceler",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:BSC-MareNostrum-B.JPG"
+ },
+ {
+  "file": "racks-art.webp",
+  "title": "TSUBAME4.0",
+  "author": "Fukumoto",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:TSUBAME4.0_P5160975.jpg"
+ },
+ {
+  "file": "gpu-cluster.webp",
+  "title": "The CSIRO GPU cluster at the data centre",
+  "author": "CSIRO",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:CSIRO_ScienceImage_11313_The_CSIRO_GPU_cluster_at_the_data_centre.jpg"
+ },
+ {
+  "file": "robot-stage.webp",
+  "title": "Spot Robot Dog, Web Summit 2025",
+  "author": "Web Summit",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Spot_Robot_Dog_Web_Summit_2025_(54919262503).jpg"
+ },
+ {
+  "file": "robot-plant.webp",
+  "title": "ANYbotics robot dog ANYmal",
+  "author": "ANYbotics",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:ANYbotics_robot_dog_ANYmal.jpg"
+ },
+ {
+  "file": "pi-hailo.webp",
+  "title": "Raspberry Pi 5 Hailo AI Accelerator Module",
+  "author": "RetroEditor",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Raspberry_Pi_5_Hailo_AI_Accelerator_Module.jpg"
+ },
+ {
+  "file": "jetson-board.webp",
+  "title": "Nvidia Jetson Orin NX on a motherboard, Computex 2025",
+  "author": "4300streetcar",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Nvidia_Jetson_Orin_NX_on_a_motherboard_Computex_2025.jpg"
+ },
+ {
+  "file": "aisle-white.webp",
+  "title": "Racks, Amravati Data Center",
+  "author": "PiDatacenters",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Racks_Amravati_Data_Center.jpg"
+ },
+ {
+  "file": "technician.webp",
+  "title": "Technician with laptop working on server rack at NERSC",
+  "author": "Derrick Coetzee",
+  "license": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File:Technician_with_laptop_working_on_server_rack_at_NERSC.jpg"
+ },
+ {
+  "file": "hw/h100.webp",
+  "title": "NVIDIA H100 (PCIe card)",
+  "author": "极客湾 Geekerwan",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:NVIDIA_H100_(极客湾Geekerwan)_001.png"
+ },
+ {
+  "file": "hw/a100.webp",
+  "title": "Nvidia Tesla A100",
+  "author": "Nvidia (uploaded to Commons)",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Nvidia_Tesla_A100.png"
+ },
+ {
+  "file": "hw/b200.webp",
+  "title": "Grafica Nvidia B200 (DGX B200 system)",
+  "author": "Javils00",
+  "license": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File:Grafica_Nvidia_B200.jpg"
+ },
+ {
+  "file": "hw/rtx5090.webp",
+  "title": "Palit GeForce RTX 5090 GameRock",
+  "author": "PantheraLeo1359531",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Palit_GeForce_RTX_5090_Gamerock_20250530_HOF3913_RAW-Export.png"
+ },
+ {
+  "file": "hw/agx-orin.webp",
+  "title": "NVIDIA Jetson AGX Orin Developer Kit",
+  "author": "Auledas",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:NVidia_Jetson_Orin_AGX.png"
+ },
+ {
+  "file": "hw/orin-nx.webp",
+  "title": "Nvidia Jetson Orin NX on a motherboard, Computex 2025",
+  "author": "4300streetcar",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Nvidia_Jetson_Orin_NX_on_a_motherboard_Computex_2025.jpg"
+ },
+ {
+  "file": "hw/pi5.webp",
+  "title": "Raspberry Pi 5",
+  "author": "LeGeekLinux",
+  "license": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File:Raspberry-Pi_5.jpg"
+ },
+ {
+  "file": "hw/iphone16pro.webp",
+  "title": "Back of iPhone 16 Pro",
+  "author": "Kyu3a",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Back_of_iPhone_16_Pro_-_1.jpg"
+ },
+ {
+  "file": "hw/pixel9pro.webp",
+  "title": "Pixel 9 and Pixel 9 Pro hands-on (video frame)",
+  "author": "ShoAndTech",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Pixel_9_%26_Pixel_9_Pro_Hands-On_Impressions_(ShoAndTech)_(2160p_24fps_VP9_LQ-160kbit_Opus)-00.01.06.800.png"
+ },
+ {
+  "file": "hw/macbook-air.webp",
+  "title": "MacBook Air (A2681) front",
+  "author": "メイド理世",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:MacBook_Air_(A2681)_front.jpg"
+ },
+ {
+  "file": "hw/s25-ultra.webp",
+  "title": "Rear view of the Samsung Galaxy S25 Ultra",
+  "author": "HuangWending18072009",
+  "license": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File:Rear_view_of_the_Samsung_Galaxy_S25_Ultra_smartphone.jpg"
+ }
 ]
