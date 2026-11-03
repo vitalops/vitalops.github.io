@@ -206,9 +206,15 @@ def lab_block(key, k=None, h2=None, lede=None, id_=None):
   <div class="lab" data-lab="{key}"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section>"""
 
+PRODUCT_PHOTO = {"plan": "racks-art", "optimize": "racks-teal", "sim": "racks-dark", "serve": "gpu-cluster", "edge": "jetson-board", "fleet": "aisle-white"}
 def cards(items, base, root="{R}", cls="pcards"):
+    def pic(k):
+        if base != "products":
+            return ""
+        return (f'<span class="pc-pic"><span class="pc-ph" style="background-image:url(\'{root}assets/photos/{PRODUCT_PHOTO[k]}.webp\')"></span>'
+                f'<img src="{root}assets/screens/{k}.webp" alt="" loading="lazy" width="1132" height="708"></span>')
     return f'<div class="{cls}">' + "".join(
-        f'<a class="pcard" href="{root}{base}/{k}/"><span class="pc-i">{ic(v["icon"])}</span><b>{v["name"]}</b><span>{v.get("blurb", v["short"])}</span><em>{ic("arrow-up-right")}</em></a>'
+        f'<a class="pcard{" has-pic" if base == "products" else ""}" href="{root}{base}/{k}/">{pic(k)}<span class="pc-body"><span class="pc-i">{ic(v["icon"])}</span><b>{v["name"]}</b><span>{v.get("blurb", v["short"])}</span></span><em>{ic("arrow-up-right")}</em></a>'
         for k, v in items.items()) + "</div>"
 
 def chips(items):

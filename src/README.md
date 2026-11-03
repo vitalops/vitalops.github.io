@@ -19,6 +19,7 @@ python3 src/build.py          # writes every page; needs only Python 3
 | `icons/` | Lucide icons and brand marks, inlined as an SVG sprite that holds only the icons the page uses. See `icons/LICENSES.md`. |
 | `og.html` | Source of the social card. |
 | `tools/render_icons.py` | Renders the PNG favicons, the Apple touch icon and `assets/og.png` from `assets/vo-mark.svg` and `og.html`. |
+| `tools/render_screens.mjs` | Renders each product's app screen to `assets/screens/` for the product tiles. Rerun after changing a screen. |
 | `tools/check.py` | Console errors and horizontal overflow at four widths. |
 | `tools/a11y.py` | axe-core, WCAG 2.2 AA, on desktop and phone. Exit code 1 on any violation. |
 
