@@ -48,24 +48,37 @@
     /* the dark scope: the demos read these variables, so they recolour without their own dark styles */
     '.vlab{--bg:#0b1020;--white:#111a30;--ink:#e8ecf5;--ink2:#c3cbdc;--ink3:#8e9ab3;--ink4:#5f6b85;--line:#263252;--line2:#1b2440;--brand50:#1a2452;--brand100:#243576;--brand200:#3b50a8;--brandD:#8fa3ff;color-scheme:dark;',
     '  background:#0b1020;color:var(--ink2);border:1px solid #1f2a44;border-radius:16px;overflow:hidden;font-family:var(--font);scroll-margin-top:74px}',
-    '.vlab-head{padding:8px 12px 4px;border-bottom:1px solid #1f2a44;background:#0d1428}',
+    '.vlab-head{padding:6px 10px 4px;border-bottom:1px solid #1f2a44;background:#0d1428}',
     '.vlab-head .hwcar-it{background:#0f1730;border-color:#263252;flex-basis:136px;padding:4px 4px 5px;gap:2px}',
     '.vlab-head .hwcar-it .hwc-ph{aspect-ratio:12/5}',
     '.vlab-head .hwcar-n{font-size:12px;margin-top:3px}.vlab-head .hwcar-s{font-size:10.5px}',
     '.vlab-head .hwcar-track{padding:4px 4px}',
     '.vlab-head .hwcar-ar{background:#0f1730;border-color:#263252;color:#c3cbdc}',
     '.vlab-wrap{scroll-margin-top:74px}',
-    '.vlab-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}',
+    '.vlab-tabs{display:flex;flex-wrap:nowrap;gap:8px;margin:0 0 10px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;padding:2px 2px}',
+    '.vlab-tabs::-webkit-scrollbar{display:none}',
+    '.vlab-tab{scroll-snap-align:center;flex:none}',
     '.vlab-tab{appearance:none;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--white);font:600 14px/1 var(--font);color:var(--ink2);cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s,background .15s}',
     '.vlab-tab svg{width:15px;height:15px;color:var(--brand)}',
     '.vlab-tab:hover{border-color:var(--brand200);color:var(--brand)}',
     '.vlab-tab[aria-selected=true]{background:var(--brand);border-color:var(--brand);color:#fff}.vlab-tab[aria-selected=true] svg{color:#fff}',
     '.vlab-tab:focus-visible{outline:2px solid var(--brand);outline-offset:2px}',
     '@media(max-width:600px){.vlab-tabs{gap:6px}.vlab-tab{padding:8px 11px;font-size:13px}}',
+    /* full screen: the wrapper covers the window, the tabs turn dark and join the panel */
+    '.vlab-wrap.vlab-full{position:fixed;inset:0;z-index:120;margin:0;display:flex;flex-direction:column;background:#0b1020}',
+    '.vlab-full .vlab-tabs{margin:0;padding:8px 10px;background:#0d1428;border-bottom:1px solid #1f2a44}',
+    '.vlab-full .vlab-tab{background:#0f1730;border-color:#263252;color:#c3cbdc}.vlab-full .vlab-tab:hover{color:#fff;border-color:#3b50a8}',
+    '.vlab-full .vlab-tab[aria-selected=true]{background:var(--brand);border-color:var(--brand);color:#fff}',
+    '.vlab-full .vlab{flex:1;min-height:0;border:0;border-radius:0;display:flex;flex-direction:column}',
+    '.vlab-full .vlab-body{flex:1;min-height:0;height:auto}',
+    'body.vlab-lock{overflow:hidden}',
+    '.vlab-fs{width:32px;height:32px;border-radius:8px;border:1px solid #263252;background:#0f1730;color:#c3cbdc;cursor:pointer;display:grid;place-items:center;flex:none}',
+    '.vlab-fs:hover{border-color:#3b50a8;color:#fff}.vlab-fs svg{width:16px;height:16px}',
+    '.vlab-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}',
     '.vlab-body{position:relative;height:var(--lab-h,640px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2a365a #0b1020}',
-    '.vlab-panel{padding:12px}',
+    '.vlab-panel{padding:10px}',
     '.vlab-panel[hidden]{display:none}',
-    '.vlab-note{padding:5px 14px 7px;font-size:11px;color:#5f6b85;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid #1f2a44}',
+    '.vlab-note{padding:4px 12px 6px;font-size:11px;color:#5f6b85;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid #1f2a44}',
     '.vlab-note b{font-weight:500;color:#8e9ab3}',
     '.vlab .hwc{background:#111a30}',
     '.vlab-tip{position:absolute;z-index:200;max-width:300px;padding:8px 10px;border-radius:8px;background:#1b2440;color:#e8ecf5;border:1px solid #34436b;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);font:400 12px/1.45 var(--font);pointer-events:none;display:none}',
@@ -111,6 +124,10 @@
     var first = tabs[0], kind0 = TABS[first].kind;
     var car = HW.carousel(kind0, kind0 === 'device' ? state.device : state.gpu, function (kind, key) { state[kind] = key; shells.forEach(function (sh) { if (sh.car !== car && sh.car.current().kind === kind) sh.car.select(key, true); }); notify(kind); });
     head.appendChild(car);
+    var fs = document.createElement('button'); fs.type = 'button'; fs.className = 'vlab-fs'; fs.setAttribute('aria-label', 'Full screen'); fs.setAttribute('data-tip', 'Full screen. Esc leaves it.');
+    var FS_IN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+    var FS_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
+    fs.innerHTML = FS_IN; head.appendChild(fs);
     var bar = document.createElement('div'); bar.className = 'vlab-tabs'; bar.setAttribute('role', 'tablist');
     var body = document.createElement('div'); body.className = 'vlab-body';
     var panels = {};
@@ -133,6 +150,7 @@
       if (!panels[t]) return;
       active = t;
       tabs.forEach(function (k) { var on = k === t; panels[k].btn.setAttribute('aria-selected', on); panels[k].btn.tabIndex = on ? 0 : -1; panels[k].panel.hidden = !on; });
+      if (bar.scrollWidth > bar.clientWidth + 2) { var bt = panels[t].btn, left = bt.offsetLeft + bt.offsetWidth / 2 - bar.clientWidth / 2; bar.scrollTo({ left: Math.max(0, left), behavior: (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth' }); }
       var kind = TABS[t].kind; car.setKind(kind, kind === 'device' ? state.device : state.gpu);
       body.scrollTop = 0;
       if (focus) panels[t].btn.focus();
@@ -147,7 +165,21 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fit(); fromHash(); });   /* web fonts arrive after the first layout and move the page */
     /* height: the panel fits the window under the site header; the demo scrolls inside if it is taller */
     /* the whole shell fits the window under the site header, with a little air; the demo scrolls inside if it is taller */
-    function fit() { var h = Math.max(360, Math.min(900, innerHeight - 62 - 24 - head.offsetHeight - (tabs.length > 1 ? bar.offsetHeight + 12 : 0) - note.offsetHeight)); box.style.setProperty('--lab-h', h + 'px'); }
+    function fit() {
+      if (root.classList.contains('vlab-full')) { box.style.removeProperty('--lab-h'); return; }
+      var h = Math.max(360, Math.min(960, innerHeight - 62 - 12 - head.offsetHeight - (tabs.length > 1 ? bar.offsetHeight + 10 : 0) - note.offsetHeight));
+      box.style.setProperty('--lab-h', h + 'px');
+    }
+    function setFull(on) {
+      root.classList.toggle('vlab-full', on); document.body.classList.toggle('vlab-lock', on);
+      fs.innerHTML = on ? FS_OUT : FS_IN; fs.setAttribute('aria-label', on ? 'Leave full screen' : 'Full screen'); fs.setAttribute('data-tip', on ? 'Leave full screen (Esc).' : 'Full screen. Esc leaves it.');
+      if (on && root.requestFullscreen) root.requestFullscreen().catch(function () {});
+      else if (!on && document.fullscreenElement === root && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+      fit(); window.dispatchEvent(new Event('resize'));
+    }
+    fs.addEventListener('click', function () { setFull(!root.classList.contains('vlab-full')); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('vlab-full')) setFull(false); });
+    document.addEventListener('fullscreenchange', function () { if (!document.fullscreenElement && root.classList.contains('vlab-full')) setFull(false); });
     fit(); addEventListener('resize', fit);
     shells.push({ root: box, car: car, show: show });
   }

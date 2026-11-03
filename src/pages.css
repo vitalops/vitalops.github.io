@@ -226,7 +226,7 @@ body.nav-open{overflow:hidden}
 
 /* ── live demo bands ── */
 .labsec{padding:56px 0 64px;border-top:1px solid var(--line)}
-.lhero+.labsec{border-top:0;padding-top:28px}
+.lhero+.labsec{border-top:0;padding-top:14px}
 .lab-list{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px;margin-top:28px}
 .lab-list a{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--ink)}.lab-list a .ic{width:16px;height:16px;color:var(--brand)}
 .lab-list p{font-size:13.5px;color:var(--ink3);margin-top:4px}
@@ -238,7 +238,7 @@ body.nav-open{overflow:hidden}
 .lab-ns{padding:24px;border:1px dashed var(--line);border-radius:12px;color:var(--ink3)}
 .lhero{padding:48px 0 0}
 .lhero h1{margin-top:12px;max-width:20ch}
-.lhero .lede{margin-top:16px}
+.lhero .lede{margin-top:12px}
 .lsub{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
 .lsub a{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:14px;font-weight:600;color:var(--ink2);transition:border-color .15s,color .15s}
 .lsub a:hover{border-color:var(--brand200);color:var(--brand)}.lsub .ic{width:15px;height:15px;color:var(--brand)}
