@@ -136,6 +136,168 @@
     }
   };
 
+
+  /* ───────────────────────────── representative source for each kernel ─────────────────────────────
+     Real CUDA shapes with the current parameters substituted. Each line may carry a tag naming which
+     estimate it feeds: regs, smem, ilp or lb. Helper device functions are named, not shown. */
+  function lbLine(st) { return '__global__ void __launch_bounds__(THREADS' + (st.lb ? ', ' + st.minBlocks : '') + ')'; }
+  var SRC = {
+    rmsnorm: function (k, st) {
+      var vec = Math.max(1, st.bpl / 2);
+      return [
+        ['#include <cuda_bf16.h>'], ['#include <cuda_fp8.h>'],
+        ['constexpr int THREADS = ' + st.threads + ';   // threads per block'],
+        ['constexpr int EPT     = ' + k.ept + ';     // elements per thread', 'regs'],
+        ['constexpr int VEC     = ' + vec + ';     // bf16 per ' + st.bpl + '-byte load'],
+        ['constexpr int ILP     = ' + st.ilp + ';     // loads issued before the first is used', 'ilp'],
+        [''],
+        ['// one token row of `hidden` bf16 per block; writes FP8 E4M3 and one scale per row'],
+        [lbLine(st), 'lb'],
+        ['rmsnorm_fp8(const __nv_bfloat16* __restrict__ x, const __nv_bfloat16* __restrict__ w,'],
+        ['            __nv_fp8_e4m3* __restrict__ y, float* __restrict__ scale, int hidden, float eps)'],
+        ['{'],
+        ['  const __nv_bfloat16* xr = x + (size_t)blockIdx.x * hidden + threadIdx.x * EPT;'],
+        ['  __nv_bfloat16 v[EPT];                       // EPT bf16 held packed: EPT/2 registers', 'regs'],
+        ['  #pragma unroll ILP                          // ILP iterations unrolled: ILP loads in flight', 'ilp'],
+        ['  for (int i = 0; i < EPT; i += VEC)'],
+        ['    *(uint4*)(v + i) = *(const uint4*)(xr + i);'],
+        ['  float ss = 0.f;'],
+        ['  #pragma unroll'],
+        ['  for (int i = 0; i < EPT; ++i) { const float f = __bfloat162float(v[i]); ss += f * f; }'],
+        ['  ss = block_sum<THREADS>(ss);                // warp shuffles, then one float per warp through shared memory'],
+        ['  const float r = rsqrtf(ss / hidden + eps);'],
+        ['  float o[EPT], amax = 0.f;                   // normalised values in fp32 before the FP8 scale is known', 'regs'],
+        ['  #pragma unroll'],
+        ['  for (int i = 0; i < EPT; ++i) { o[i] = __bfloat162float(v[i]) * r * __bfloat162float(w[threadIdx.x * EPT + i]); amax = fmaxf(amax, fabsf(o[i])); }'],
+        ['  amax = block_max<THREADS>(amax);'],
+        ['  const float s = amax / 448.f;               // E4M3 range'],
+        ['  if (threadIdx.x == 0) scale[blockIdx.x] = s;'],
+        ['  #pragma unroll'],
+        ['  for (int i = 0; i < EPT; ++i) y[(size_t)blockIdx.x * hidden + threadIdx.x * EPT + i] = __nv_fp8_e4m3(o[i] / s);'],
+        ['}']
+      ];
+    },
+    attn: function (k, st) {
+      var g = Math.max(1, Math.round(k.heads / k.kvh));
+      return [
+        ['#include <cuda_bf16.h>'],
+        ['constexpr int THREADS = ' + st.threads + ';   // threads per block, ' + Math.ceil(st.threads / 32) + ' warps'],
+        ['constexpr int HD      = ' + k.hd + ';   // head dimension'],
+        ['constexpr int GROUP   = ' + g + ';     // query heads per KV head', 'regs'],
+        ['constexpr int SPLIT   = 2048;  // KV tokens per block (flash-decoding split)'],
+        ['constexpr int ILP     = ' + st.ilp + ';     // ' + st.bpl + '-byte K loads in flight per lane', 'ilp'],
+        [''],
+        ['// one new token per sequence; grid = (sequences, KV heads, splits)'],
+        [lbLine(st), 'lb'],
+        ['decode_attn_gqa(const __nv_bfloat16* __restrict__ q, const __nv_bfloat16* __restrict__ K,'],
+        ['                const __nv_bfloat16* __restrict__ V, float* __restrict__ partial, int kv_len, float scale)'],
+        ['{'],
+        ['  const int seq = blockIdx.x, kvh = blockIdx.y, split = blockIdx.z;'],
+        ['  const int warp = threadIdx.x / 32, lane = threadIdx.x % 32;'],
+        ['  __shared__ float red[THREADS / 32][GROUP][HD];   // one partial output per warp and query head', 'smem'],
+        ['  __nv_bfloat16 qg[GROUP][HD / 32];                // the group\'s queries, HD/32 per lane, packed in pairs', 'regs'],
+        ['  load_queries(qg, q, seq, kvh, lane);'],
+        ['  float m[GROUP], l[GROUP], acc[GROUP][HD / 32];    // running max, sum and output per head', 'regs'],
+        ['  init_state(m, l, acc);'],
+        ['  for (int t = split * SPLIT + warp; t < min(kv_len, (split + 1) * SPLIT); t += THREADS / 32) {'],
+        ['    uint4 kv[ILP];                                 // ILP independent ' + st.bpl + '-byte loads of K', 'ilp'],
+        ['    #pragma unroll'],
+        ['    for (int j = 0; j < ILP; ++j) kv[j] = load_k(K, seq, kvh, t, lane, j);'],
+        ['    float sc[GROUP];'],
+        ['    dot_group(sc, qg, kv, lane);                   // q·k for each head of the group, reduced across the warp'],
+        ['    online_softmax(m, l, sc, scale);'],
+        ['    accumulate(acc, V, seq, kvh, t, lane, sc);     // += p · v'],
+        ['  }'],
+        ['  store_partial(red[warp], acc, m, l, lane);       // combined across warps through shared memory', 'smem'],
+        ['  __syncthreads();'],
+        ['  if (warp == 0) combine_write(partial, red, seq, kvh, split, lane);   // splits are merged by a second kernel'],
+        ['}']
+      ];
+    },
+    gemm: function (k, st) {
+      var acc = Math.ceil(k.bm * k.bn / st.threads), tm = Math.ceil(Math.sqrt(acc)), tn = Math.ceil(acc / tm);
+      return [
+        ['#include <cuda_bf16.h>'],
+        ['constexpr int BM = ' + k.bm + ', BN = ' + k.bn + ', BK = ' + k.bk + ';   // block tile', 'smem'],
+        ['constexpr int STAGES  = ' + k.stages + ';            // cp.async pipeline depth', 'smem'],
+        ['constexpr int THREADS = ' + st.threads + ';'],
+        ['constexpr int TM = ' + tm + ', TN = ' + tn + ';         // per-thread accumulator tile: BM·BN/THREADS = ' + acc + ' fp32', 'regs'],
+        [''],
+        ['// C = A·B, bf16 in, fp32 accumulate; one block per BM×BN output tile'],
+        [lbLine(st), 'lb'],
+        ['gemm_bf16(const __nv_bfloat16* __restrict__ A, const __nv_bfloat16* __restrict__ B,'],
+        ['          __nv_bfloat16* __restrict__ C, int M, int N, int K)'],
+        ['{'],
+        ['  __shared__ __align__(128) __nv_bfloat16 As[STAGES][BM][BK];   // BM×BK×2 B per stage', 'smem'],
+        ['  __shared__ __align__(128) __nv_bfloat16 Bs[STAGES][BK][BN];   // BK×BN×2 B per stage', 'smem'],
+        ['  float acc[TM][TN] = {};                                       // TM×TN fp32 accumulators', 'regs'],
+        ['  __nv_bfloat16 af[TM], bf[TN];                                 // fragments for one k step', 'regs'],
+        ['  const int tm0 = blockIdx.y * BM, tn0 = blockIdx.x * BN, ktiles = K / BK;'],
+        ['  for (int s = 0; s < STAGES - 1; ++s)                           // prologue: STAGES-1 tiles in flight', 'ilp'],
+        ['    cp_async_tile(As[s], Bs[s], A, B, tm0, tn0, s * BK, K, N);'],
+        ['  cp_async_wait<STAGES - 2>(); __syncthreads();'],
+        ['  for (int kt = 0; kt < ktiles; ++kt) {'],
+        ['    const int cur = kt % STAGES, nxt = (kt + STAGES - 1) % STAGES;'],
+        ['    if (kt + STAGES - 1 < ktiles) cp_async_tile(As[nxt], Bs[nxt], A, B, tm0, tn0, (kt + STAGES - 1) * BK, K, N);'],
+        ['    #pragma unroll'],
+        ['    for (int kk = 0; kk < BK; kk += 16) {'],
+        ['      load_frags(af, bf, As[cur], Bs[cur], kk, threadIdx.x);'],
+        ['      mma_bf16_16x8x16(acc, af, bf);                              // tensor-core MMA'],
+        ['    }'],
+        ['    cp_async_wait<STAGES - 2>(); __syncthreads();'],
+        ['  }'],
+        ['  store_tile(C, acc, tm0, tn0, N, threadIdx.x);'],
+        ['}']
+      ];
+    },
+    silu: function (k, st) {
+      var vec = Math.max(1, st.bpl / 2);
+      return [
+        ['#include <cuda_bf16.h>'],
+        ['constexpr int THREADS = ' + st.threads + ';'],
+        ['constexpr int EPT     = ' + k.ept + ';     // elements per thread', 'regs'],
+        ['constexpr int VEC     = ' + vec + ';     // bf16 per ' + st.bpl + '-byte load'],
+        ['constexpr int ILP     = ' + st.ilp + ';     // loads issued before the first is used', 'ilp'],
+        [''],
+        ['// out = SiLU(gate) · up, elementwise over n values'],
+        [lbLine(st), 'lb'],
+        ['silu_mul(const __nv_bfloat16* __restrict__ gate, const __nv_bfloat16* __restrict__ up,'],
+        ['         __nv_bfloat16* __restrict__ out, size_t n)'],
+        ['{'],
+        ['  const size_t i0 = ((size_t)blockIdx.x * THREADS + threadIdx.x) * EPT;'],
+        ['  if (i0 >= n) return;'],
+        ['  __nv_bfloat16 g[EPT], u[EPT];                 // both inputs, EPT elements each', 'regs'],
+        ['  #pragma unroll ILP                            // ILP iterations unrolled: that many loads in flight', 'ilp'],
+        ['  for (int i = 0; i < EPT; i += VEC) {'],
+        ['    *(uint4*)(g + i) = *(const uint4*)(gate + i0 + i);'],
+        ['    *(uint4*)(u + i) = *(const uint4*)(up + i0 + i);'],
+        ['  }'],
+        ['  __nv_bfloat16 o[EPT];'],
+        ['  #pragma unroll'],
+        ['  for (int i = 0; i < EPT; ++i) {'],
+        ['    const float x = __bfloat162float(g[i]);'],
+        ['    const float sx = x / (1.f + __expf(-x));    // SiLU'],
+        ['    o[i] = __float2bfloat16(sx * __bfloat162float(u[i]));'],
+        ['  }'],
+        ['  #pragma unroll'],
+        ['  for (int i = 0; i < EPT; i += VEC) *(uint4*)(out + i0 + i) = *(const uint4*)(o + i);'],
+        ['}']
+      ];
+    }
+  };
+  var KW = /\b(constexpr|const|int|float|void|size_t|if|return|for|template|__global__|__shared__|__restrict__|__align__|__launch_bounds__|uint4|__nv_bfloat16|__nv_fp8_e4m3|__syncthreads|blockIdx|threadIdx|min|fmaxf|fabsf|rsqrtf|__expf|__bfloat162float|__float2bfloat16)\b/g;
+  function hlLine(t) {
+    var i = t.indexOf('//'), code = i >= 0 ? t.slice(0, i) : t, cm = i >= 0 ? t.slice(i) : '';
+    code = esc(code).replace(/^(#\w+.*)$/, '<i class="pp">$1</i>').replace(KW, '<b>$1</b>').replace(/\b(\d+(?:\.\d*)?f?)\b/g, '<u>$1</u>');
+    return code + (cm ? '<i class="cm">' + esc(cm) + '</i>' : '');
+  }
+  function sourceHTML(st) {
+    var lines = SRC[st.kernel](st.k, st);
+    var body = lines.map(function (l) { return '<span class="l' + (l[1] ? ' t-' + l[1] : '') + '">' + (hlLine(l[0]) || ' ') + '</span>'; }).join('');
+    return '<pre class="lk-src" tabindex="0"' + tipAttr(TIP.srcPre) + '>' + body + '</pre>' +
+      '<div class="lk-lg"><span style="--c:var(--brand)"' + tipAttr(TIP.lgRegs) + '>registers estimate</span><span style="--c:#14a89a"' + tipAttr(TIP.lgSmem) + '>shared memory estimate</span><span style="--c:var(--warn)"' + tipAttr(TIP.lgIlp) + '>loads in flight</span><span style="--c:var(--ink3)"' + tipAttr(TIP.lgLb) + '>launch bounds</span></div>';
+  }
+
   /* ───────────────────────────── the full estimate for one GPU ───────────────────────────── */
   function estimate(gpuKey, st) {
     var G = HW.gpus[gpuKey], A = HW.arch[G.arch], K = KERNELS[st.kernel];
@@ -199,7 +361,13 @@
     thSp: 'Registers per thread spilled under the launch-bounds cap.', thBW: 'Achievable bandwidth from Little\'s law against the datasheet peak, TB/s.', thBound: 'Memory, latency or compute bound.', thTime: 'Estimated kernel time.',
     regsEst: 'The register estimate for this kernel from its formula under "How this is calculated"; the slider overrides it.',
     smemEst: 'The shared-memory estimate for this kernel from its formula; the slider overrides it.',
-    chartTabs: 'Switches between the occupancy curve and the roofline for the selected GPU.'
+    chartTabs: 'Switches between the occupancy curve, the roofline and the kernel source for the selected GPU.',
+    cSrc: 'Representative CUDA for this kernel with the current parameters substituted. The marked lines are where the register and shared-memory estimates come from; ptxas decides the real register count (-Xptxas -v).',
+    srcPre: 'Representative source, not the exact kernel measured: helper device functions are named rather than shown, and the shapes match the parameters on the left.',
+    lgRegs: 'Declarations held in registers: the estimate counts these arrays plus a fixed overhead for addresses and loop state.',
+    lgSmem: 'Declarations in shared memory: their size is the shared-memory estimate per block.',
+    lgIlp: 'Where the loads in flight per thread come from: independent loads issued before the first result is used.',
+    lgLb: 'The launch bounds line: with a minimum blocks per SM, nvcc caps registers per thread to fit them.'
   };
   var CARD_TIPS_NV = ['Compute-capability rule: 32-bit registers per SM.', 'Compute-capability rule: registers are allocated per warp in this unit, and warps in groups of this many.', 'Compute-capability rule: shared memory per SM, and the most one block may take.', 'Compute-capability rule: maximum resident warps and blocks per SM.', 'ISA limit on registers per thread.', 'Datasheet peak memory bandwidth.', 'Datasheet rate for the type this kernel runs in: vector FP32 for streaming kernels, tensor-core bf16 for attention and GEMM.', 'Assumed DRAM latency for Little\'s law; editable on the left.'];
   var CARD_TIPS_AMD = ['Vector general-purpose register file per compute unit: 512 per lane on each of 4 SIMDs.', 'VGPRs are allocated per wave in this granularity.', 'Local data share (shared memory) per compute unit.', 'Maximum resident waves per compute unit (8 per SIMD × 4).', 'Maximum workgroups per compute unit.', 'Datasheet peak memory bandwidth.', 'Datasheet rate for the type this kernel runs in.', 'Assumed DRAM latency for Little\'s law; editable on the left.'];
@@ -367,6 +535,14 @@
       '.lk-tbl td{padding:7px 8px;border-bottom:1px solid var(--line2);font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}.lk-tbl td:first-child{font-family:var(--font);font-weight:600;color:var(--ink)}',
       '.lk-tbl tr.on td{background:var(--brand50)}.lk-tbl tr[tabindex]{cursor:pointer}.lk-tbl tr[tabindex]:hover td{background:var(--bg)}.lk-tbl .n{text-align:right}',
       '.lk-tw{overflow-x:auto}',
+      '.lk-src{margin:0;font:11.5px/1.55 var(--mono);color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:8px;padding:8px 0;overflow:auto;max-height:330px;white-space:pre;tab-size:2}',
+      '.lk-src .l{display:block;padding:0 12px;border-left:3px solid transparent}',
+      '.lk-src .t-regs{border-left-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,transparent)}',
+      '.lk-src .t-smem{border-left-color:#14a89a;background:color-mix(in srgb,#14a89a 10%,transparent)}',
+      '.lk-src .t-ilp{border-left-color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,transparent)}',
+      '.lk-src .t-lb{border-left-color:var(--ink3);background:color-mix(in srgb,var(--ink3) 12%,transparent)}',
+      '.lk-src b{font-weight:600;color:var(--brandD)}.lk-src u{text-decoration:none;color:var(--ok)}.lk-src i{font-style:normal}.lk-src .cm{color:var(--ink3)}.lk-src .pp{color:var(--ink3)}',
+      '.lk-src:focus-visible{outline:2px solid var(--brand);outline-offset:2px}',
       '.lk-note{font-size:12px;color:var(--ink2);margin:0}.lk-note code{font-family:var(--mono);font-size:11.5px;background:var(--bg);padding:1px 4px;border-radius:4px}',
       '.lk-root details{border-top:1px solid var(--line);padding-top:10px}.lk-root summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)}',
       '.lk-root details ul{margin:8px 0 0;padding-left:18px;color:var(--ink2);font-size:12.5px}.lk-root details li{margin:4px 0}',
@@ -499,8 +675,10 @@
 
       var charts =
         '<div class="lk-charts">' +
-        '<div class="lk-ctabs" role="group" aria-label="Chart"><button type="button" data-chart="occ" aria-pressed="' + (st.chart === 'occ') + '"' + tipAttr(TIP.cOcc) + '>Occupancy against registers</button><button type="button" data-chart="roof" aria-pressed="' + (st.chart === 'roof') + '"' + tipAttr(TIP.cRoof) + '>Roofline</button></div>' +
-        (st.chart === 'occ'
+        '<div class="lk-ctabs" role="group" aria-label="Chart"><button type="button" data-chart="occ" aria-pressed="' + (st.chart === 'occ') + '"' + tipAttr(TIP.cOcc) + '>Occupancy against registers</button><button type="button" data-chart="roof" aria-pressed="' + (st.chart === 'roof') + '"' + tipAttr(TIP.cRoof) + '>Roofline</button><button type="button" data-chart="src" aria-pressed="' + (st.chart === 'src') + '"' + tipAttr(TIP.cSrc) + '>Kernel source</button></div>' +
+        (st.chart === 'src'
+          ? '<div class="lk-card"><p class="lk-sub"><span' + tipAttr(TIP.cSrc) + '>Kernel source</span> <i>' + esc(K.name) + ' · representative CUDA</i></p>' + sourceHTML(st) + '</div>'
+          : st.chart === 'occ'
           ? '<div class="lk-card"><p class="lk-sub"><span' + tipAttr(TIP.cOcc) + '>Occupancy against registers per thread</span> <i>' + esc(A.name) + ' · ' + st.threads + ' threads · ' + kb(st.smem) + ' smem</i></p>' + occCurveSVG(E, st) + '<div class="lk-lg"><span style="--c:var(--brand)"' + tipAttr(TIP.lgThis) + '>this architecture</span><span style="--c:var(--line)"' + tipAttr(TIP.lgOthers) + '>the others</span>' + (E.cap < 255 ? '<span style="--c:var(--warn)"' + tipAttr(TIP.lgCap) + '>above the cap: spilled</span>' : '') + '</div></div>'
           : '<div class="lk-card"><p class="lk-sub"><span' + tipAttr(TIP.cRoof) + '>Roofline</span> <i>' + esc(K.name) + ' on ' + esc(G.name) + '</i></p>' + rooflineSVG(E) + '<div class="lk-lg"><span style="--c:var(--line)"' + tipAttr(TIP.lgPeak) + '>peak bandwidth roof</span><span style="--c:var(--warn)"' + tipAttr(TIP.lgAch) + '>achievable (Little\'s law)</span><span style="--c:var(--brand)"' + tipAttr(TIP.lgKern) + '>this kernel</span></div></div>') +
         '</div>';
