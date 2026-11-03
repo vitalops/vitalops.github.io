@@ -1,9 +1,9 @@
-"""Build ../index.html.
+"""Build the site: every page under the repository root.
 
 site.py is the page; app.py and app.css are the mock app screens. The two are
 kept apart so site and app styles never collide, and spliced into one generated
 module here (_site_gen.py, ignored by git) so that app.py's icon lookups resolve
-against src/icons. Run:  python3 src/build.py
+against src/icons. pages.py then lays out every page from those parts. Run:  python3 src/build.py
 """
 import os, re, runpy
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -23,4 +23,7 @@ E = E.replace('open(OUT, "w").write(HTML.replace("__JSONLD__", jsonld(HTML)))',
               'open(OUT, "w").write(HTML.replace("__SPRITE__", sprite()).replace("__JSONLD__", jsonld(HTML)))')
 gen = os.path.join(HERE, "_site_gen.py")
 open(gen, "w").write(A + parts + "\n" + SITE_CSS + css + E)
-runpy.run_path(gen, run_name="__main__")
+g = runpy.run_path(gen, run_name="_vo_site")   # the screens, styles and scripts, without writing a page
+import sys; sys.path.insert(0, HERE)
+import pages
+pages.build(g)

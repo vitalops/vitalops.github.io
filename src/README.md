@@ -1,9 +1,9 @@
 # Site source
 
-`index.html` is generated. Edit the files here, then rebuild:
+Every page (`index.html`, `products/`, `solutions/`, `lab/`, `platform/`, `services/`, `security/`, `company/`, `credits/`) and the shared files under `assets/css/` and `assets/js/site.js`, `assets/js/play.js` are generated. Edit the files here, then rebuild:
 
 ```sh
-python3 src/build.py          # writes ../index.html; needs only Python 3
+python3 src/build.py          # writes every page; needs only Python 3
 ```
 
 | File | What it is |
@@ -11,7 +11,11 @@ python3 src/build.py          # writes ../index.html; needs only Python 3
 | `site.py` | The page: copy, sections, site CSS, the playback and carousel scripts. |
 | `app.py` | The mock app screens shown in the hero and walkthrough: fixed 1132×708 canvases, scaled by the page, never reflowed. |
 | `app.css` | Styles for those screens. The app palette is scoped to `.mock` so it never leaks into the site. |
-| `build.py` | Splices the three into one generated module (`_site_gen.py`, git-ignored) and runs it. |
+| `build.py` | Splices the three into one generated module (`_site_gen.py`, git-ignored), runs it, then hands its parts to `pages.py`. |
+| `pages.py` | The company site: navigation, footer, the home page, product, solution and demo pages, and the Plan screen. Writes the shared CSS and JS with a content hash on each link. |
+| `pages.css`, `pages.js` | Styles and the small nav and lifecycle script for those pages. |
+| `photo_credits.json` | Source and licence of each photo under `assets/photos/`; the credits page is built from it. |
+| `../assets/js/lab-*.js` | The five live demos (planner, batching, quant, specdec, edgefit). Hand-written, self-contained; each mounts on `[data-lab="name"]`. |
 | `icons/` | Lucide icons and brand marks, inlined as an SVG sprite that holds only the icons the page uses. See `icons/LICENSES.md`. |
 | `og.html` | Source of the social card. |
 | `tools/render_icons.py` | Renders the PNG favicons, the Apple touch icon and `assets/og.png` from `assets/vo-mark.svg` and `og.html`. |
@@ -24,4 +28,5 @@ Conventions worth keeping:
 
 - Site and app share no class names. A collision shows up as one side's styles bleeding into the other.
 - Everything the mocks do on screen is scripted playback driven by `data-step` attributes; nothing is recorded.
-- The photos under `assets/stock/` are from Pexels under the Pexels licence, which needs no attribution.
+- The photos under `assets/stock/` are from Pexels under the Pexels licence, which needs no attribution. The photos under `assets/photos/` are from Wikimedia Commons; several are CC BY or CC BY-SA, so keep the credits page linked from the footer.
+- The live demos are estimators built on first-order physics. They never quote a VitalOps result.

@@ -1471,5 +1471,6 @@ def jsonld(page):
     site = {"@type": "WebSite", "@id": "https://vitalops.ai/#site", "url": "https://vitalops.ai/", "name": "VitalOps", "publisher": {"@id": "https://vitalops.ai/#org"}}
     graph = [org, site] + ([{"@type": "FAQPage", "mainEntity": faqs}] if faqs else [])
     return '<script type="application/ld+json">' + json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False) + '</script>'
-open(OUT, "w").write(HTML.replace("__JSONLD__", jsonld(HTML)))
-print("written", len(HTML))
+if __name__ == "__main__":
+    open(OUT, "w").write(HTML.replace("__JSONLD__", jsonld(HTML)))
+    print("written", len(HTML))
