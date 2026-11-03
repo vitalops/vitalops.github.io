@@ -573,14 +573,14 @@ def home():
 # ───────────────────────── other pages ─────────────────────────
 def lab_page():
     order = ["planner", "batching", "kernel", "quant", "specdec", "edgefit"]
-    sub = "".join(f'<a href="#{k}" data-tab="{k}">{ic(DEMOS[k][2])}{DEMOS[k][0]}</a>' for k in order)
+    sub = ""
     intro = {"planner": "Estimates how many GPUs you need and the cost per million tokens. It assumes decode is limited by memory bandwidth and prefill by compute, which is where Plan starts before running a full simulation.",
              "batching": "Simulates a model server using static batching, continuous batching, chunked prefill and prefix caching on chat, RAG and agent traffic.",
              "quant": "Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights. You can see the effect of group size and outlier protection.",
              "specdec": "A draft model proposes several tokens and the main model checks them in one pass. Adjust the acceptance rate and draft length to find the best setting.",
              "kernel": "Occupancy from the CUDA occupancy-calculator rules for each architecture, the register file and shared memory drawn to scale, spills under a register cap, achievable bandwidth from Little's law and a roofline for the chosen kernel.",
              "edgefit": "Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi. You can also check whether on-device fine-tuning would fit."}
-    body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. For real numbers on your own model and hardware, you would use the products.</p><nav class="lsub" aria-label="Demos">{sub}</nav></div></section>"""
+    body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. Pick the hardware at the top of the panel; every tab follows it.</p></div></section>"""
     items = "".join(f'<li><a href="#{k}">{ic(DEMOS[k][2])}<b>{DEMOS[k][0]}</b></a><p>{intro[k]}</p></li>' for k in order)
     body += f'<section class="labsec" id="demos"><div class="wrap"><div class="lab" data-lab-shell data-tabs="{",".join(order)}" data-gpu="h100"><noscript><p class="lab-ns">These demos need JavaScript.</p></noscript></div><ul class="lab-list">{items}</ul></div></section>'
 

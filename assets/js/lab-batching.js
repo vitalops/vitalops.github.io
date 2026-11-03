@@ -343,6 +343,34 @@
   function fmtRate(v) { return v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2); }
   function fmtTok(n) { return n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1000 ? (n / 1000).toFixed(n >= 100000 ? 0 : 1) + 'k' : String(n); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function tipAttr(t) { return t ? ' data-tip="' + esc(t) + '"' : ''; }
+  function tipRows(card, tips) { var dts = card.querySelectorAll('.hwc-kv dt'); tips.forEach(function (t, i) { if (dts[i] && t) dts[i].setAttribute('data-tip', t); }); }
+  var TIP = {
+    model: 'Open-weight model. Its parameter count sets the weight bytes read every step; its layers, KV heads and head size set the bytes per cached token. Weights and KV cache are fp8.',
+    gpu: 'The GPU one replica runs on: memory sets the KV budget, bandwidth the step time, the fp8 or bf16 rate the prefill cost.',
+    traffic: 'Arrival shape: the prompt and output length distributions (log-normal, fixed seed) and any shared prefix.',
+    sched: 'How requests share the GPU across engine steps.',
+    cache: 'Keeps the preset\'s shared prefix resident after the first request, so later requests skip prefilling it and share its KV entries. No effect on traffic without a shared prefix.',
+    rate: 'Mean arrival rate, Poisson. Defaults to 70% of the estimated capacity for this model, GPU and traffic; the top of the range is about 1.6× that.',
+    play: 'Runs or pauses the simulated clock.', reset: 'Restarts the run with a new random seed.', speed: 'Simulated time per real second.',
+    spd1: 'Real time.', spd4: 'Four simulated seconds per real second.',
+    lane: 'GPU batch slots over time, newest at the right: each bar is one request.',
+    lgPf: 'The request\'s prompt is being processed (prefill), before its first token.', lgDec: 'The request is generating output, one token per engine step.',
+    lgHit: 'Prefix-cache hit: the shared prefix was already resident, so only the unique part of the prompt was prefilled.',
+    lgHeld: 'Static batching: the request has finished but its slot stays taken until the batch\'s longest answer ends.',
+    lgLong: 'An engine step over three times the median step on screen, usually a large prefill. Every running stream waits for it.',
+    lgWait: 'A queued request that has waited more than two seconds.',
+    mTps: 'Output tokens per second over the last 5 s of simulated time.',
+    mT50: 'Median time from arrival to first token over the last 20 s, counting requests still waiting with their wait so far.',
+    mT99: '99th percentile time from arrival to first token over the last 20 s; the sparkline tracks the last 40 s.',
+    mTpot: 'Median time per output token after the first, per completed request.',
+    mItl: '99th percentile gap between consecutive tokens of a stream over the last 15 s. Long prefill steps show up here.',
+    mStr: 'Average streams in the batch over the last 5 s.', mQ: 'Requests waiting for a slot or for KV-cache space.', mKv: 'Share of the KV-cache budget in use.',
+    kvLine: 'Cached tokens in use against the KV-cache budget.',
+    phys: 'The step-time formula derived from this model and GPU, the KV-cache budget and the estimated capacity for this traffic.'
+  };
+  var CARD_TIPS = ['Datasheet memory capacity and type.', 'Datasheet: HBM stacks or GDDR channels and the capacity of each.', 'Datasheet peak memory bandwidth; steps read at 75% of it.', 'Datasheet dense tensor-core rate the prefill runs at: fp8 where the GPU has it, otherwise bf16.', 'Parameters × 1 byte.', 'Weight bytes ÷ (bandwidth × 0.75): the fixed cost of every step, before the 1 ms launch overhead.', 'Bytes per cached token ÷ (bandwidth × 0.75): the cost each decoding stream adds per token of context.', '2 FLOPs per parameter ÷ (tensor rate × 0.6): the cost of each prompt token.', 'Cached tokens that fit: (memory − weights − 10% reserve) ÷ bytes per cached token.'];
+  var MEM_TIPS = ['fp8 weights, resident for the whole run.', 'KV cache held by the running requests, updated as the simulation runs.', '10% of memory assumed for activations, CUDA context and fragmentation.', 'Memory not in use.'];
 
   /* ───────────── widget ───────────── */
   var uid = 0;
@@ -356,42 +384,42 @@
     var st = { model: 'qwen32b', gpu: shell && HW.gpus[LAB.gpu] ? LAB.gpu : 'h100', preset: 'chat', mode: 'continuous', prefix: true, rate: 1, speed: 1, playing: !reduce, seed: 11 };
     var ph, cap;
 
-    function seg(name, label, opts, cur) {
-      return '<div class="lb-grp"><span class="lb-lab" id="' + id + name + '">' + label + '</span><div class="lb-seg" role="group" aria-labelledby="' + id + name + '" data-k="' + name + '">' +
-        opts.map(function (o) { return '<button type="button" data-v="' + o[0] + '" aria-pressed="' + (o[0] === cur) + '">' + o[1] + '</button>'; }).join('') + '</div></div>';
+    function seg(name, label, opts, cur, tip) {
+      return '<div class="lb-grp"><span class="lb-lab" id="' + id + name + '"' + tipAttr(tip) + '>' + label + '</span><div class="lb-seg" role="group" aria-labelledby="' + id + name + '" data-k="' + name + '">' +
+        opts.map(function (o) { return '<button type="button" data-v="' + o[0] + '" aria-pressed="' + (o[0] === cur) + '"' + tipAttr(o[2]) + '>' + o[1] + '</button>'; }).join('') + '</div></div>';
     }
-    function sel(name, label, opts, cur) {
-      return '<div class="lb-grp"><label class="lb-lab" for="' + id + name + '">' + label + '</label><select class="lb-sel" id="' + id + name + '" data-k="' + name + '">' +
+    function sel(name, label, opts, cur, tip) {
+      return '<div class="lb-grp"><label class="lb-lab" for="' + id + name + '"' + tipAttr(tip) + '>' + label + '</label><select class="lb-sel" id="' + id + name + '" data-k="' + name + '">' +
         opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select></div>';
     }
     root.innerHTML =
       '<div class="lb">' +
       '<div class="lb-bar">' +
-      sel('model', 'Model · fp8', Object.keys(MODELS).map(function (k) { return [k, MODELS[k].label]; }), st.model) +
-      (shell ? '' : sel('gpu', 'GPU · one replica', GPU_KEYS.map(function (k) { return [k, HW.gpus[k].name]; }), st.gpu)) +
-      seg('preset', 'Traffic', Object.keys(PRESETS).map(function (k) { return [k, PRESETS[k].label]; }), st.preset) +
-      seg('mode', 'Scheduler', Object.keys(MODES).map(function (k) { return [k, MODES[k].label]; }), st.mode) +
-      '<div class="lb-grp"><span class="lb-lab">Cache</span><label class="lb-sw"><input type="checkbox" data-k="prefix" checked><i></i><span>Prefix caching</span></label></div>' +
-      '<div class="lb-grp lb-rate"><label class="lb-lab" for="' + id + 'r">Arrivals<output>—</output></label><input id="' + id + 'r" type="range" min="0.1" max="6" step="0.1" value="3" data-k="rate"></div>' +
-      '<div class="lb-ctl"><button type="button" class="lb-btn lb-pri" data-a="play"></button><button type="button" class="lb-btn" data-a="reset">' + ICON_RESET + 'Reset</button>' +
-      '<div class="lb-seg" role="group" aria-label="Playback speed" data-k="speed"><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="4" aria-pressed="false">4×</button></div></div>' +
+      sel('model', 'Model · fp8', Object.keys(MODELS).map(function (k) { return [k, MODELS[k].label]; }), st.model, TIP.model) +
+      (shell ? '' : sel('gpu', 'GPU · one replica', GPU_KEYS.map(function (k) { return [k, HW.gpus[k].name]; }), st.gpu, TIP.gpu)) +
+      seg('preset', 'Traffic', Object.keys(PRESETS).map(function (k) { return [k, PRESETS[k].label, PRESETS[k].hint]; }), st.preset, TIP.traffic) +
+      seg('mode', 'Scheduler', Object.keys(MODES).map(function (k) { return [k, MODES[k].label, MODES[k].note]; }), st.mode, TIP.sched) +
+      '<div class="lb-grp"><span class="lb-lab"' + tipAttr(TIP.cache) + '>Cache</span><label class="lb-sw"' + tipAttr(TIP.cache) + '><input type="checkbox" data-k="prefix" checked><i></i><span>Prefix caching</span></label></div>' +
+      '<div class="lb-grp lb-rate"><label class="lb-lab" for="' + id + 'r"' + tipAttr(TIP.rate) + '>Arrivals<output>—</output></label><input id="' + id + 'r" type="range" min="0.1" max="6" step="0.1" value="3" data-k="rate"></div>' +
+      '<div class="lb-ctl"><button type="button" class="lb-btn lb-pri" data-a="play"' + tipAttr(TIP.play) + '></button><button type="button" class="lb-btn" data-a="reset"' + tipAttr(TIP.reset) + '>' + ICON_RESET + 'Reset</button>' +
+      '<div class="lb-seg" role="group" aria-label="Playback speed" data-k="speed"' + tipAttr(TIP.speed) + '><button type="button" data-v="1" aria-pressed="true"' + tipAttr(TIP.spd1) + '>1×</button><button type="button" data-v="4" aria-pressed="false"' + tipAttr(TIP.spd4) + '>4×</button></div></div>' +
       '</div>' +
       '<div class="lb-main"><div class="lb-viz"><canvas role="img" aria-label="GPU batch slots over time: each bar is a request, darker while its prompt is prefilled, lighter while it generates."></canvas><div class="lb-nf" hidden></div></div><div class="lb-hw"></div></div>' +
-      '<div class="lb-leg"><span><i style="background:var(--lb-pf)"></i>Prefill</span><span><i style="background:var(--lb-dec)"></i>Decode</span>' +
-      '<span><i style="background:var(--lb-hit)"></i>Prefix cache hit</span><span><i style="background:transparent;border-top:2px dashed var(--ink4,#94a3b8);height:0;border-radius:0"></i>Slot held, idle</span>' +
-      '<span><i style="background:var(--lb-long);border-left:2px solid var(--lb-longl)"></i>Long step: every stream stalls</span><span><i style="background:var(--lb-wait);width:8px"></i>Waiting &gt; 2 s</span></div>' +
+      '<div class="lb-leg"><span' + tipAttr(TIP.lgPf) + '><i style="background:var(--lb-pf)"></i>Prefill</span><span' + tipAttr(TIP.lgDec) + '><i style="background:var(--lb-dec)"></i>Decode</span>' +
+      '<span' + tipAttr(TIP.lgHit) + '><i style="background:var(--lb-hit)"></i>Prefix cache hit</span><span' + tipAttr(TIP.lgHeld) + '><i style="background:transparent;border-top:2px dashed var(--ink4,#94a3b8);height:0;border-radius:0"></i>Slot held, idle</span>' +
+      '<span' + tipAttr(TIP.lgLong) + '><i style="background:var(--lb-long);border-left:2px solid var(--lb-longl)"></i>Long step: every stream stalls</span><span' + tipAttr(TIP.lgWait) + '><i style="background:var(--lb-wait);width:8px"></i>Waiting &gt; 2 s</span></div>' +
       '<div class="lb-met">' +
-      '<div class="lb-m"><small>Output throughput</small><b data-m="tps">—</b></div>' +
-      '<div class="lb-m"><small>TTFT p50</small><b data-m="ttft50">—</b></div>' +
-      '<div class="lb-m" title="TTFT p99 over the last 40 s"><small>TTFT p99</small><b data-m="ttft99">—</b><svg viewBox="0 0 200 16" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="var(--brand,#3f5cf6)" stroke-width="1.5" vector-effect="non-scaling-stroke" points=""/></svg></div>' +
-      '<div class="lb-m"><small>TPOT p50</small><b data-m="tpot">—</b></div>' +
-      '<div class="lb-m"><small>Inter-token p99</small><b data-m="itl99">—</b></div>' +
-      '<div class="lb-m"><small>Streams running</small><b data-m="streams">—</b></div>' +
-      '<div class="lb-m"><small>Queue</small><b data-m="queue">0</b></div>' +
-      '<div class="lb-m"><small>KV cache in use</small><b data-m="kv">0<em>%</em></b></div>' +
+      '<div class="lb-m"' + tipAttr(TIP.mTps) + '><small>Output throughput</small><b data-m="tps">—</b></div>' +
+      '<div class="lb-m"' + tipAttr(TIP.mT50) + '><small>TTFT p50</small><b data-m="ttft50">—</b></div>' +
+      '<div class="lb-m"' + tipAttr(TIP.mT99) + '><small>TTFT p99</small><b data-m="ttft99">—</b><svg viewBox="0 0 200 16" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="var(--brand,#3f5cf6)" stroke-width="1.5" vector-effect="non-scaling-stroke" points=""/></svg></div>' +
+      '<div class="lb-m"' + tipAttr(TIP.mTpot) + '><small>TPOT p50</small><b data-m="tpot">—</b></div>' +
+      '<div class="lb-m"' + tipAttr(TIP.mItl) + '><small>Inter-token p99</small><b data-m="itl99">—</b></div>' +
+      '<div class="lb-m"' + tipAttr(TIP.mStr) + '><small>Streams running</small><b data-m="streams">—</b></div>' +
+      '<div class="lb-m"' + tipAttr(TIP.mQ) + '><small>Queue</small><b data-m="queue">0</b></div>' +
+      '<div class="lb-m"' + tipAttr(TIP.mKv) + '><small>KV cache in use</small><b data-m="kv">0<em>%</em></b></div>' +
       '</div>' +
       '<p class="lb-note" aria-live="polite"></p>' +
-      '<p class="lb-phys" aria-live="polite"></p>' +
+      '<p class="lb-phys" aria-live="polite"' + tipAttr(TIP.phys) + '></p>' +
       '<details class="lb-det"><summary>What the simulation models</summary><ul data-det></ul></details></div>';
 
     var el = root.querySelector('.lb'), canvas = el.querySelector('canvas'), ctx = canvas.getContext('2d');
@@ -430,7 +458,7 @@
       rateOut.textContent = cap ? fmtRate(st.rate) + ' req/s' : '—';
       rateIn.disabled = !ph.fits;
       prefIn.disabled = !p.shared; prefLab.classList.toggle('lb-dis', !p.shared);
-      prefLab.title = p.shared ? '' : 'Chat traffic here has no shared prefix';
+      prefLab.setAttribute('data-tip', p.shared ? TIP.cache : 'Chat traffic here has no shared prefix, so there is nothing to cache.');
       playBtn.disabled = !ph.fits;
       // readout
       phys.hidden = !ph.fits;
@@ -439,7 +467,7 @@
           (cap ? ' · capacity ≈ <b>' + fmtRate(cap.lmax) + ' req/s</b> on this traffic' : '')
         : m.label + ' in fp8 is ' + HW.gb(ph.weights) + '; the ' + g.name + ' has ' + g.mem + ' GB and ' + HW.gb(ph.reserve) + ' is reserved, so it does not fit on one GPU.';
       nf.hidden = ph.fits;
-      nf.textContent = ph.fits ? '' : 'Doesn’t fit on one ' + g.name + '. Pick a smaller model or a GPU with more memory; splitting across GPUs is outside this demo.';
+      nf.textContent = ph.fits ? '' : 'Does not fit on one ' + g.name + '. A smaller model or a GPU with more memory would be needed; splitting across GPUs is not modelled.';
       buildCard(m, g);
       buildDetails(m, g);
     }
@@ -458,9 +486,10 @@
       var card = HW.card(g, { photo: !shell, rows: rows, sub: g.arch === 'cdna3' ? g.cus + ' CUs · ' + HW.arch[g.arch].name : g.sms + ' SMs · ' + HW.arch[g.arch].name,
         note: (ph.fp8 ? '' : 'No fp8 tensor cores: weights stay fp8 in memory and are dequantised on the fly; prefill is priced at the bf16 rate. ') +
               (shell ? '' : 'Reads at ' + Math.round(BW_EFF * 100) + '% of peak bandwidth, prefill at ' + Math.round(FLOPS_EFF * 100) + '% of peak compute, ' + OVERHEAD + ' ms launch overhead per step, ' + Math.round(RESERVE * 100) + '% of memory reserved. All assumptions; see below.') });
+      tipRows(card, CARD_TIPS);
       hwBox.innerHTML = ''; hwBox.appendChild(card);
       var slot = card.querySelector('.hwc-slot');
-      kvLine = document.createElement('div'); kvLine.className = 'lb-kvline';
+      kvLine = document.createElement('div'); kvLine.className = 'lb-kvline'; kvLine.setAttribute('data-tip', TIP.kvLine);
       slot.appendChild(kvLine);
       memBar = null; drawMem(0, true);
     }
@@ -469,6 +498,7 @@
         var bar = HW.memoryBar(HW.gpus[st.gpu], memParts(kvTokens));
         if (memBar) memBar.parentNode.replaceChild(bar, memBar); else kvLine.parentNode.insertBefore(bar, kvLine);
         memBar = bar;
+        [].forEach.call(bar.querySelectorAll('.hwm-lg span'), function (sp, i) { if (MEM_TIPS[i]) sp.setAttribute('data-tip', MEM_TIPS[i]); });
       } else {
         // update the stack fills in place
         var parts = memParts(kvTokens), capB = ph.memB;

@@ -84,13 +84,6 @@
   "page": "https://commons.wikimedia.org/wiki/File:Nvidia_Tesla_A100.png"
  },
  {
-  "file": "hw/b200.webp",
-  "title": "Grafica Nvidia B200 (DGX B200 system)",
-  "author": "Javils00",
-  "license": "CC0",
-  "page": "https://commons.wikimedia.org/wiki/File:Grafica_Nvidia_B200.jpg"
- },
- {
   "file": "hw/rtx5090.webp",
   "title": "Palit GeForce RTX 5090 GameRock",
   "author": "PantheraLeo1359531",
@@ -145,5 +138,19 @@
   "author": "HuangWending18072009",
   "license": "CC0",
   "page": "https://commons.wikimedia.org/wiki/File:Rear_view_of_the_Samsung_Galaxy_S25_Ultra_smartphone.jpg"
+ },
+ {
+  "file": "hw/gb200.webp",
+  "title": "GB200 superchip board at Computex 2024 (video frame)",
+  "author": "极客湾 Geekerwan",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:AI助手能帮我超频？COMPUTEX_NV展区体验_(极客湾Geekerwan)_09.png"
+ },
+ {
+  "file": "hw/mi300x.webp",
+  "title": "AMD Instinct MI300-series OAM module (video frame)",
+  "author": "极客湾 Geekerwan",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:超级核显来袭！AMD新品现场体验_(2160p_60fps_VP9-128kbit_AAC)-00.06.51.561.png"
  }
 ]

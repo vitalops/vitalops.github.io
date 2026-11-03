@@ -121,34 +121,34 @@
     var st = { a: 0.85, k: 4, c: 0.12, model: 'llama8b', gpu: LAB ? LAB.gpu : 'h100' };
     var BASE_TPS = 60, SLOW = 9, fits = true;   // overwritten by derive()
 
-    var gpuCtl = !LAB && HW ? '<div class="ls-grp"><label class="ls-lab" for="' + id + 'g">GPU</label><select id="' + id + 'g" data-sel="gpu">' +
+    var gpuCtl = !LAB && HW ? '<div class="ls-grp"><label class="ls-lab" for="' + id + 'g" data-tip="The GPU whose datasheet bandwidth and memory set the baseline rate.">GPU</label><select id="' + id + 'g" data-sel="gpu">' +
       Object.keys(HW.gpus).map(function (k) { return '<option value="' + k + '">' + esc(HW.gpus[k].name) + '</option>'; }).join('') + '</select></div>' : '';
 
     root.innerHTML =
       '<div class="ls">' +
       '<div class="ls-bar">' +
-      '<div class="ls-grp"><label class="ls-lab" for="' + id + 'm">Target model · fp8</label><select id="' + id + 'm" data-sel="model">' +
+      '<div class="ls-grp"><label class="ls-lab" for="' + id + 'm" data-tip="The model that produces the final answer, with fp8 weights. Its weight bytes set the baseline rate: one stream reads every weight once per token.">Target model · fp8</label><select id="' + id + 'm" data-sel="model">' +
       MODELS.map(function (m) { return '<option value="' + m.id + '">' + esc(m.name) + ' · ' + gbs(m.bytes) + '</option>'; }).join('') + '</select></div>' +
       gpuCtl +
-      '<div class="ls-grp"><span class="ls-lab" id="' + id + 'p">Draft model</span><div class="ls-seg" role="group" aria-labelledby="' + id + 'p">' +
-      PRESETS.map(function (p) { return '<button type="button" data-a="' + p.a + '" aria-pressed="' + (p.a === st.a) + '">' + p.label + '<em>α≈' + p.a + '</em></button>'; }).join('') + '</div></div>' +
-      '<div class="ls-grp"><label class="ls-lab" for="' + id + 'a">Acceptance <span class="ls-sym">α</span><output data-o="a"></output></label><input id="' + id + 'a" type="range" min="0.3" max="0.95" step="0.01" data-k="a"></div>' +
-      '<div class="ls-grp"><label class="ls-lab" for="' + id + 'k">Draft length <span class="ls-sym">k</span><output data-o="k"></output></label><input id="' + id + 'k" type="range" min="1" max="8" step="1" data-k="k"></div>' +
-      '<div class="ls-grp"><label class="ls-lab" for="' + id + 'c">Draft cost <span class="ls-sym">c</span><output data-o="c"></output></label><input id="' + id + 'c" type="range" min="0.02" max="0.3" step="0.01" data-k="c"></div>' +
-      '<div class="ls-grp ls-end"><button type="button" class="ls-btn" data-act="run"></button></div>' +
+      '<div class="ls-grp"><span class="ls-lab" id="' + id + 'p" data-tip="The small model that proposes tokens. The presets set the acceptance rate α; the draft cost c comes from its size against the target.">Draft model</span><div class="ls-seg" role="group" aria-labelledby="' + id + 'p">' +
+      PRESETS.map(function (p) { return '<button type="button" data-a="' + p.a + '" aria-pressed="' + (p.a === st.a) + '" data-tip="' + (p.id === 'generic' ? 'A small off-the-shelf model as the draft: about 60% of its tokens match the target, a typical figure for unrelated drafts.' : 'A draft head trained on the deployment\'s own traffic, EAGLE-style: about 85% of its tokens match the target.') + '">' + p.label + '<em>α≈' + p.a + '</em></button>'; }).join('') + '</div></div>' +
+      '<div class="ls-grp"><label class="ls-lab" for="' + id + 'a" data-tip="Probability that each draft token matches what the target would have produced, treated as independent per token. Drafting stops at the first mismatch.">Acceptance <span class="ls-sym">α</span><output data-o="a"></output></label><input id="' + id + 'a" type="range" min="0.3" max="0.95" step="0.01" data-k="a"></div>' +
+      '<div class="ls-grp"><label class="ls-lab" for="' + id + 'k" data-tip="Tokens the draft proposes before one verify pass. A longer draft can yield more tokens per pass but costs k draft passes, and later tokens are less likely to be reached.">Draft length <span class="ls-sym">k</span><output data-o="k"></output></label><input id="' + id + 'k" type="range" min="1" max="8" step="1" data-k="k"></div>' +
+      '<div class="ls-grp"><label class="ls-lab" for="' + id + 'c" data-tip="Cost of one draft pass as a fraction of a target pass. The default is the draft\'s weight bytes over the target\'s (a 1 GB fp8 draft), since both passes are bound by reading weights. Editable.">Draft cost <span class="ls-sym">c</span><output data-o="c"></output></label><input id="' + id + 'c" type="range" min="0.02" max="0.3" step="0.01" data-k="c"></div>' +
+      '<div class="ls-grp ls-end"><button type="button" class="ls-btn" data-act="run" data-tip="Restarts both panes on one clock with a fresh random draw of accepted and rejected draft tokens."></button></div>' +
       '</div>' +
       '<div class="ls-race">' +
-      pane('base', 'Baseline', '1 token per forward pass') +
-      pane('spec', 'Speculative', 'draft k tokens, verify in one pass') +
+      pane('base', 'Baseline', '1 token per forward pass', 'Plain decoding: one forward pass of the target model per token, each pass reading all the weights.', 'Tokens per second = bandwidth × 0.75 ÷ target weight bytes: the same memory-bound, batch-1 model as the capacity planner.') +
+      pane('spec', 'Speculative', 'draft k tokens, verify in one pass', 'Draft-then-verify: the draft proposes k tokens, then one target pass checks them all and adds a token of its own. The output is identical to plain decoding.', 'Tokens per second from the same clock: accepted draft tokens plus one per verify pass, divided by the time spent in draft and target passes.') +
       '</div>' +
       '<div class="ls-bot"><div class="ls-met">' +
-      '<div class="ls-m"><small>Measured speed-up</small><b data-m="up">—</b></div>' +
-      '<div class="ls-m"><small>Tokens per verify pass</small><b data-m="tpp">—</b></div>' +
-      '<div class="ls-m"><small>Draft tokens accepted</small><b data-m="acc">—</b></div>' +
-      '<div class="ls-m"><small>Expected speed-up</small><b data-m="exp">—</b></div>' +
-      '<div class="ls-m"><small>Best k at this α and c</small><b data-m="best">—</b></div>' +
-      '<div class="ls-m"><small>Expected tok/s, one stream</small><b data-m="etps">—</b></div>' +
-      '</div><div class="ls-chart"><small>Expected speed-up against draft length k</small><svg viewBox="0 0 300 104" role="img" aria-label="Expected speed-up for draft lengths 1 to 8"></svg></div></div>' +
+      '<div class="ls-m" data-tip="Baseline time per token divided by speculative time per token, from the run so far. It converges on the expected value as the text goes on."><small>Measured speed-up</small><b data-m="up">—</b></div>' +
+      '<div class="ls-m" data-tip="Tokens produced per verify pass in this run: accepted draft tokens plus the target\'s own token."><small>Tokens per verify pass</small><b data-m="tpp">—</b></div>' +
+      '<div class="ls-m" data-tip="Share of all proposed draft tokens that were accepted in this run."><small>Draft tokens accepted</small><b data-m="acc">—</b></div>' +
+      '<div class="ls-m" data-tip="Closed form: (1 − α^(k+1)) ÷ (1 − α) expected tokens per step, divided by the step cost 1 + k·c."><small>Expected speed-up</small><b data-m="exp">—</b></div>' +
+      '<div class="ls-m" data-tip="The draft length from 1 to 8 that maximises the expected speed-up at the current α and c."><small>Best k at this α and c</small><b data-m="best">—</b></div>' +
+      '<div class="ls-m" data-tip="Baseline tokens per second × expected speed-up, for one stream on the selected GPU."><small>Expected tok/s, one stream</small><b data-m="etps">—</b></div>' +
+      '</div><div class="ls-chart"><small data-tip="The expected speed-up formula evaluated for k = 1 to 8 at the current α and c; the dashed line is 1×, the marked point the chosen k.">Expected speed-up against draft length k</small><svg viewBox="0 0 300 104" role="img" aria-label="Expected speed-up for draft lengths 1 to 8"></svg></div></div>' +
       '<p class="ls-note" data-note></p>' +
       '<details class="ls-det"><summary>What the simulation models</summary><ul>' +
       '<li>The baseline runs one target-model forward pass per token. One stream reads every weight once per token, so its rate is <code>peak bandwidth × ' + BW_EFF + ' ÷ weight bytes</code>: the same first-order, memory-bound model as the capacity planner, batch 1, no attention or communication cost. Peak bandwidth comes from the GPU\'s datasheet.</li>' +
@@ -158,11 +158,11 @@
       '<li>Playback is slowed so each step can be followed; the counters are scaled to the derived baseline. It ignores batching: at large batch sizes the verify pass stops being nearly free and the gain shrinks. Figures come from this model, not from measurements of any product.</li>' +
       '</ul></details></div>';
 
-    function pane(kind, title, sub) {
-      return '<div class="ls-pane ls-' + kind + '" data-p="' + kind + '"><div class="ls-ph"><b>' + title + '</b><span>' + sub + '</span></div>' +
-        '<div class="ls-tps"><span><span data-v="tps">0</span><em>tok/s</em></span><small data-v="sub"></small></div><div class="ls-prog"><i></i></div>' +
+    function pane(kind, title, sub, tipT, tipR) {
+      return '<div class="ls-pane ls-' + kind + '" data-p="' + kind + '"><div class="ls-ph"><b data-tip="' + tipT + '">' + title + '</b><span>' + sub + '</span></div>' +
+        '<div class="ls-tps" data-tip="' + tipR + '"><span><span data-v="tps">0</span><em>tok/s</em></span><small data-v="sub"></small></div><div class="ls-prog"><i></i></div>' +
         '<div class="ls-txt" aria-hidden="true"></div>' +
-        '<div class="ls-pf"><span>Tokens <b data-v="n">0</b></span><span>Target passes <b data-v="fp">0</b></span><span>Time <b data-v="t">0.00 s</b></span></div></div>';
+        '<div class="ls-pf"><span data-tip="Tokens of the answer produced so far, out of the total.">Tokens <b data-v="n">0</b></span><span data-tip="Forward passes of the target model so far. The baseline needs one per token; speculative decoding needs one per verify step.">Target passes <b data-v="fp">0</b></span><span data-tip="Elapsed time in model time, at the derived baseline rate (playback on screen is slowed).">Time <b data-v="t">0.00 s</b></span></div></div>';
     }
 
     var el = root.querySelector('.ls'), runBtn = el.querySelector('[data-act="run"]'), noteEl = el.querySelector('[data-note]');
@@ -192,7 +192,7 @@
       noteEl.className = 'ls-note' + (fits ? '' : ' ls-warn');
       noteEl.textContent = fits
         ? m.name + ' in fp8 on ' + g.name + ': ' + Math.round(BASE_TPS) + ' tok/s baseline, memory-bound at batch 1. Same text, same target model, one clock; playback is slowed ' + SLOW + '× so each step can be followed.'
-        : m.name + ' in fp8 is ' + gbs(m.bytes) + '; ' + g.name + ' has ' + g.mem + ' GB. The weights do not fit on one GPU, so there is no single-GPU baseline to race. Pick a smaller model or a larger GPU.';
+        : m.name + ' in fp8 is ' + gbs(m.bytes) + '; ' + g.name + ' has ' + g.mem + ' GB. The weights do not fit on one GPU, so there is no single-GPU baseline to race.';
       runBtn.disabled = !fits;
     }
     function defaultC() { return Math.min(0.3, Math.max(0.02, DRAFT_BYTES / model().bytes)); }

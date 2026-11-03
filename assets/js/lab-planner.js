@@ -122,6 +122,48 @@
   function ms(s) { var v = s * 1000; return (v >= 100 ? Math.round(v) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ms'; }
   function fmtUSD(v) { return v >= 1000 ? '$' + Math.round(v).toLocaleString('en-GB') : v >= 10 ? '$' + v.toFixed(0) : '$' + v.toFixed(2); }
   function byId(arr, id) { for (var i = 0; i < arr.length; i++) if (arr[i].id === id) return arr[i]; return arr[0]; }
+  function tipAttr(t) { return t ? ' data-tip="' + HW.esc(t) + '"' : ''; }
+  function tipRows(card, tips) { var dts = card.querySelectorAll('.hwc-kv dt'); tips.forEach(function (t, i) { if (dts[i] && t) dts[i].setAttribute('data-tip', t); }); }
+  var TIP = {
+    model: 'Open-weight model preset. Its parameter count, layers, KV heads, head size and hidden size set the weight bytes, the KV cache per token and the all-reduce sizes.',
+    w: 'Weight precision: bytes read per parameter in every decode step. bf16 2 B, fp8 1 B, int4 0.5625 B including group scales.',
+    bf16: '16-bit brain float, the checkpoint precision: 2 bytes per parameter; matmuls at the bf16 tensor-core rate.',
+    fp8: '8-bit floating point (E4M3): 1 byte per parameter; matmuls at the fp8 tensor-core rate where the GPU has one, otherwise dequantised to bf16.',
+    int4: '4-bit integers with group scales: 0.5625 bytes per parameter; runs as NVFP4 on Blackwell, otherwise dequantised to fp8 or bf16 for the matmuls.',
+    kv: 'KV-cache precision: bytes per cached key or value element. Sets the KV bytes read per step and the cache each request reserves.',
+    kvbf16: '2 bytes per cached element.',
+    kvfp8: '1 byte per cached element: half the KV bytes read per step, twice the requests in the same memory.',
+    price: 'Hourly price of one GPU. The default is an assumption per GPU, editable; it only affects the cost figures.',
+    users: 'Requests in flight at once across all replicas. Sets the batch per replica and the KV cache that must fit.',
+    inp: 'Average prompt length in tokens. Sets prefill work, time to first token and the KV cache per request.',
+    out: 'Average answer length in tokens. Sets the KV cache per request and how much prefill is amortised over each answer.',
+    slo: 'Time-to-first-token target. The planner picks the fewest GPUs among TP 1, 2, 4 and 8 whose TTFT meets it.',
+    gpus: 'Tensor-parallel degree × replicas: the fewest GPUs whose memory holds the weights and KV cache and whose TTFT meets the target.',
+    user: 'Tokens per second one stream sees: 1 ÷ (decode step + prefill share amortised per output token).',
+    agg: 'Per-user rate × batch per replica × replicas.',
+    ttft: 'Time to first token: one prompt prefilled at 60% of the matmul rate, plus its all-reduces, plus one decode step. No queueing is modelled.',
+    cpm: 'GPUs × hourly price ÷ (aggregate tokens per second × 3600), per million output tokens. The monthly figure is the hourly cost × 730.',
+    stk: 'How one output token\'s time splits at the operating point: weights read, KV cache read, tensor-parallel all-reduces, and the prefill share. The total is 1 ÷ the per-user rate.',
+    l1: 'Weight bytes read per step ÷ (bandwidth × 0.75), the bytes split across the tensor-parallel group. When compute bound, the matmul time replaces it.',
+    l2: 'Batch × average context × KV bytes per token ÷ (bandwidth × 0.75).',
+    l3: 'Two ring all-reduces per layer per step over the GPU link, plus an assumed 8 µs latency each over NVLink or Infinity Fabric, 25 µs over PCIe.',
+    l4: 'Prefill time of the batch\'s prompts spread over their output tokens.',
+    chart: 'Aggregate and per-user tokens per second as the batch grows, one replica, from the same step model. The marked batch is the planned operating point.',
+    cagg: 'Batch × per-user rate.',
+    cusr: '1 ÷ (step time + amortised prefill): falls as the batch\'s KV reads and prefill grow.',
+    tp: 'Tensor-parallel degree per replica × number of replicas.',
+    batch: 'Requests per replica, and the most that fit its KV cache at this layout (capped at 512).',
+    rps: 'Aggregate tokens per second ÷ output tokens per request.',
+    rate: 'Dense tensor-core rate the matmuls run at for this weight format, from the datasheet.',
+    kvreq: 'KV bytes per token × (prompt + output tokens), reserved for the whole request.',
+    kvall: 'KV cache per request × concurrent requests.',
+    step: 'One decode step at the operating point: max(memory time, compute time) + communication.',
+    comm: 'Tensor-parallel all-reduce time per step and its share of the step. None at TP 1.',
+    mem: 'Memory of one GPU drawn as its stacks or channels; memory is interleaved across them, so each shows the same fill.',
+    regime: 'Memory-bandwidth bound when the bytes read per step take longer than the matmuls at the rate used; compute bound otherwise.'
+  };
+  var CARD_TIPS = ['Datasheet: HBM stacks or GDDR channels and the capacity of each.', 'Datasheet peak memory bandwidth; the estimate uses 75% of it.', 'Datasheet dense tensor-core rate for the format the matmuls run in.', 'Streaming multiprocessors (NVIDIA) or compute units (AMD) from the datasheet.', 'GPU-to-GPU link and its usable bandwidth per direction, from the datasheet; it carries the tensor-parallel all-reduces.', 'Datasheet board power.'];
+  var MEM_TIPS = ['Weight bytes held by this GPU: params × bytes per parameter ÷ TP.', 'KV cache reserved for the requests on this replica, split across the TP group.', 'Assumed 8% of memory + 1.5 GB for activations, CUDA graphs and allocator slack.', 'Memory left after weights, KV cache and the runtime reserve.'];
   function isPCIe(g) { return /PCIe/i.test(g.link.name); }
 
   /* ---------- the model ---------- */
@@ -202,12 +244,12 @@
   }
 
   /* ---------- rendering ---------- */
-  function seg(name, opts, sel, label) {
-    return '<div class="lp-f"><span class="lp-lab" id="' + name + '-l">' + label + '</span><div class="lp-seg" role="group" aria-labelledby="' + name + '-l" data-seg="' + name + '">' +
-      opts.map(function (o) { return '<button type="button" data-v="' + o[0] + '" aria-pressed="' + (o[0] === sel) + '">' + o[0] + '</button>'; }).join('') + '</div></div>';
+  function seg(name, opts, sel, label, tip, optTips) {
+    return '<div class="lp-f"><span class="lp-lab" id="' + name + '-l"' + tipAttr(tip) + '>' + label + '</span><div class="lp-seg" role="group" aria-labelledby="' + name + '-l" data-seg="' + name + '">' +
+      opts.map(function (o) { return '<button type="button" data-v="' + o[0] + '" aria-pressed="' + (o[0] === sel) + '"' + tipAttr(optTips && optTips[o[0]]) + '>' + o[0] + '</button>'; }).join('') + '</div></div>';
   }
-  function range(name, label, arr, idx, fmt) {
-    return '<div class="lp-f"><label for="' + name + '">' + label + ' <output data-o="' + name + '">' + fmt(arr[idx]) + '</output></label>' +
+  function range(name, label, arr, idx, fmt, tip) {
+    return '<div class="lp-f"><label for="' + name + '"' + tipAttr(tip) + '>' + label + ' <output data-o="' + name + '">' + fmt(arr[idx]) + '</output></label>' +
       '<input type="range" id="' + name + '" data-r="' + name + '" min="0" max="' + (arr.length - 1) + '" step="1" value="' + idx + '"></div>';
   }
 
@@ -221,42 +263,42 @@
       '<div class="lp">' +
       '<div class="lp-ctl">' +
         '<div class="lp-hd"><i></i>Capacity planner</div>' +
-        '<div class="lp-f"><label for="' + u + 'm">Model</label><select class="lp-sel" id="' + u + 'm" data-k="model">' +
+        '<div class="lp-f"><label for="' + u + 'm"' + tipAttr(TIP.model) + '>Model</label><select class="lp-sel" id="' + u + 'm" data-k="model">' +
           MODELS.map(function (m) { return '<option value="' + m.id + '"' + (m.id === st.model ? ' selected' : '') + '>' + m.name + '</option>'; }).join('') + '</select></div>' +
-        '<div class="lp-row2">' + seg(u + 'w', WPREC, st.w, 'Weights') + seg(u + 'kv', KVPREC, st.kv, 'KV cache') + '</div>' +
-        (L ? '' : '<div class="lp-f"><label for="' + u + 'g">GPU</label><select class="lp-sel" id="' + u + 'g" data-k="gpu">' +
+        '<div class="lp-row2">' + seg(u + 'w', WPREC, st.w, 'Weights', TIP.w, { bf16: TIP.bf16, fp8: TIP.fp8, int4: TIP.int4 }) + seg(u + 'kv', KVPREC, st.kv, 'KV cache', TIP.kv, { bf16: TIP.kvbf16, fp8: TIP.kvfp8 }) + '</div>' +
+        (L ? '' : '<div class="lp-f"><label for="' + u + 'g" data-tip="The GPU every replica runs on; its memory, bandwidth, tensor rates and link come from the catalogue.">GPU</label><select class="lp-sel" id="' + u + 'g" data-k="gpu">' +
           GPU_ORDER.map(function (k) { var g = HW.gpus[k]; return '<option value="' + k + '"' + (k === st.gpu ? ' selected' : '') + '>' + g.name + ' · ' + g.mem + ' GB</option>'; }).join('') + '</select></div>') +
-        '<div class="lp-f lp-inl"><label for="' + u + 'p">Price per GPU-hour</label><span class="lp-usd"><input class="lp-num" id="' + u + 'p" data-k="price" type="number" min="0" step="0.05" value="' + st.price.toFixed(2) + '" inputmode="decimal"></span></div>' +
-        range(u + 'users', 'Concurrent requests', USERS, st.users, String) +
-        range(u + 'inp', 'Prompt tokens', PROMPT, st.inp, fmtTok) +
-        range(u + 'out', 'Output tokens', OUTPUT, st.out, String) +
-        range(u + 'slo', 'TTFT target', SLO, st.slo, function (v) { return v + ' ms'; }) +
+        '<div class="lp-f lp-inl"><label for="' + u + 'p"' + tipAttr(TIP.price) + '>Price per GPU-hour</label><span class="lp-usd"><input class="lp-num" id="' + u + 'p" data-k="price" type="number" min="0" step="0.05" value="' + st.price.toFixed(2) + '" inputmode="decimal"></span></div>' +
+        range(u + 'users', 'Concurrent requests', USERS, st.users, String, TIP.users) +
+        range(u + 'inp', 'Prompt tokens', PROMPT, st.inp, fmtTok, TIP.inp) +
+        range(u + 'out', 'Output tokens', OUTPUT, st.out, String, TIP.out) +
+        range(u + 'slo', 'TTFT target', SLO, st.slo, function (v) { return v + ' ms'; }, TIP.slo) +
       '</div>' +
       '<div class="lp-out" aria-live="polite">' +
         '<div class="lp-kpis">' +
-          '<div class="lp-kpi"><small>GPUs needed</small><b data-x="gpus">—</b><span data-x="layout">—</span></div>' +
-          '<div class="lp-kpi"><small>Per-user decode</small><b data-x="user">—</b><span>tok/s per stream</span></div>' +
-          '<div class="lp-kpi"><small>Aggregate output</small><b data-x="agg">—</b><span>tok/s, all GPUs</span></div>' +
-          '<div class="lp-kpi"><small>Time to first token</small><b data-x="ttft">—</b><span data-x="slo">—</span></div>' +
-          '<div class="lp-kpi"><small>Per 1M output tokens</small><b data-x="cpm">—</b><span data-x="month">—</span></div>' +
+          '<div class="lp-kpi"' + tipAttr(TIP.gpus) + '><small>GPUs needed</small><b data-x="gpus">—</b><span data-x="layout">—</span></div>' +
+          '<div class="lp-kpi"' + tipAttr(TIP.user) + '><small>Per-user decode</small><b data-x="user">—</b><span>tok/s per stream</span></div>' +
+          '<div class="lp-kpi"' + tipAttr(TIP.agg) + '><small>Aggregate output</small><b data-x="agg">—</b><span>tok/s, all GPUs</span></div>' +
+          '<div class="lp-kpi"' + tipAttr(TIP.ttft) + '><small>Time to first token</small><b data-x="ttft">—</b><span data-x="slo">—</span></div>' +
+          '<div class="lp-kpi"' + tipAttr(TIP.cpm) + '><small>Per 1M output tokens</small><b data-x="cpm">—</b><span data-x="month">—</span></div>' +
         '</div>' +
         '<div data-x="alert"></div>' +
         '<div class="lp-mid"><div class="lp-card" data-x="card"></div><div class="lp-r">' +
-          '<div><div class="lp-sec">Time per output token, one stream<span data-x="steplab">—</span></div>' +
+          '<div><div class="lp-sec"><span' + tipAttr(TIP.stk) + '>Time per output token, one stream</span><span data-x="steplab">—</span></div>' +
             '<div class="lp-stk" role="img" data-x="stk"><i style="background:' + C_W + '"></i><i style="background:' + C_KV + '"></i><i style="background:' + C_COMM + '"></i><i style="background:' + C_PRE + '"></i></div>' +
-            '<div class="lp-leg"><span><i style="background:' + C_W + '"></i><span data-x="l1n">Weights read</span> <em data-x="l1">—</em></span><span data-x="l2s"><i style="background:' + C_KV + '"></i>KV cache read <em data-x="l2">—</em></span><span><i style="background:' + C_COMM + '"></i>TP all-reduces <em data-x="l3">—</em></span><span><i style="background:' + C_PRE + '"></i>Prefill share <em data-x="l4">—</em></span></div></div>' +
-          '<div class="lp-chart"><div class="lp-sec">Throughput against batch size, one replica<span data-x="regime">—</span></div><div data-x="chart"></div>' +
-            '<div class="lp-leg"><span><i style="background:' + C_W + '"></i>Aggregate tok/s (left axis)</span><span><i style="background:none;border-top:2px dashed var(--ink3);height:0;width:14px"></i>Per-user tok/s (right axis)</span></div></div>' +
+            '<div class="lp-leg"><span' + tipAttr(TIP.l1) + '><i style="background:' + C_W + '"></i><span data-x="l1n">Weights read</span> <em data-x="l1">—</em></span><span data-x="l2s"' + tipAttr(TIP.l2) + '><i style="background:' + C_KV + '"></i>KV cache read <em data-x="l2">—</em></span><span' + tipAttr(TIP.l3) + '><i style="background:' + C_COMM + '"></i>TP all-reduces <em data-x="l3">—</em></span><span' + tipAttr(TIP.l4) + '><i style="background:' + C_PRE + '"></i>Prefill share <em data-x="l4">—</em></span></div></div>' +
+          '<div class="lp-chart"><div class="lp-sec"><span' + tipAttr(TIP.chart) + '>Throughput against batch size, one replica</span><span data-x="regime"' + tipAttr(TIP.regime) + '>—</span></div><div data-x="chart"></div>' +
+            '<div class="lp-leg"><span' + tipAttr(TIP.cagg) + '><i style="background:' + C_W + '"></i>Aggregate tok/s (left axis)</span><span' + tipAttr(TIP.cusr) + '><i style="background:none;border-top:2px dashed var(--ink3);height:0;width:14px"></i>Per-user tok/s (right axis)</span></div></div>' +
         '</div></div>' +
         '<dl class="lp-tbl" style="margin:0">' +
-          '<div><dt>Tensor parallel × replicas</dt><dd data-x="tp">—</dd></div>' +
-          '<div><dt>Batch per replica</dt><dd data-x="batch">—</dd></div>' +
-          '<div><dt>Requests per second</dt><dd data-x="rps">—</dd></div>' +
-          '<div><dt>Matmul rate used</dt><dd data-x="rate">—</dd></div>' +
-          '<div><dt>KV cache per request</dt><dd data-x="kvreq">—</dd></div>' +
-          '<div><dt>KV cache, all requests</dt><dd data-x="kvall">—</dd></div>' +
-          '<div><dt>Decode step</dt><dd data-x="step">—</dd></div>' +
-          '<div><dt>Of which communication</dt><dd data-x="comm">—</dd></div>' +
+          '<div><dt' + tipAttr(TIP.tp) + '>Tensor parallel × replicas</dt><dd data-x="tp">—</dd></div>' +
+          '<div><dt' + tipAttr(TIP.batch) + '>Batch per replica</dt><dd data-x="batch">—</dd></div>' +
+          '<div><dt' + tipAttr(TIP.rps) + '>Requests per second</dt><dd data-x="rps">—</dd></div>' +
+          '<div><dt' + tipAttr(TIP.rate) + '>Matmul rate used</dt><dd data-x="rate">—</dd></div>' +
+          '<div><dt' + tipAttr(TIP.kvreq) + '>KV cache per request</dt><dd data-x="kvreq">—</dd></div>' +
+          '<div><dt' + tipAttr(TIP.kvall) + '>KV cache, all requests</dt><dd data-x="kvall">—</dd></div>' +
+          '<div><dt' + tipAttr(TIP.step) + '>Decode step</dt><dd data-x="step">—</dd></div>' +
+          '<div><dt' + tipAttr(TIP.comm) + '>Of which communication</dt><dd data-x="comm">—</dd></div>' +
         '</dl>' +
         '<details class="lp-how"><summary>How this is calculated</summary><ul>' +
           '<li>Weights take <code>params × bytes</code> (bf16 2, fp8 1, int4 0.56 with group scales), split across the tensor-parallel group. Each GPU also holds <code>8% of memory + 1.5 GB</code> for activations, CUDA graphs and allocator slack; what is left holds the KV cache. GB means 2<sup>30</sup> bytes, as the driver reports it. The memory drawing shows the GPU\'s HBM stacks (or GDDR channels); memory is interleaved across them, so every stack holds the same share.</li>' +
@@ -304,6 +346,7 @@
       ];
       var note = fallback ? (wname === 'fp8' ? 'No fp8 tensor cores: fp8 weights are dequantised and the matmuls run at the bf16 rate.' : 'int4 weights are dequantised to ' + rt.as + ' for the matmuls.') : (wname === 'int4' && rt.as === 'fp4' ? 'int4 weights run as NVFP4 at the fp4 tensor-core rate.' : '');
       var c = HW.card(g, { photo: !L, rows: rows, sub: HW.arch[g.arch].name, note: note });
+      tipRows(c, CARD_TIPS);
       X.card.innerHTML = ''; X.card.appendChild(c);
       memBar = null;
     }
@@ -311,8 +354,9 @@
       var parts = [{ label: 'Weights', bytes: w, color: C_W }, { label: 'KV cache', bytes: kv, color: C_KV }, { label: 'Activations and runtime', bytes: act, color: C_ACT }];
       var slot = X.card.querySelector('.hwc-slot');
       if (!memBar) {
-        slot.innerHTML = '<div class="lp-sec" style="margin-bottom:6px">Memory per GPU<span data-x="memcap"></span></div>';
+        slot.innerHTML = '<div class="lp-sec" style="margin-bottom:6px"><span' + tipAttr(TIP.mem) + '>Memory per GPU</span><span data-x="memcap"></span></div>';
         memBar = HW.memoryBar(g, parts); slot.appendChild(memBar);
+        [].forEach.call(memBar.querySelectorAll('.hwm-lg span'), function (sp, i) { if (MEM_TIPS[i]) sp.setAttribute('data-tip', MEM_TIPS[i]); });
       } else {
         var cap = g.mem * GiB, stacks = memBar.querySelectorAll('.hwm-st');
         [].forEach.call(stacks, function (s) {
@@ -346,7 +390,7 @@
         ['user', 'agg', 'ttft', 'cpm', 'tp', 'batch', 'rps', 'kvall', 'step', 'comm'].forEach(function (k) { X[k].textContent = '—'; });
         X.slo.textContent = ''; X.month.textContent = ''; X.slo.className = '';
         X.kvreq.textContent = fmtGB(s.kvTok * (s.inTok + s.outTok));
-        X.alert.innerHTML = '<div class="lp-alert lp-err">' + fmtGB(r.weights) + ' of weights plus the KV cache don\'t fit on 8 × ' + g.name + '. Choose lower-precision weights, a larger GPU, or shorter contexts.</div>';
+        X.alert.innerHTML = '<div class="lp-alert lp-err">' + fmtGB(r.weights) + ' of weights plus the KV cache don\'t fit on 8 × ' + g.name + '. Lower-precision weights, a larger GPU or shorter contexts would be needed.</div>';
         var wPer8 = r.weights / 8;
         setMem(g, Math.min(wPer8, r.memB), 0, Math.min(r.act, Math.max(0, r.memB - wPer8)), 8);
         setStack(null);
@@ -372,7 +416,7 @@
       X.kvall.textContent = fmtGB(r.perReq * s.users);
       X.step.textContent = ms(p.tStep);
       X.comm.textContent = r.tp > 1 ? ms(p.tComm) + ' (' + Math.round(p.tComm / p.tStep * 100) + '%)' : 'none, TP1';
-      if (!r.sloOk) alert = '<div class="lp-alert">No layout up to TP8 prefills a ' + fmtTok(s.inTok) + '-token prompt within ' + s.slo + ' ms on ' + g.name + '. Shown: the fastest layout. Prefix caching or a faster GPU would close the gap.</div>';
+      if (!r.sloOk) alert = '<div class="lp-alert">No layout up to TP8 prefills a ' + fmtTok(s.inTok) + '-token prompt within ' + s.slo + ' ms on ' + g.name + '. Shown: the fastest layout. Prefix caching or a faster GPU would be needed.</div>';
       X.alert.innerHTML = alert;
       setMem(g, r.wPer, r.kvPer, r.act, r.tp);
       setStack(p);

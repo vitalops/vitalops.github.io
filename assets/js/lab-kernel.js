@@ -79,7 +79,8 @@
   var KERNELS = {
     rmsnorm: {
       name: 'RMSNorm + FP8 quant', rate: 'fp32', dtypeNote: 'vector FP32 (no tensor cores)',
-      params: [['tokens', 'Tokens', 8192, 256, 65536], ['hidden', 'Hidden size', 4096, 1024, 16384], ['ept', 'Elements per thread', 8, 2, 32]],
+      tip: 'Normalises each token\'s hidden vector and writes it as FP8: 2 B read and 1 B written per element, about 6 FLOPs each. A streaming kernel on the CUDA cores, usually memory bound.',
+      params: [['tokens', 'Tokens', 8192, 256, 65536, 'Rows normalised in this launch. With the hidden size it sets the bytes moved and the thread count.'], ['hidden', 'Hidden size', 4096, 1024, 16384, 'Elements per token vector.'], ['ept', 'Elements per thread', 8, 2, 32, 'Elements one thread handles: raises the register estimate and lowers the thread count.']],
       defaults: { threads: 256, ilp: 2, bpl: 16 },
       est: function (k, s) { return { regs: 20 + Math.ceil(k.ept / 2) + s.ilp * s.bpl / 4, smem: 0 }; },
       work: function (k, s) {
@@ -91,7 +92,8 @@
     },
     attn: {
       name: 'Decode attention (GQA)', rate: 'bf16', dtypeNote: 'BF16 tensor rate (flash-decoding style)',
-      params: [['batch', 'Sequences', 16, 1, 256], ['heads', 'Query heads', 32, 8, 128], ['kvh', 'KV heads', 8, 1, 64], ['hd', 'Head dim', 128, 64, 256], ['kvlen', 'KV length', 8192, 512, 131072], ['kvb', 'KV bytes per value', 2, 1, 2]],
+      tip: 'Attention for one new token per sequence against the cached keys and values, with query heads grouped onto fewer KV heads. Reads the whole K and V of each sequence; 4 FLOPs per query head per cached token.',
+      params: [['batch', 'Sequences', 16, 1, 256, 'Sequences decoded in this step; each reads its own KV cache.'], ['heads', 'Query heads', 32, 8, 128, 'Query heads per layer.'], ['kvh', 'KV heads', 8, 1, 64, 'KV heads shared by groups of query heads (grouped-query attention). Fewer KV heads means fewer bytes per cached token.'], ['hd', 'Head dim', 128, 64, 256, 'Elements per head.'], ['kvlen', 'KV length', 8192, 512, 131072, 'Cached tokens per sequence; the K and V bytes read scale with it.'], ['kvb', 'KV bytes per value', 2, 1, 2, 'Bytes per cached element: 2 for bf16, 1 for fp8.']],
       defaults: { threads: 128, ilp: 4, bpl: 16 },
       est: function (k, s) {
         var g = Math.max(1, Math.round(k.heads / k.kvh));
@@ -106,7 +108,8 @@
     },
     gemm: {
       name: 'GEMM tile (bf16)', rate: 'bf16', dtypeNote: 'BF16 tensor rate',
-      params: [['M', 'M', 8192, 256, 65536], ['N', 'N', 8192, 256, 65536], ['K', 'K', 8192, 256, 65536], ['bm', 'Block tile M', 128, 32, 256], ['bn', 'Block tile N', 128, 32, 256], ['bk', 'Block tile K', 64, 16, 128], ['stages', 'Pipeline stages', 3, 1, 6]],
+      tip: 'Tiled matrix multiply on the tensor cores in bf16 with fp32 accumulation: 2MNK FLOPs. Bytes are the read-once ideal; tiles re-read from L2 are not counted.',
+      params: [['M', 'M', 8192, 256, 65536, 'Rows of A and C.'], ['N', 'N', 8192, 256, 65536, 'Columns of B and C.'], ['K', 'K', 8192, 256, 65536, 'Inner dimension; iterations = K ÷ block tile K.'], ['bm', 'Block tile M', 128, 32, 256, 'Rows of C one block computes. With tile N it sets the accumulators per thread.'], ['bn', 'Block tile N', 128, 32, 256, 'Columns of C one block computes.'], ['bk', 'Block tile K', 64, 16, 128, 'Depth of each shared-memory tile; sets shared memory per stage.'], ['stages', 'Pipeline stages', 3, 1, 6, 'Tile buffers kept in shared memory for the load pipeline (cp.async or TMA depth); multiplies shared memory per block.']],
       defaults: { threads: 256, ilp: 2, bpl: 16 },
       est: function (k, s) {
         var acc = Math.ceil(k.bm * k.bn / s.threads), tm = Math.ceil(Math.sqrt(acc)), tn = Math.ceil(acc / tm);
@@ -120,7 +123,8 @@
     },
     silu: {
       name: 'SiLU × up (elementwise)', rate: 'fp32', dtypeNote: 'vector FP32 (no tensor cores)',
-      params: [['tokens', 'Tokens', 8192, 256, 65536], ['inter', 'Intermediate size', 14336, 1024, 65536], ['ept', 'Elements per thread', 8, 2, 32]],
+      tip: 'The gated-MLP activation SiLU(gate) × up: two bf16 reads and one bf16 write per element, about 8 FLOPs each. Streams through the CUDA cores, memory bound.',
+      params: [['tokens', 'Tokens', 8192, 256, 65536, 'Rows in this launch.'], ['inter', 'Intermediate size', 14336, 1024, 65536, 'MLP intermediate width; elements per row.'], ['ept', 'Elements per thread', 8, 2, 32, 'Elements one thread handles: raises the register estimate and lowers the thread count.']],
       defaults: { threads: 256, ilp: 2, bpl: 16 },
       est: function (k, s) { return { regs: 20 + k.ept + s.ilp * s.bpl / 4, smem: 0 }; },
       work: function (k, s) {
@@ -160,6 +164,45 @@
 
   /* ───────────────────────────── formatting ───────────────────────────── */
   var fmt = HW.fmt, esc = HW.esc;
+  function tipAttr(t) { return t ? ' data-tip="' + esc(t) + '"' : ''; }
+  function tipRows(card, tips) { var dts = card.querySelectorAll('.hwc-kv dt'); tips.forEach(function (t, i) { if (dts[i] && t) dts[i].setAttribute('data-tip', t); }); }
+  var TIP = {
+    kernel: 'Kernel presets. Each sets its own byte and FLOP formulas and an estimate of registers and shared memory; every launch parameter below can be overridden.',
+    problem: 'Problem size for the chosen kernel: sets the bytes moved, the FLOPs and the number of threads launched.',
+    threads: 'Threads per block. Warps per block = threads ÷ 32; it also sets the block count the warp and block limits allow.',
+    regs: 'Registers per thread the kernel needs. The compiler decides the real figure (-Xptxas -v prints it); here it starts from an estimate. Allocated per warp in units of 256 and in groups of 4 warps.',
+    smem: 'Static plus dynamic shared memory per block. The occupancy rule adds 1 KB reserved per block and rounds up to 128 B.',
+    ilp: 'Independent loads a thread issues before using the first (unrolling). Multiplies the bytes in flight in the Little\'s-law estimate.',
+    bpl: 'Width of each load. A 16-byte vector load per thread moves 512 B per warp per instruction.',
+    bpl4: '4-byte scalar loads.', bpl8: '8-byte loads (two 32-bit values).', bpl16: '16-byte vector loads (float4, uint4): the widest per-thread load.',
+    lb: '__launch_bounds__(threads, minBlocksPerSM) makes nvcc cap registers so that many blocks fit per SM; registers above the cap are spilled to local memory.',
+    minb: 'Second launch-bounds argument. Cap = ⌊registers per SM ÷ (min blocks × threads rounded to a warp)⌋ rounded down to 8.',
+    lat: 'Assumed DRAM latency for Little\'s law; published microbenchmarks put HBM3 around 600–800 ns, GDDR a little lower. Editable.',
+    sWarps: 'Warps resident per SM: blocks × warps per block, with blocks limited by registers, shared memory, the warp cap and the block cap (CUDA occupancy calculator rules).',
+    sOcc: 'Resident warps ÷ the architecture\'s maximum warps per SM, and which limit binds.',
+    sSpill: 'Registers requested above the launch-bounds cap. Each costs a 4 B store and reload per thread per iteration, counted as DRAM traffic (a pessimistic bound).',
+    sBW: 'Little\'s law: bytes in flight per SM × SMs ÷ DRAM latency, capped at the datasheet peak.',
+    sBound: 'Compute if FLOPs ÷ rate exceeds bytes ÷ achievable bandwidth; otherwise memory when the achievable bandwidth reaches the peak, latency when it does not. The ridge is rate ÷ achievable bandwidth in FLOP per byte.',
+    sTime: 'max(bytes ÷ achievable bandwidth, FLOPs ÷ rate). Launch overhead, tail effects, L2 hits and tensor-core stalls are not modelled.',
+    rf: 'The SM\'s register file, one cell per 256-register allocation unit: each resident warp\'s allocation, the rounding inside it, and what no further warp can use.',
+    rfWarps: 'Registers each resident warp allocates: registers per thread × 32 lanes, rounded up to 256.',
+    rfWaste: 'Registers inside each warp\'s allocation that the rounding to 256 leaves unused.',
+    rfIdle: 'Registers no warp can use, because another limit binds or too few remain for a whole block.',
+    sm: 'Shared memory per SM: each block\'s allocation, including the 1 KB the runtime reserves per block, rounded to 128 B.',
+    smBlock: 'Shared memory allocated to each resident block.', smResv: '1 KB per block reserved by the CUDA runtime.', smFree: 'Shared memory left unallocated.',
+    cOcc: 'Occupancy from the same calculator as registers per thread vary, for this architecture (others faint). The shaded region is above the register cap, where spills begin.',
+    cRoof: 'Roofline, log-log: attainable TFLOPS against FLOP per byte. The lower roof is the achievable bandwidth from Little\'s law; the point is this kernel at its arithmetic intensity.',
+    lgThis: 'The selected GPU\'s architecture.', lgOthers: 'The other architectures in the catalogue, from the same rules.', lgCap: 'Registers above the launch-bounds cap are spilled.',
+    lgPeak: 'Datasheet peak memory bandwidth.', lgAch: 'Achievable bandwidth at this occupancy, from Little\'s law.', lgKern: 'This kernel: arithmetic intensity and the TFLOPS it attains at the estimated time.',
+    tbl: 'Every GPU in the catalogue with the same kernel and launch parameters, from the same rules. Selecting a row switches the GPU.',
+    thGPU: 'GPU and its architecture rules.', thRes: 'Resident warps (or waves) per SM out of the maximum.', thOcc: 'Resident ÷ maximum.', thLim: 'Which limit binds: registers, shared memory, warps per SM, blocks per SM, or the SM is full.',
+    thSp: 'Registers per thread spilled under the launch-bounds cap.', thBW: 'Achievable bandwidth from Little\'s law against the datasheet peak, TB/s.', thBound: 'Memory, latency or compute bound.', thTime: 'Estimated kernel time.',
+    regsEst: 'The register estimate for this kernel from its formula under "How this is calculated"; the slider overrides it.',
+    smemEst: 'The shared-memory estimate for this kernel from its formula; the slider overrides it.',
+    chartTabs: 'Switches between the occupancy curve and the roofline for the selected GPU.'
+  };
+  var CARD_TIPS_NV = ['Compute-capability rule: 32-bit registers per SM.', 'Compute-capability rule: registers are allocated per warp in this unit, and warps in groups of this many.', 'Compute-capability rule: shared memory per SM, and the most one block may take.', 'Compute-capability rule: maximum resident warps and blocks per SM.', 'ISA limit on registers per thread.', 'Datasheet peak memory bandwidth.', 'Datasheet rate for the type this kernel runs in: vector FP32 for streaming kernels, tensor-core bf16 for attention and GEMM.', 'Assumed DRAM latency for Little\'s law; editable on the left.'];
+  var CARD_TIPS_AMD = ['Vector general-purpose register file per compute unit: 512 per lane on each of 4 SIMDs.', 'VGPRs are allocated per wave in this granularity.', 'Local data share (shared memory) per compute unit.', 'Maximum resident waves per compute unit (8 per SIMD × 4).', 'Maximum workgroups per compute unit.', 'Datasheet peak memory bandwidth.', 'Datasheet rate for the type this kernel runs in.', 'Assumed DRAM latency for Little\'s law; editable on the left.'];
   function si(v, unit, d) {
     var a = Math.abs(v);
     if (a >= 1e12) return fmt(v / 1e12, d == null ? 2 : d) + ' T' + unit;
@@ -358,8 +401,8 @@
     var ctl = root.querySelector('.lk-ctl'), res = root.querySelector('.lk-res');
     ctl.addEventListener('submit', function (e) { e.preventDefault(); });
 
-    function seg(name, opts, cur, fmtf) {
-      return '<div class="lk-seg mono" role="group" aria-label="' + esc(name) + '">' + opts.map(function (o) { return '<button type="button" data-seg="' + esc(name) + '" data-v="' + o + '" aria-pressed="' + (o === cur) + '">' + (fmtf ? fmtf(o) : o) + '</button>'; }).join('') + '</div>';
+    function seg(name, opts, cur, fmtf, tipf) {
+      return '<div class="lk-seg mono" role="group" aria-label="' + esc(name) + '">' + opts.map(function (o) { return '<button type="button" data-seg="' + esc(name) + '" data-v="' + o + '" aria-pressed="' + (o === cur) + '"' + tipAttr(tipf ? tipf(o) : '') + '>' + (fmtf ? fmtf(o) : o) + '</button>'; }).join('') + '</div>';
     }
     function buildControls() {
       var K = KERNELS[st.kernel], G = HW.gpus[st.gpu], A = HW.arch[G.arch];
@@ -367,16 +410,16 @@
       var e = K.est(st.k, st);
       ctl.innerHTML =
         '<div class="lk-h">Kernel lab</div>' +
-        (L ? '' : '<div class="lk-f"><label for="' + id + '-gpu">GPU</label><select id="' + id + '-gpu" name="gpu">' + GPU_ORDER.map(function (k) { return '<option value="' + k + '"' + (k === st.gpu ? ' selected' : '') + '>' + esc(HW.gpus[k].name) + '</option>'; }).join('') + '</select></div>') +
-        '<div class="lk-f"><span class="lk-lab">Kernel</span><div class="lk-seg" role="group" aria-label="Kernel">' + Object.keys(KERNELS).map(function (k) { return '<button type="button" data-kernel="' + k + '" aria-pressed="' + (k === st.kernel) + '">' + esc(KERNELS[k].name) + '</button>'; }).join('') + '</div></div>' +
-        '<div class="lk-f"><span class="lk-lab">Problem</span><div class="lk-kp">' + K.params.map(function (p) { return '<label>' + esc(p[1]) + '<input type="number" name="k:' + p[0] + '" value="' + st.k[p[0]] + '" min="' + p[3] + '" max="' + p[4] + '" step="1"></label>'; }).join('') + '</div></div>' +
-        '<div class="lk-f"><span class="lk-lab">Threads per block</span>' + seg('threads', [64, 128, 256, 512, 1024], st.threads) + '</div>' +
-        '<div class="lk-f"><label for="' + id + '-regs">Registers per thread <output>' + st.regs + '</output></label><input id="' + id + '-regs" type="range" name="regs" min="8" max="' + maxRegs + '" step="1" value="' + Math.min(st.regs, maxRegs) + '"><div class="lk-est">estimate for this kernel: ' + Math.round(e.regs) + (st.over.regs ? ' · <button type="button" data-reset="regs">use estimate</button>' : '') + '</div></div>' +
-        '<div class="lk-f"><label for="' + id + '-smem">Shared memory per block <output>' + kb(st.smem) + '</output></label><input id="' + id + '-smem" type="range" name="smem" min="0" max="' + maxSmem + '" step="1024" value="' + Math.min(st.smem, maxSmem) + '"><div class="lk-est">estimate: ' + kb(Math.round(e.smem)) + (st.over.smem ? ' · <button type="button" data-reset="smem">use estimate</button>' : '') + '</div></div>' +
-        '<div class="lk-f"><label for="' + id + '-ilp">Loads in flight per thread <output>' + st.ilp + '</output></label><input id="' + id + '-ilp" type="range" name="ilp" min="1" max="8" step="1" value="' + st.ilp + '"><div class="lk-est">independent loads issued before the first is used (unrolling)</div></div>' +
-        '<div class="lk-f"><span class="lk-lab">Bytes per load</span>' + seg('bpl', [4, 8, 16], st.bpl, function (o) { return o + ' B'; }) + '</div>' +
-        '<div class="lk-f"><label class="lk-chk"><input type="checkbox" name="lb"' + (st.lb ? ' checked' : '') + '> <span>Cap registers with <code>__launch_bounds__</code></span></label>' + (st.lb ? '<label for="' + id + '-mb">Minimum blocks per SM <output>' + st.minBlocks + '</output></label><input id="' + id + '-mb" type="range" name="minBlocks" min="1" max="8" step="1" value="' + st.minBlocks + '">' : '') + '</div>' +
-        '<div class="lk-f"><label for="' + id + '-lat">DRAM latency, ns (assumption)</label><input id="' + id + '-lat" type="number" name="latency" min="100" max="2000" step="10" value="' + (st.latency != null ? st.latency : G.latency) + '"></div>';
+        (L ? '' : '<div class="lk-f"><label for="' + id + '-gpu" data-tip="The GPU whose architecture rules, bandwidth and rates are used.">GPU</label><select id="' + id + '-gpu" name="gpu">' + GPU_ORDER.map(function (k) { return '<option value="' + k + '"' + (k === st.gpu ? ' selected' : '') + '>' + esc(HW.gpus[k].name) + '</option>'; }).join('') + '</select></div>') +
+        '<div class="lk-f"><span class="lk-lab"' + tipAttr(TIP.kernel) + '>Kernel</span><div class="lk-seg" role="group" aria-label="Kernel">' + Object.keys(KERNELS).map(function (k) { return '<button type="button" data-kernel="' + k + '" aria-pressed="' + (k === st.kernel) + '"' + tipAttr(KERNELS[k].tip) + '>' + esc(KERNELS[k].name) + '</button>'; }).join('') + '</div></div>' +
+        '<div class="lk-f"><span class="lk-lab"' + tipAttr(TIP.problem) + '>Problem</span><div class="lk-kp">' + K.params.map(function (p) { return '<label' + tipAttr(p[5]) + '>' + esc(p[1]) + '<input type="number" name="k:' + p[0] + '" value="' + st.k[p[0]] + '" min="' + p[3] + '" max="' + p[4] + '" step="1"></label>'; }).join('') + '</div></div>' +
+        '<div class="lk-f"><span class="lk-lab"' + tipAttr(TIP.threads) + '>Threads per block</span>' + seg('threads', [64, 128, 256, 512, 1024], st.threads, null, function (o) { return o / 32 + ' warp' + (o > 32 ? 's' : '') + ' per block.'; }) + '</div>' +
+        '<div class="lk-f"><label for="' + id + '-regs"' + tipAttr(TIP.regs) + '>Registers per thread <output>' + st.regs + '</output></label><input id="' + id + '-regs" type="range" name="regs" min="8" max="' + maxRegs + '" step="1" value="' + Math.min(st.regs, maxRegs) + '"><div class="lk-est"><span' + tipAttr(TIP.regsEst) + '>estimate for this kernel: ' + Math.round(e.regs) + '</span>' + (st.over.regs ? ' · <button type="button" data-reset="regs">use estimate</button>' : '') + '</div></div>' +
+        '<div class="lk-f"><label for="' + id + '-smem"' + tipAttr(TIP.smem) + '>Shared memory per block <output>' + kb(st.smem) + '</output></label><input id="' + id + '-smem" type="range" name="smem" min="0" max="' + maxSmem + '" step="1024" value="' + Math.min(st.smem, maxSmem) + '"><div class="lk-est"><span' + tipAttr(TIP.smemEst) + '>estimate: ' + kb(Math.round(e.smem)) + '</span>' + (st.over.smem ? ' · <button type="button" data-reset="smem">use estimate</button>' : '') + '</div></div>' +
+        '<div class="lk-f"><label for="' + id + '-ilp"' + tipAttr(TIP.ilp) + '>Loads in flight per thread <output>' + st.ilp + '</output></label><input id="' + id + '-ilp" type="range" name="ilp" min="1" max="8" step="1" value="' + st.ilp + '"><div class="lk-est">independent loads issued before the first is used (unrolling)</div></div>' +
+        '<div class="lk-f"><span class="lk-lab"' + tipAttr(TIP.bpl) + '>Bytes per load</span>' + seg('bpl', [4, 8, 16], st.bpl, function (o) { return o + ' B'; }, function (o) { return TIP['bpl' + o]; }) + '</div>' +
+        '<div class="lk-f"><label class="lk-chk"' + tipAttr(TIP.lb) + '><input type="checkbox" name="lb"' + (st.lb ? ' checked' : '') + '> <span>Cap registers with <code>__launch_bounds__</code></span></label>' + (st.lb ? '<label for="' + id + '-mb"' + tipAttr(TIP.minb) + '>Minimum blocks per SM <output>' + st.minBlocks + '</output></label><input id="' + id + '-mb" type="range" name="minBlocks" min="1" max="8" step="1" value="' + st.minBlocks + '">' : '') + '</div>' +
+        '<div class="lk-f"><label for="' + id + '-lat"' + tipAttr(TIP.lat) + '>DRAM latency, ns (assumption)</label><input id="' + id + '-lat" type="number" name="latency" min="100" max="2000" step="10" value="' + (st.latency != null ? st.latency : G.latency) + '"></div>';
     }
     buildControls();
 
@@ -404,8 +447,8 @@
       var i = ctl.querySelector('[name=ilp]'); if (i) i.parentNode.querySelector('output').textContent = st.ilp;
       var m = ctl.querySelector('[name=minBlocks]'); if (m) m.parentNode.querySelector('output').textContent = st.minBlocks;
       var est = KERNELS[st.kernel].est(st.k, st), e1 = ctl.querySelectorAll('.lk-est');
-      if (e1[0]) e1[0].innerHTML = 'estimate for this kernel: ' + Math.round(est.regs) + (st.over.regs ? ' · <button type="button" data-reset="regs">use estimate</button>' : '');
-      if (e1[1]) e1[1].innerHTML = 'estimate: ' + kb(Math.round(est.smem)) + (st.over.smem ? ' · <button type="button" data-reset="smem">use estimate</button>' : '');
+      if (e1[0]) e1[0].innerHTML = '<span' + tipAttr(TIP.regsEst) + '>estimate for this kernel: ' + Math.round(est.regs) + '</span>' + (st.over.regs ? ' · <button type="button" data-reset="regs">use estimate</button>' : '');
+      if (e1[1]) e1[1].innerHTML = '<span' + tipAttr(TIP.smemEst) + '>estimate: ' + kb(Math.round(est.smem)) + '</span>' + (st.over.smem ? ' · <button type="button" data-reset="smem">use estimate</button>' : '');
     }
 
     function render() {
@@ -413,12 +456,12 @@
       var unitName = G.sms ? 'SM' : 'CU', U = o.unit;
       var stats =
         '<div class="lk-stats">' +
-        tile('Resident ' + U + 's / ' + unitName, o.warps + ' / ' + o.maxWarps, o.blocks + ' block' + (o.blocks === 1 ? '' : 's') + ' × ' + o.warpsPerBlock, o.warps === 0 ? 'bad' : '') +
-        tile('Occupancy', pct(o.occ), /full$/.test(o.limiter) ? o.limiter : 'limited by ' + o.limiter, o.occ >= .5 ? 'ok' : o.occ >= .25 ? 'warn' : 'bad') +
-        tile('Spilled registers', E.spilled ? E.spilled + ' / thread' : 'none', E.spilled ? '+' + (E.spilled * 8) + ' B local traffic per thread per iteration' : 'cap ' + E.cap + ' per thread', E.spilled ? 'warn' : '') +
-        tile('Achievable bandwidth', E.launchable ? fmt(E.achBW / 1e12, 2) + ' TB/s' : 'n/a', E.launchable ? pct(E.achBW / E.peakBW) + ' of peak · ' + si(E.inFlightPerSM, 'B') + ' in flight / ' + unitName : 'no block fits on the ' + unitName, E.achBW / E.peakBW >= .9 ? 'ok' : E.achBW / E.peakBW >= .5 ? 'warn' : 'bad') +
-        tile('Bound', E.bound, E.launchable ? fmt(E.ai, E.ai < 10 ? 2 : 0) + ' FLOP/B · ridge at ' + fmt(E.rate / (E.achBW / 1e12), 0) : 'reduce threads, registers or shared memory', E.bound === 'latency' ? 'warn' : E.launchable ? '' : 'bad') +
-        tile('Estimated time', tm(E.t), E.launchable ? 'memory ' + tm(E.tMem) + ' · compute ' + tm(E.tComp) : 'kernel cannot run with this launch', '') +
+        tile('Resident ' + U + 's / ' + unitName, o.warps + ' / ' + o.maxWarps, o.blocks + ' block' + (o.blocks === 1 ? '' : 's') + ' × ' + o.warpsPerBlock, o.warps === 0 ? 'bad' : '', TIP.sWarps) +
+        tile('Occupancy', pct(o.occ), /full$/.test(o.limiter) ? o.limiter : 'limited by ' + o.limiter, o.occ >= .5 ? 'ok' : o.occ >= .25 ? 'warn' : 'bad', TIP.sOcc) +
+        tile('Spilled registers', E.spilled ? E.spilled + ' / thread' : 'none', E.spilled ? '+' + (E.spilled * 8) + ' B local traffic per thread per iteration' : 'cap ' + E.cap + ' per thread', E.spilled ? 'warn' : '', TIP.sSpill) +
+        tile('Achievable bandwidth', E.launchable ? fmt(E.achBW / 1e12, 2) + ' TB/s' : 'n/a', E.launchable ? pct(E.achBW / E.peakBW) + ' of peak · ' + si(E.inFlightPerSM, 'B') + ' in flight / ' + unitName : 'no block fits on the ' + unitName, E.achBW / E.peakBW >= .9 ? 'ok' : E.achBW / E.peakBW >= .5 ? 'warn' : 'bad', TIP.sBW) +
+        tile('Bound', E.bound, E.launchable ? fmt(E.ai, E.ai < 10 ? 2 : 0) + ' FLOP/B · ridge at ' + fmt(E.rate / (E.achBW / 1e12), 0) : 'fewer threads, registers or shared memory would be needed', E.bound === 'latency' ? 'warn' : E.launchable ? '' : 'bad', TIP.sBound) +
+        tile('Estimated time', tm(E.t), E.launchable ? 'memory ' + tm(E.tMem) + ' · compute ' + tm(E.tComp) : 'kernel cannot run with this launch', '', TIP.sTime) +
         '</div>';
 
       var card = HW.card(G, {
@@ -445,35 +488,36 @@
         ],
         note: A.amd ? 'Simplified CDNA 3 model: VGPR file per SIMD, waves per SIMD, LDS per CU. The compiler also places registers in AGPRs.' : null
       });
+      tipRows(card, A.amd ? CARD_TIPS_AMD : CARD_TIPS_NV);
       var slot = card.querySelector('.hwc-slot');
       var regsFile = A.amd ? A.vgprPerSIMD * A.simdsPerCU * A.warpSize : A.regsPerSM;
       slot.innerHTML =
-        '<p class="lk-sub">Register file <i>' + fmt(o.regsUsed * (A.amd ? A.warpSize : 1)) + ' / ' + fmt(regsFile) + '</i></p>' + regFileSVG(E) +
-        '<div class="lk-lg"><span style="--c:var(--brand)">' + o.warps + ' ' + U + 's × ' + fmt(A.amd ? o.regsAlloc : o.regsPerWarpAlloc) + (A.amd ? ' VGPRs' : ' regs') + '</span><span style="--c:var(--brand200)">rounding waste ' + fmt(o.regsWaste * (A.amd ? A.warpSize : 1)) + '</span><span style="--c:var(--line2)">idle ' + fmt(regsFile - o.regsUsed * (A.amd ? A.warpSize : 1)) + (o.limiter === 'registers' ? ' (too few for another ' + U + ')' : /full$/.test(o.limiter) ? '' : ' (' + o.limiter + ' limit)') + '</span></div>' +
-        '<p class="lk-sub" style="margin-top:10px">' + (A.amd ? 'LDS per CU' : 'Shared memory per SM') + ' <i>' + o.blocks + ' × ' + kb(o.smemAlloc) + ' / ' + kb(o.smemTotal) + '</i></p>' + smemSVG(E) +
-        '<div class="lk-lg"><span style="--c:var(--brand)">block allocation</span>' + (A.amd ? '' : '<span style="--c:var(--ink3)">1 KB reserved per block</span>') + '<span style="--c:var(--line2)">free</span></div>';
+        '<p class="lk-sub"><span' + tipAttr(TIP.rf) + '>Register file</span> <i>' + fmt(o.regsUsed * (A.amd ? A.warpSize : 1)) + ' / ' + fmt(regsFile) + '</i></p>' + regFileSVG(E) +
+        '<div class="lk-lg"><span style="--c:var(--brand)"' + tipAttr(TIP.rfWarps) + '>' + o.warps + ' ' + U + 's × ' + fmt(A.amd ? o.regsAlloc : o.regsPerWarpAlloc) + (A.amd ? ' VGPRs' : ' regs') + '</span><span style="--c:var(--brand200)"' + tipAttr(TIP.rfWaste) + '>rounding waste ' + fmt(o.regsWaste * (A.amd ? A.warpSize : 1)) + '</span><span style="--c:var(--line2)"' + tipAttr(TIP.rfIdle) + '>idle ' + fmt(regsFile - o.regsUsed * (A.amd ? A.warpSize : 1)) + (o.limiter === 'registers' ? ' (too few for another ' + U + ')' : /full$/.test(o.limiter) ? '' : ' (' + o.limiter + ' limit)') + '</span></div>' +
+        '<p class="lk-sub" style="margin-top:10px"><span' + tipAttr(TIP.sm) + '>' + (A.amd ? 'LDS per CU' : 'Shared memory per SM') + '</span> <i>' + o.blocks + ' × ' + kb(o.smemAlloc) + ' / ' + kb(o.smemTotal) + '</i></p>' + smemSVG(E) +
+        '<div class="lk-lg"><span style="--c:var(--brand)"' + tipAttr(TIP.smBlock) + '>block allocation</span>' + (A.amd ? '' : '<span style="--c:var(--ink3)"' + tipAttr(TIP.smResv) + '>1 KB reserved per block</span>') + '<span style="--c:var(--line2)"' + tipAttr(TIP.smFree) + '>free</span></div>';
 
       var charts =
         '<div class="lk-charts">' +
-        '<div class="lk-ctabs" role="group" aria-label="Chart"><button type="button" data-chart="occ" aria-pressed="' + (st.chart === 'occ') + '">Occupancy against registers</button><button type="button" data-chart="roof" aria-pressed="' + (st.chart === 'roof') + '">Roofline</button></div>' +
+        '<div class="lk-ctabs" role="group" aria-label="Chart"><button type="button" data-chart="occ" aria-pressed="' + (st.chart === 'occ') + '"' + tipAttr(TIP.cOcc) + '>Occupancy against registers</button><button type="button" data-chart="roof" aria-pressed="' + (st.chart === 'roof') + '"' + tipAttr(TIP.cRoof) + '>Roofline</button></div>' +
         (st.chart === 'occ'
-          ? '<div class="lk-card"><p class="lk-sub">Occupancy against registers per thread <i>' + esc(A.name) + ' · ' + st.threads + ' threads · ' + kb(st.smem) + ' smem</i></p>' + occCurveSVG(E, st) + '<div class="lk-lg"><span style="--c:var(--brand)">this architecture</span><span style="--c:var(--line)">the others</span>' + (E.cap < 255 ? '<span style="--c:var(--warn)">above the cap: spilled</span>' : '') + '</div></div>'
-          : '<div class="lk-card"><p class="lk-sub">Roofline <i>' + esc(K.name) + ' on ' + esc(G.name) + '</i></p>' + rooflineSVG(E) + '<div class="lk-lg"><span style="--c:var(--line)">peak bandwidth roof</span><span style="--c:var(--warn)">achievable (Little\'s law)</span><span style="--c:var(--brand)">this kernel</span></div></div>') +
+          ? '<div class="lk-card"><p class="lk-sub"><span' + tipAttr(TIP.cOcc) + '>Occupancy against registers per thread</span> <i>' + esc(A.name) + ' · ' + st.threads + ' threads · ' + kb(st.smem) + ' smem</i></p>' + occCurveSVG(E, st) + '<div class="lk-lg"><span style="--c:var(--brand)"' + tipAttr(TIP.lgThis) + '>this architecture</span><span style="--c:var(--line)"' + tipAttr(TIP.lgOthers) + '>the others</span>' + (E.cap < 255 ? '<span style="--c:var(--warn)"' + tipAttr(TIP.lgCap) + '>above the cap: spilled</span>' : '') + '</div></div>'
+          : '<div class="lk-card"><p class="lk-sub"><span' + tipAttr(TIP.cRoof) + '>Roofline</span> <i>' + esc(K.name) + ' on ' + esc(G.name) + '</i></p>' + rooflineSVG(E) + '<div class="lk-lg"><span style="--c:var(--line)"' + tipAttr(TIP.lgPeak) + '>peak bandwidth roof</span><span style="--c:var(--warn)"' + tipAttr(TIP.lgAch) + '>achievable (Little\'s law)</span><span style="--c:var(--brand)"' + tipAttr(TIP.lgKern) + '>this kernel</span></div></div>') +
         '</div>';
 
       var rows = GPU_ORDER.map(function (k) {
         var e = estimate(k, st), g = HW.gpus[k];
         return '<tr tabindex="0" data-gpu="' + k + '" class="' + (k === st.gpu ? 'on' : '') + '" aria-selected="' + (k === st.gpu) + '"><td>' + esc(g.name) + '</td><td class="n">' + e.occ.warps + '/' + e.occ.maxWarps + '</td><td class="n">' + pct(e.occ.occ) + '</td><td>' + e.occ.limiter + '</td><td class="n">' + (e.spilled || '–') + '</td><td class="n">' + (e.launchable ? fmt(e.achBW / 1e12, 2) : '–') + ' / ' + fmt(g.bw, 2) + '</td><td>' + e.bound + '</td><td class="n">' + tm(e.t) + '</td></tr>';
       }).join('');
-      var table = '<div class="lk-card"><p class="lk-sub">All GPUs, same kernel and launch <i>select a row</i></p><div class="lk-tw"><table class="lk-tbl"><thead><tr><th>GPU</th><th class="n">Resident</th><th class="n">Occupancy</th><th>Limit</th><th class="n">Spills</th><th class="n">Achievable / peak TB/s</th><th>Bound</th><th class="n">Time</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+      var table = '<div class="lk-card"><p class="lk-sub"><span' + tipAttr(TIP.tbl) + '>All GPUs, same kernel and launch</span> <i>a row selects the GPU</i></p><div class="lk-tw"><table class="lk-tbl"><thead><tr><th' + tipAttr(TIP.thGPU) + '>GPU</th><th class="n"' + tipAttr(TIP.thRes) + '>Resident</th><th class="n"' + tipAttr(TIP.thOcc) + '>Occupancy</th><th' + tipAttr(TIP.thLim) + '>Limit</th><th class="n"' + tipAttr(TIP.thSp) + '>Spills</th><th class="n"' + tipAttr(TIP.thBW) + '>Achievable / peak TB/s</th><th' + tipAttr(TIP.thBound) + '>Bound</th><th class="n"' + tipAttr(TIP.thTime) + '>Time</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
 
       var w = E.work;
       var details = '<details><summary>How this is calculated</summary><ul>' +
         '<li><b>Occupancy</b> (the CUDA occupancy calculator\'s rules, per compute capability): registers per warp = regs × 32 rounded up to ' + (A.amd ? A.vgprAllocUnit + ' VGPRs per lane' : A.regAllocUnit) + '; warps per SM limited by registers = ⌊' + fmt(A.amd ? A.vgprPerSIMD : A.regsPerSM) + ' ÷ regs per warp⌋' + (A.amd ? ' per SIMD, × 4 SIMDs' : ' rounded down to ' + A.warpAllocGran) + '; shared memory per block = requested + ' + (A.amd ? '0' : A.smemReservedPerBlock + ' B reserved') + ' rounded up to ' + (A.amd ? A.ldsAllocUnit : A.smemAllocUnit) + ' B; blocks per SM = min(by registers, by shared memory, by warps, ' + (A.amd ? A.maxWorkgroupsPerCU : A.maxBlocksPerSM) + '). Resident warps = blocks × ⌈threads ÷ ' + A.warpSize + '⌉.</li>' +
         '<li><b>Register cap</b>: with <code>__launch_bounds__(' + st.threads + ', ' + st.minBlocks + ')</code>, regs ≤ ⌊' + fmt(A.amd ? A.vgprPerSIMD * A.simdsPerCU : A.regsPerSM) + ' ÷ (' + st.minBlocks + ' × ' + roundUp(st.threads, A.warpSize) + ')⌋ rounded down to 8 = ' + regCap(A, st.threads, st.minBlocks) + '. Registers requested above the cap are spilled to local memory: ' + (E.spilled || 0) + ' × 4 B × 2 (store and reload) per thread per iteration, counted as DRAM traffic here, which is a pessimistic upper bound (spills usually hit L1 or L2).</li>' +
-        '<li><b>Achievable bandwidth</b> (Little\'s law): bytes in flight per ' + unitName + ' = resident ' + U + 's × ' + A.warpSize + ' lanes × loads in flight × bytes per load = ' + o.warps + ' × ' + A.warpSize + ' × ' + st.ilp + ' × ' + st.bpl + ' = ' + si(E.inFlightPerSM, 'B') + '; achievable = min(peak, in flight × ' + E.units + ' ' + unitName + 's ÷ ' + fmt(E.latency) + ' ns) = ' + fmt(E.achBW / 1e12, 2) + ' TB/s. The latency is an assumption from published microbenchmarks; edit it.</li>' +
+        '<li><b>Achievable bandwidth</b> (Little\'s law): bytes in flight per ' + unitName + ' = resident ' + U + 's × ' + A.warpSize + ' lanes × loads in flight × bytes per load = ' + o.warps + ' × ' + A.warpSize + ' × ' + st.ilp + ' × ' + st.bpl + ' = ' + si(E.inFlightPerSM, 'B') + '; achievable = min(peak, in flight × ' + E.units + ' ' + unitName + 's ÷ ' + fmt(E.latency) + ' ns) = ' + fmt(E.achBW / 1e12, 2) + ' TB/s. The latency is an assumption from published microbenchmarks and is editable.</li>' +
         '<li><b>Kernel work</b>: ' + esc(w.text) + '. Here ' + si(w.bytes, 'B') + ' and ' + si(w.flops, 'FLOP') + ' over ' + si(w.threads, 'threads') + ', ' + w.iters + ' iteration' + (w.iters === 1 ? '' : 's') + ' each' + (E.spillBytes ? '; spills add ' + si(E.spillBytes, 'B') : '') + '.</li>' +
-        '<li><b>Register estimate</b>: ' + esc(K.regsText) + '. This is an estimate to show the mechanics; <code>ptxas</code> decides the real count. Compile with <code>-Xptxas -v</code> and type the number in.</li>' +
+        '<li><b>Register estimate</b>: ' + esc(K.regsText) + '. This is an estimate to show the mechanics; <code>ptxas</code> decides the real count. <code>-Xptxas -v</code> prints the real count, which can be entered above.</li>' +
         '<li><b>Time</b> = max(bytes ÷ achievable bandwidth, FLOPs ÷ peak rate) = max(' + tm(E.tMem) + ', ' + tm(E.tComp) + '). Rate used: ' + fmt(E.rate) + ' TFLOPS, ' + esc(K.dtypeNote) + ' (vector FP32 rates are from the datasheets and are not in the catalogue). Bound: compute if the FLOP term is larger; otherwise memory when the achievable bandwidth reaches the peak, latency when it does not. Launch overhead, tail effects, L2 hits and tensor-core pipeline stalls are not modelled.</li>' +
         (A.amd ? '<li><b>CDNA 3</b>: a CU has 4 SIMDs, each with a 512-entry VGPR file per lane and at most 8 waves of 64 lanes; LDS is 64 KB per CU. AGPRs, the unified register file split and wave32 modes are not modelled.</li>' : '') +
         '</ul></details>';
@@ -487,7 +531,7 @@
     function choose(k) { if (L) L.select('gpu', k); else pickGpu(k); }   // through the shell, so the carousel follows
     function pickGpu(k) { if (!HW.gpus[k]) return; st.gpu = k; st.latency = null; buildControls(); render(); }
     if (L) L.subscribe(function (m) { if (m.kind === 'gpu' && m.gpu !== st.gpu) pickGpu(m.gpu); });
-    function tile(label, value, sub, cls) { return '<div class="lk-st ' + cls + '"><small>' + esc(label) + '</small><b>' + esc(value) + '</b><span>' + esc(sub) + '</span></div>'; }
+    function tile(label, value, sub, cls, tip) { return '<div class="lk-st ' + cls + '"' + tipAttr(tip) + '><small>' + esc(label) + '</small><b>' + esc(value) + '</b><span>' + esc(sub) + '</span></div>'; }
     render();
   }
 

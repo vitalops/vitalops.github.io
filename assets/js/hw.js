@@ -31,11 +31,11 @@
   var GPUS = {
     h100:  { name: 'H100 SXM',  vendor: 'nvidia', arch: 'sm_90',  sms: 132, mem: 80,  memType: 'HBM3',   stacks: 5, stackGB: 16,  bw: 3.35, flops: { fp32: 67, bf16: 989,  fp8: 1979, int8: 1979 },           l2: 50, link: { name: 'NVLink 4', gbps: 450 }, tdp: 700, latency: 650, price: 2.50, photo: 'h100', photoNote: 'H100 PCIe card pictured (same GH100 die as the SXM module).' },
     h200:  { name: 'H200 SXM',  vendor: 'nvidia', arch: 'sm_90',  sms: 132, mem: 141, memType: 'HBM3e',  stacks: 6, stackGB: 24,  bw: 4.8,  flops: { fp32: 67, bf16: 989,  fp8: 1979, int8: 1979 },           l2: 50, link: { name: 'NVLink 4', gbps: 450 }, tdp: 700, latency: 650, price: 3.50, photo: 'h100', photoNote: 'H100 card pictured; no licensed H200 photo (same die, HBM3e).' },
-    b200:  { name: 'B200',      vendor: 'nvidia', arch: 'sm_100', sms: 148, mem: 180, memType: 'HBM3e',  stacks: 8, stackGB: 24,  bw: 8.0,  flops: { fp32: 80, bf16: 2250, fp8: 4500, int8: 4500, fp4: 9000 }, l2: 126, link: { name: 'NVLink 5', gbps: 900 }, tdp: 1000, latency: 700, price: 5.50, photo: 'b200', photoNote: 'DGX B200 system front pictured; the GPU itself sits inside.' },
+    b200:  { name: 'B200',      vendor: 'nvidia', arch: 'sm_100', sms: 148, mem: 180, memType: 'HBM3e',  stacks: 8, stackGB: 24,  bw: 8.0,  flops: { fp32: 80, bf16: 2250, fp8: 4500, int8: 4500, fp4: 9000 }, l2: 126, link: { name: 'NVLink 5', gbps: 900 }, tdp: 1000, latency: 700, price: 5.50, photo: 'gb200', photoNote: 'GB200 superchip board: two Blackwell GPUs and a Grace CPU (Computex 2024).' },
     a100:  { name: 'A100 SXM 80 GB', vendor: 'nvidia', arch: 'sm_80', sms: 108, mem: 80, memType: 'HBM2e', stacks: 5, stackGB: 16, bw: 2.0, flops: { fp32: 19.5, bf16: 312, int8: 624 },                   l2: 40, link: { name: 'NVLink 3', gbps: 300 }, tdp: 400, latency: 550, price: 1.60, photo: 'a100', photoNote: 'A100 PCIe card pictured.' },
     l40s:  { name: 'L40S',      vendor: 'nvidia', arch: 'sm_89',  sms: 142, mem: 48,  memType: 'GDDR6',  stacks: 12, stackGB: 4,  bw: 0.864, flops: { fp32: 91.6, bf16: 362, fp8: 733, int8: 733 },             l2: 96, link: { name: 'PCIe 4.0 x16', gbps: 25 }, tdp: 350, latency: 550, price: 1.00, photo: null, photoNote: 'No licensed photo. Dual-slot PCIe card.' },
     rtx5090: { name: 'RTX 5090', vendor: 'nvidia', arch: 'sm_120', sms: 170, mem: 32, memType: 'GDDR7', stacks: 16, stackGB: 2, bw: 1.79, flops: { fp32: 104.8, bf16: 209, fp8: 419, int8: 419, fp4: 838 },      l2: 96, link: { name: 'PCIe 5.0 x16', gbps: 50 }, tdp: 575, latency: 550, price: 0.70, photo: 'rtx5090', photoNote: 'Palit GameRock board pictured; memory and compute are the same GB202 on every board.' },
-    mi300x: { name: 'MI300X',   vendor: 'amd',    arch: 'cdna3',  cus: 304, mem: 192, memType: 'HBM3',   stacks: 8, stackGB: 24,  bw: 5.3,  flops: { fp32: 163.4, bf16: 1307, fp8: 2615, int8: 2615 },           l2: 256, link: { name: 'Infinity Fabric', gbps: 448 }, tdp: 750, latency: 850, price: 2.50, photo: null, photoNote: 'No licensed photo. OAM module.' },
+    mi300x: { name: 'MI300X',   vendor: 'amd',    arch: 'cdna3',  cus: 304, mem: 192, memType: 'HBM3',   stacks: 8, stackGB: 24,  bw: 5.3,  flops: { fp32: 163.4, bf16: 1307, fp8: 2615, int8: 2615 },           l2: 256, link: { name: 'Infinity Fabric', gbps: 448 }, tdp: 750, latency: 850, price: 2.50, photo: 'mi300x', photoNote: 'AMD Instinct MI300-series OAM module.' },
     /* Jetson modules share LPDDR5 between CPU and GPU; "mem" is the whole module. */
     agx_orin: { name: 'Jetson AGX Orin 64 GB', vendor: 'nvidia', arch: 'sm_87', sms: 16, mem: 64, memType: 'LPDDR5', stacks: 8, stackGB: 8, bw: 0.2048, flops: { fp32: 5.3, bf16: 42, int8: 85 }, l2: 4, link: { name: 'PCIe 4.0 x8', gbps: 12 }, tdp: 60, latency: 450, price: 0, photo: 'agx-orin', photoNote: 'AGX Orin Developer Kit pictured.' }
   };
@@ -53,7 +53,7 @@
   };
 
   var PHOTOS = {
-    h100: 'h100', a100: 'a100', b200: 'b200', rtx5090: 'rtx5090', 'agx-orin': 'agx-orin', 'orin-nx': 'orin-nx', pi5: 'pi5', iphone16pro: 'iphone16pro', pixel9pro: 'pixel9pro', 'macbook-air': 'macbook-air', 's25-ultra': 's25-ultra'
+    h100: 'h100', a100: 'a100', b200: 'b200', gb200: 'gb200', mi300x: 'mi300x', rtx5090: 'rtx5090', 'agx-orin': 'agx-orin', 'orin-nx': 'orin-nx', pi5: 'pi5', iphone16pro: 'iphone16pro', pixel9pro: 'pixel9pro', 'macbook-air': 'macbook-air', 's25-ultra': 's25-ultra'
   };
   function photoURL(key) { return key && PHOTOS[key] ? ROOT + 'assets/photos/hw/' + PHOTOS[key] + '.webp' : null; }
 

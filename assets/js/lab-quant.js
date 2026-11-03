@@ -428,14 +428,14 @@
     var segBtn = function (val, label, attr) { return '<button type="button" role="radio" aria-checked="false" data-' + attr + '="' + val + '">' + label + '</button>'; };
     root.innerHTML =
       '<div class="lq" role="group" aria-label="Quantisation lab">' +
-      '<div class="lq-head"><div class="lq-title"><b>Quantisation lab</b><span>mlp.down_proj · 1,024 × 1,024 · synthetic, seeded</span></div><div class="lq-status" aria-live="polite"><i></i><span></span></div></div>' +
+      '<div class="lq-head"><div class="lq-title"><b>Quantisation lab</b><span data-tip="One MLP down-projection of a transformer: 1,024 input channels by 1,024 output channels, generated here from a fixed seed with heavy tails, four outlier weight channels and eight high-activation channels.">mlp.down_proj · 1,024 × 1,024 · synthetic, seeded</span></div><div class="lq-status" aria-live="polite" data-tip="All formats are quantised and dequantised in the browser; the comparison fills in as each finishes."><i></i><span></span></div></div>' +
       '<div class="lq-ctrls">' +
-        '<div class="lq-ctl"><span class="lq-lab" id="' + id + '-f">Format</span><div class="lq-seg lq-fmt" role="radiogroup" aria-labelledby="' + id + '-f">' +
+        '<div class="lq-ctl"><span class="lq-lab" id="' + id + '-f" data-tip="The number format the weights are stored in. Each option\'s tip gives its bits, its scale scheme and whether the selected GPU runs it natively or dequantises first.">Format</span><div class="lq-seg lq-fmt" role="radiogroup" aria-labelledby="' + id + '-f">' +
           FMTS.map(function (f) { return segBtn(f, short(f, f === 'int4g' ? 'G' : 0).replace('gG', 'g128'), 'fmt'); }).join('') + '</div></div>' +
-        '<div class="lq-ctl"><span class="lq-lab" id="' + id + '-g">INT4 group size</span><div class="lq-seg lq-grp" role="radiogroup" aria-labelledby="' + id + '-g">' +
-          GROUPS.map(function (g) { return segBtn(g, g, 'g'); }).join('') + '</div></div>' +
-        '<label class="lq-sw"><input type="checkbox" class="lq-prot"><span class="lq-sw-t" aria-hidden="true"></span><span>Protect outlier channels</span></label>' +
-        (!LAB && HW ? '<div class="lq-ctl"><label class="lq-lab" for="' + id + '-gpu">GPU</label><select id="' + id + '-gpu" class="lq-gsel">' + Object.keys(HW.gpus).map(function (k) { return '<option value="' + k + '">' + esc(HW.gpus[k].name) + '</option>'; }).join('') + '</select></div>' : '') +
+        '<div class="lq-ctl"><span class="lq-lab" id="' + id + '-g" data-tip="How many consecutive input weights share one scale and zero point in INT4 g-formats. Smaller groups track outliers better and cost more bits in scales.">INT4 group size</span><div class="lq-seg lq-grp" role="radiogroup" aria-labelledby="' + id + '-g">' +
+          GROUPS.map(function (g) { return segBtn(g, g, 'g').replace('<button', '<button data-tip="One FP16 scale and 4-bit zero point per ' + g + ' weights: ' + (4 + 20 / g).toFixed(3) + ' bits per weight."'); }).join('') + '</div></div>' +
+        '<label class="lq-sw" data-tip="Activation-aware scaling as in AWQ: input channels with large activations are scaled up before quantisation and the inverse folded into the previous layer, so they land on finer steps. The scale exponent is grid-searched on the calibration sample. No extra memory."><input type="checkbox" class="lq-prot"><span class="lq-sw-t" aria-hidden="true"></span><span>Protect outlier channels</span></label>' +
+        (!LAB && HW ? '<div class="lq-ctl"><label class="lq-lab" for="' + id + '-gpu" data-tip="The GPU whose tensor-core rates decide which formats run natively, and whose bandwidth sets the weight-read time.">GPU</label><select id="' + id + '-gpu" class="lq-gsel">' + Object.keys(HW.gpus).map(function (k) { return '<option value="' + k + '">' + esc(HW.gpus[k].name) + '</option>'; }).join('') + '</select></div>' : '') +
       '</div>' +
       '<p class="lq-desc"></p>' +
       '<div class="lq-body"><div class="lq-load">Generating the layer…</div></div>' +
@@ -466,31 +466,31 @@
     function build() {
       body.innerHTML =
         '<div class="lq-metrics">' +
-          '<div class="lq-m"><small>Bits per weight, incl. scales</small><b data-m="bits"></b><em data-m="bitsx"></em></div>' +
-          '<div class="lq-m"><small>This layer</small><b data-m="layer"></b><em data-m="layerx"></em></div>' +
-          '<div class="lq-m"><small>32B model, weights</small><b data-m="m32"></b><em data-m="m32x"></em></div>' +
-          '<div class="lq-m"><small>70B model, weights</small><b data-m="m70"></b><em data-m="m70x"></em></div>' +
-          '<div class="lq-m"><small>Weight error, RMSE / RMS</small><b data-m="werr"></b><em data-m="sqnr"></em></div>' +
-          '<div class="lq-m"><small>Output error, ‖xW − xŴ‖ / ‖xW‖</small><b data-m="yerr"></b><em data-m="prot"></em></div>' +
+          '<div class="lq-m" data-tip="Storage per weight including the scales and zero points: e.g. INT4 g128 is 4 bits plus a 16-bit scale and a 4-bit zero point per 128 weights, 4.156 bits."><small>Bits per weight, incl. scales</small><b data-m="bits"></b><em data-m="bitsx"></em></div>' +
+          '<div class="lq-m" data-tip="1,024 × 1,024 weights × bits per weight, in MiB; BF16 is 2 MiB."><small>This layer</small><b data-m="layer"></b><em data-m="layerx"></em></div>' +
+          '<div class="lq-m" data-tip="32 × 10⁹ parameters × bits per weight ÷ 8, weights only; the KV cache and activations come on top."><small>32B model, weights</small><b data-m="m32"></b><em data-m="m32x"></em></div>' +
+          '<div class="lq-m" data-tip="70 × 10⁹ parameters × bits per weight ÷ 8, weights only."><small>70B model, weights</small><b data-m="m70"></b><em data-m="m70x"></em></div>' +
+          '<div class="lq-m" data-tip="Root-mean-square quantisation error of the weights divided by their RMS. SQNR is the same ratio in decibels: 20 × log10(RMS ÷ RMSE)."><small>Weight error, RMSE / RMS</small><b data-m="werr"></b><em data-m="sqnr"></em></div>' +
+          '<div class="lq-m" data-tip="Relative error of the layer\'s output on the 16-token calibration sample: ‖x(W − Ŵ)‖ ÷ ‖xW‖. Channels with large activations weigh most, which is what outlier protection targets."><small>Output error, ‖xW − xŴ‖ / ‖xW‖</small><b data-m="yerr"></b><em data-m="prot"></em></div>' +
         '</div>' +
         '<div class="lq-cols">' +
           '<div class="lq-col">' +
-            '<div class="lq-panel"><div class="lq-ph"><b>Weight distribution</b><label class="lq-chk"><input type="checkbox" class="lq-log" checked>Log counts</label></div><svg class="lq-hist" viewBox="0 0 600 150" role="img" aria-label="Histogram of the layer\'s weights with the quantisation grid"></svg><p class="lq-cap lq-hsub"></p></div>' +
-            (HW ? '<div class="lq-panel lq-gpu"><div class="lq-ph"><b class="lq-gname">On this GPU</b><span class="lq-gsub">from the datasheet</span></div><div class="lq-gbody"></div></div>' : '') +
+            '<div class="lq-panel"><div class="lq-ph"><b data-tip="Histogram of all 1,048,576 weights. The vertical lines are the representable values of the current format for the highlighted group, so the grid can be compared with where the weights sit.">Weight distribution</b><label class="lq-chk" data-tip="Logarithmic count axis, so the sparse tails and the outliers stay visible."><input type="checkbox" class="lq-log" checked>Log counts</label></div><svg class="lq-hist" viewBox="0 0 600 150" role="img" aria-label="Histogram of the layer\'s weights with the quantisation grid"></svg><p class="lq-cap lq-hsub"></p></div>' +
+            (HW ? '<div class="lq-panel lq-gpu"><div class="lq-ph"><b class="lq-gname" data-tip="What the selected GPU does with the current format, from its datasheet tensor-core rates: native where a rate exists, otherwise dequantised at matmul time (the memory saving stays, the compute speed-up does not).">On this GPU</b><span class="lq-gsub">from the datasheet</span></div><div class="lq-gbody"></div></div>' : '') +
           '</div>' +
           '<div class="lq-col">' +
-            '<div class="lq-panel"><div class="lq-ph"><b>One group, as quantised</b><span class="lq-isub"></span></div><svg class="lq-inset" viewBox="0 0 300 150" role="img" aria-label="Weights of one group against the quantisation levels"></svg>' +
-              '<div class="lq-key"><span><i class="lq-k-o"></i>weight</span><span><i class="lq-k-q"></i>quantised</span><span><i class="lq-k-g"></i>levels</span><span><i class="lq-k-s"></i>ch 291, 300</span></div></div>' +
+            '<div class="lq-panel"><div class="lq-ph"><b data-tip="Output channel 17, inputs 256 to 383: each original weight as a dot and its quantised value as a dash, over the format\'s levels. Channel 300 carries an outlier weight and 291 a large activation.">One group, as quantised</b><span class="lq-isub"></span></div><svg class="lq-inset" viewBox="0 0 300 150" role="img" aria-label="Weights of one group against the quantisation levels"></svg>' +
+              '<div class="lq-key"><span data-tip="The original BF16 weight."><i class="lq-k-o"></i>weight</span><span data-tip="The value after quantising and dequantising in the current format."><i class="lq-k-q"></i>quantised</span><span data-tip="The representable values of the current format for this group."><i class="lq-k-g"></i>levels</span><span data-tip="Input channel 291 has large activations (protection scales it); channel 300 holds an outlier weight that stretches a per-channel grid."><i class="lq-k-s"></i>ch 291, 300</span></div></div>' +
           '</div>' +
           '<div class="lq-col">' +
-            '<div class="lq-panel"><div class="lq-ph"><b>Error map</b><span class="lq-sp"></span><div class="lq-seg sm lq-hm" role="radiogroup" aria-label="Error map scale">' + segBtn('act', '× activation', 'hm') + segBtn('raw', 'Raw', 'hm') + '</div></div>' +
+            '<div class="lq-panel"><div class="lq-ph"><b data-tip="Absolute quantisation error for a 64 × 64 tile: inputs 256 to 319 across, outputs 0 to 63 down, on a log colour scale. Outlier channels show as bright columns.">Error map</b><span class="lq-sp"></span><div class="lq-seg sm lq-hm" role="radiogroup" aria-label="Error map scale">' + segBtn('act', '× activation', 'hm').replace('<button', '<button data-tip="Each error multiplied by its input channel\'s RMS activation: what the next layer receives."') + segBtn('raw', 'Raw', 'hm').replace('<button', '<button data-tip="The weight error alone, without activation weighting."') + '</div></div>' +
               '<div class="lq-heat"><div class="lq-marks"><i style="left:' + ((262 - TK0 + .5) / 64 * 100) + '%">262</i><i style="left:' + ((291 - TK0 + .5) / 64 * 100) + '%">291</i><i class="w" style="left:' + ((300 - TK0 + .5) / 64 * 100) + '%">300</i></div><canvas aria-hidden="true"></canvas></div>' +
-              '<div class="lq-axes"><span>in 256 → 319</span><span>out 0 ↓ 63</span></div><div class="lq-legend"><span class="lq-lo"></span><i></i><span class="lq-hi"></span></div></div>' +
+              '<div class="lq-axes"><span data-tip="Input channels 256 to 319, left to right; 262, 291 and 300 are marked above.">in 256 → 319</span><span data-tip="Output channels 0 to 63, top to bottom.">out 0 ↓ 63</span></div><div class="lq-legend" data-tip="Colour scale of the absolute error, logarithmic from the left value to the right value."><span class="lq-lo"></span><i></i><span class="lq-hi"></span></div></div>' +
           '</div>' +
           '<div class="lq-col">' +
-            '<div class="lq-panel"><div class="lq-ph"><b>All formats</b><span>this layer, current settings</span></div>' +
-              '<div class="lq-cmp-h"><span>Format</span><span>Bits per weight</span><span>Output error, log</span></div><div class="lq-rows"></div>' +
-              '<p class="lq-note">Pick a row to inspect it. Shorter bars are better.</p></div>' +
+            '<div class="lq-panel"><div class="lq-ph"><b data-tip="Every format on this layer with the current group size and protection setting, computed in the background.">All formats</b><span>this layer, current settings</span></div>' +
+              '<div class="lq-cmp-h"><span>Format</span><span data-tip="Storage per weight including scales, out of 16 for BF16.">Bits per weight</span><span data-tip="Relative output error on the calibration sample, on a log scale from 0.01% to 100%.">Output error, log</span></div><div class="lq-rows"></div>' +
+              '<p class="lq-note">A row selects its format. Shorter bars are smaller or more accurate.</p></div>' +
           '</div>' +
         '</div>';
       els.hist = $('.lq-hist'); els.inset = $('.lq-inset'); els.canvas = $('.lq-heat canvas'); els.rows = $('.lq-rows');
@@ -531,7 +531,7 @@
       [].forEach.call($('.lq-fmt').querySelectorAll('button'), function (b) {
         var f = b.getAttribute('data-fmt'), sp = support(f, g);
         b.innerHTML = esc(short(f, S.G)) + (sp && !sp.native ? '<em>dequant</em>' : '');
-        b.title = sp ? sp.how : '';
+        b.setAttribute('data-tip', desc(f, S.G) + (sp ? ' On ' + g.name + ': ' + sp.how + '.' : ''));
       });
     }
     function gpuPanel(r) {
@@ -542,12 +542,12 @@
       els.gsub.textContent = (HW.arch[g.arch] ? HW.arch[g.arch].name : g.arch) + ' · ' + g.mem + ' GB ' + g.memType + ' · ' + g.bw + ' TB/s';
       var rate = function (k) { return f[k] ? esc(fmtN(f[k])) : '<span class="dq">none</span>'; };
       var dl = document.createElement('dl'); dl.className = 'lq-on';
-      dl.innerHTML = '<dt>BF16 · FP8 · FP4, TFLOPS</dt><dd>' + rate('bf16') + ' · ' + rate('fp8') + ' · ' + rate('fp4') + '</dd>' +
-        '<dt>' + esc(short(S.fmt, S.G)) + ' here</dt><dd class="' + (sp.native ? 'ok' : 'dq') + '">' + (sp.native ? 'native' : 'dequantised → ' + sp.rate.toUpperCase()) + '</dd>' +
-        '<dt>Matmul rate used</dt><dd>' + esc(fmtN(rateT) + ' TFLOPS ' + sp.rate) + '</dd>' +
-        '<dt>32B weights to read</dt><dd>' + esc(gb(32 * r.bits / 8) + ' GB') + '</dd>' +
-        '<dt>Per token, one stream</dt><dd>' + esc(tMs.toFixed(2) + ' ms · ≤ ' + Math.round(1000 / tMs) + ' tok/s') + '</dd>';
-      var how = document.createElement('p'); how.className = 'lq-how'; how.textContent = sp.how + '. Read time = bytes ÷ (' + g.bw + ' TB/s × ' + BW_EFF + '); the matmul itself is not counted.'; how.title = how.textContent;
+      dl.innerHTML = '<dt data-tip="Dense tensor-core rates from the datasheet, in TFLOPS. \'none\' means the GPU has no units for that format.">BF16 · FP8 · FP4, TFLOPS</dt><dd>' + rate('bf16') + ' · ' + rate('fp8') + ' · ' + rate('fp4') + '</dd>' +
+        '<dt data-tip="Native: the tensor cores take this format directly. Dequantised: weights are expanded to the widest supported type before the matmul; memory is saved, compute is not.">' + esc(short(S.fmt, S.G)) + ' here</dt><dd class="' + (sp.native ? 'ok' : 'dq') + '">' + (sp.native ? 'native' : 'dequantised → ' + sp.rate.toUpperCase()) + '</dd>' +
+        '<dt data-tip="The tensor-core rate the matmul would run at for this format on this GPU.">Matmul rate used</dt><dd>' + esc(fmtN(rateT) + ' TFLOPS ' + sp.rate) + '</dd>' +
+        '<dt data-tip="32 × 10⁹ parameters at the current bits per weight: the bytes one decode step reads.">32B weights to read</dt><dd>' + esc(gb(32 * r.bits / 8) + ' GB') + '</dd>' +
+        '<dt data-tip="Weight bytes ÷ (datasheet bandwidth × 0.75): the time one stream spends reading the weights per token, and the tokens per second that bounds. The matmul itself is not counted.">Per token, one stream</dt><dd>' + esc(tMs.toFixed(2) + ' ms · ≤ ' + Math.round(1000 / tMs) + ' tok/s') + '</dd>';
+      var how = document.createElement('p'); how.className = 'lq-how'; how.textContent = sp.how + '. Read time = bytes ÷ (' + g.bw + ' TB/s × ' + BW_EFF + '); the matmul itself is not counted.'; how.setAttribute('data-tip', how.textContent);
       els.gbody.innerHTML = ''; els.gbody.appendChild(dl); els.gbody.appendChild(how);
     }
     function fmtN(n) { return n == null ? '—' : Number(n).toLocaleString('en-GB'); }
@@ -603,7 +603,7 @@
       els.rows.innerHTML = FMTS.map(function (f) {
         var r = cache[keyOf(f, S.G, S.prot)], b = bits(f, S.G);
         var e = r ? '<i style="width:' + Math.max(2, Math.min(100, (Math.log10(Math.max(r.yErr, 1e-4)) - lo) / (hi - lo) * 100)).toFixed(1) + '%"></i><span>' + pct(r.yErr) + '</span>' : '<span class="pend">computing…</span>';
-        return '<div class="lq-row' + (f === S.fmt ? ' on' : '') + '" role="button" tabindex="0" aria-pressed="' + (f === S.fmt) + '" data-f="' + f + '">' +
+        return '<div class="lq-row' + (f === S.fmt ? ' on' : '') + '" role="button" tabindex="0" aria-pressed="' + (f === S.fmt) + '" data-f="' + f + '" data-tip="' + esc(name(f, S.G)) + ': ' + b.toFixed(3) + ' bits per weight' + (r ? ', output error ' + pct(r.yErr) : '') + '.">' +
           '<span class="lq-fn">' + esc(short(f, S.G)) + '</span>' +
           '<span class="lq-bar"><i style="width:' + (b / maxB * 100 * 0.78).toFixed(1) + '%"></i><span>' + b.toFixed(2) + '</span></span>' +
           '<span class="lq-bar">' + e + '</span></div>';

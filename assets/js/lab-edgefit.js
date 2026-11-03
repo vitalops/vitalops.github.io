@@ -16,6 +16,7 @@
     { id: '32',  label: '32B',  p: 32.8, L: 64, kvh: 8, hd: 128, h: 5120, I: 27648 }
   ];
   var PREC = [['fp16', 'fp16'], ['int8', 'int8'], ['int4', 'int4'], ['int4p', 'int4 −2L']];
+  var PREC_TIP = { fp16: 'Half precision: 2 bytes per parameter, no quantisation error.', int8: '8-bit integers with group scales: 1.06 bytes per parameter.', int4: '4-bit integers with group scales and zero points: 0.56 bytes per parameter.', int4p: 'int4 with two transformer layers pruned as well; the memory and KV cache shrink by 2 ÷ layers. Accuracy is re-checked after pruning.' };
   var KVP = [['fp16', 2], ['int8', 1]];
   var CTX = [1024, 2048, 4096, 8192, 16384, 32768];
   var VISION_P = 0.6, IMAGE_TOK = 1024, VOCAB = 152064, TRAIN_SEQ = 512, RANK = 16;
@@ -158,31 +159,31 @@
         '<div class="le-hd"><i></i>Edge fit</div>' +
         (shell ? '' : '<div class="le-f"><label for="' + u + 'd">Device</label><select class="le-sel" id="' + u + 'd" data-k="device">' +
           DEV_ORDER.map(function (k) { var d = HW.devices[k]; return '<option value="' + k + '"' + (k === st.device ? ' selected' : '') + '>' + d.name + '</option>'; }).join('') + '</select></div>') +
-        '<div class="le-f"><span class="le-lab" id="' + u + 'pl">Weights</span><div class="le-seg" role="group" aria-labelledby="' + u + 'pl" data-seg="prec">' +
-          PREC.map(function (p) { return '<button type="button" data-v="' + p[0] + '" aria-pressed="' + (p[0] === st.prec) + '"' + (p[0] === 'int4p' ? ' title="int4 with two transformer layers pruned"' : '') + '>' + p[1] + '</button>'; }).join('') + '</div></div>' +
-        '<div class="le-f"><span class="le-lab" id="' + u + 'ml">Model size <output>Qwen2.5-class</output></span><div class="le-lad" role="group" aria-labelledby="' + u + 'ml" data-x="lad">' +
-          LADDER.map(function (m) { return '<button type="button" data-m="' + m.id + '" aria-pressed="' + (m.id === st.model) + '"><b>' + m.label + '</b><span></span><em></em></button>'; }).join('') + '</div></div>' +
-        '<div class="le-f"><label for="' + u + 'c">Context <output data-x="ctxo">' + tok(CTX[st.ctx]) + '</output></label><input type="range" id="' + u + 'c" data-k="ctx" min="0" max="' + (CTX.length - 1) + '" step="1" value="' + st.ctx + '"></div>' +
-        '<div class="le-f"><span class="le-lab" id="' + u + 'kl">KV cache</span><div class="le-seg" role="group" aria-labelledby="' + u + 'kl" data-seg="kv">' +
-          KVP.map(function (p) { return '<button type="button" data-v="' + p[0] + '" aria-pressed="' + (p[0] === st.kv) + '">' + p[0] + '</button>'; }).join('') + '</div></div>' +
-        '<label class="le-chk"><input type="checkbox" data-k="vlm"' + (st.vlm ? ' checked' : '') + '><span><b>Vision-language model</b>Adds a 0.6B vision encoder and one image (~1k tokens) to the context.</span></label>' +
-        '<label class="le-chk"><input type="checkbox" data-k="train"' + (st.train ? ' checked' : '') + '><span><b>Fine-tune on the device</b>QLoRA, rank 16, 512-token samples, gradient checkpointing.</span></label>' +
+        '<div class="le-f"><span class="le-lab" id="' + u + 'pl" data-tip="Precision the weights are stored in. It sets the bytes per parameter and so the weight memory and the bytes read per token.">Weights</span><div class="le-seg" role="group" aria-labelledby="' + u + 'pl" data-seg="prec">' +
+          PREC.map(function (p) { return '<button type="button" data-v="' + p[0] + '" aria-pressed="' + (p[0] === st.prec) + '" data-tip="' + PREC_TIP[p[0]] + '">' + p[1] + '</button>'; }).join('') + '</div></div>' +
+        '<div class="le-f"><span class="le-lab" id="' + u + 'ml" data-tip="The model ladder uses Qwen2.5-class shapes (layers, KV heads, head dimension). Each row shows the memory it needs and, where it fits, the decode speed; the badge marks the largest size that fits with the current settings.">Model size <output>Qwen2.5-class</output></span><div class="le-lad" role="group" aria-labelledby="' + u + 'ml" data-x="lad">' +
+          LADDER.map(function (m) { return '<button type="button" data-m="' + m.id + '" aria-pressed="' + (m.id === st.model) + '" data-tip="' + m.p + 'B parameters, ' + m.L + ' layers, ' + m.kvh + ' KV heads of ' + m.hd + ' dimensions, hidden size ' + m.h + '. The KV cache per token is 2 × ' + m.L + ' × ' + m.kvh + ' × ' + m.hd + ' × bytes."><b>' + m.label + '</b><span></span><em></em></button>'; }).join('') + '</div></div>' +
+        '<div class="le-f"><label for="' + u + 'c" data-tip="Maximum context in tokens. The KV cache is sized for the whole context, and the bytes read per token average over the answer, so a longer context lowers decode speed.">Context <output data-x="ctxo">' + tok(CTX[st.ctx]) + '</output></label><input type="range" id="' + u + 'c" data-k="ctx" min="0" max="' + (CTX.length - 1) + '" step="1" value="' + st.ctx + '"></div>' +
+        '<div class="le-f"><span class="le-lab" id="' + u + 'kl" data-tip="Precision of the key and value cache: 2 bytes per element in fp16, 1 in int8. It scales the KV memory and the KV bytes read per token.">KV cache</span><div class="le-seg" role="group" aria-labelledby="' + u + 'kl" data-seg="kv">' +
+          KVP.map(function (p) { return '<button type="button" data-v="' + p[0] + '" aria-pressed="' + (p[0] === st.kv) + '" data-tip="' + (p[0] === 'fp16' ? 'Keys and values in fp16: 2 bytes per element.' : 'Keys and values quantised to int8: 1 byte per element, half the KV memory and KV read.') + '">' + p[0] + '</button>'; }).join('') + '</div></div>' +
+        '<label class="le-chk" data-tip="Adds a 0.6B-parameter vision encoder (fp16 with fp16 weights, int8 otherwise) and one image of about 1,024 tokens to the context. The encoder runs once per image, so it is not in the per-token bytes."><input type="checkbox" data-k="vlm"' + (st.vlm ? ' checked' : '') + '><span><b>Vision-language model</b>Adds a 0.6B vision encoder and one image (~1k tokens) to the context.</span></label>' +
+        '<label class="le-chk" data-tip="Also checks whether a QLoRA fine-tune fits: 4-bit base weights, rank-16 adapters on every linear layer with fp32 optimiser state, checkpointed activations for 512-token samples, and fp32 logits over a 152k vocabulary."><input type="checkbox" data-k="train"' + (st.train ? ' checked' : '') + '><span><b>Fine-tune on the device</b>QLoRA, rank 16, 512-token samples, gradient checkpointing.</span></label>' +
       '</div>' +
       '<div class="le-out" aria-live="polite">' +
         '<div class="le-kpis">' +
-          '<div class="le-kpi" data-x="fitk"><small>Inference</small><b data-x="fit">—</b><span data-x="fits">—</span></div>' +
-          '<div class="le-kpi"><small>Decode speed</small><b data-x="tps">—</b><span>tok/s, bandwidth bound</span></div>' +
-          '<div class="le-kpi"><small>Memory needed</small><b data-x="need">—</b><span data-x="needs">—</span></div>' +
-          '<div class="le-kpi"><small>Largest that fits</small><b data-x="best">—</b><span data-x="bests">—</span></div>' +
+          '<div class="le-kpi" data-x="fitk" data-tip="Whether weights, vision encoder, KV cache and runtime buffers fit in the memory the device leaves to one process (the usable figure on the card). Headroom is usable memory minus the total needed."><small>Inference</small><b data-x="fit">—</b><span data-x="fits">—</span></div>' +
+          '<div class="le-kpi" data-tip="Tokens per second for one stream: bandwidth × efficiency ÷ (weight bytes + KV bytes read per token). Decode on these devices is bound by memory bandwidth, not compute."><small>Decode speed</small><b data-x="tps">—</b><span>tok/s, bandwidth bound</span></div>' +
+          '<div class="le-kpi" data-tip="Weights + vision encoder + KV cache for the full context + runtime buffers (0.3 GB plus 5% of the weights)."><small>Memory needed</small><b data-x="need">—</b><span data-x="needs">—</span></div>' +
+          '<div class="le-kpi" data-tip="The largest size on the ladder whose inference (and fine-tuning, when that option is on) fits the usable memory at the current precision and context."><small>Largest that fits</small><b data-x="best">—</b><span data-x="bests">—</span></div>' +
         '</div>' +
         '<div class="le-mid"><div class="le-card" data-x="card"></div><div class="le-r">' +
-          '<div><div class="le-sec">Where the bandwidth goes, per token<span data-x="bwlab">—</span></div>' +
+          '<div><div class="le-sec" data-tip="Every generated token reads all the weights once plus the KV cache for the tokens so far. The bar splits the bytes read per token between the two.">Where the bandwidth goes, per token<span data-x="bwlab">—</span></div>' +
             '<div class="le-bb" role="img" data-x="bb"><i class="le-c-w"></i><i class="le-c-kv"></i></div>' +
-            '<div class="le-leg"><span><i class="le-c-w"></i>Weights <em data-x="bw1"></em></span><span><i class="le-c-kv"></i>KV cache, average over the answer <em data-x="bw2"></em></span></div>' +
-            '<dl class="le-math"><dt>Bytes read per token</dt><dd data-x="m1">—</dd><dt>Effective bandwidth</dt><dd data-x="m2">—</dd><dt>Decode speed</dt><dd data-x="m3">—</dd><dt>At the end of the context</dt><dd data-x="m4">—</dd></dl></div>' +
-          '<div data-x="trs" hidden><div class="le-sec">Fine-tuning memory<span data-x="tcap">—</span></div>' +
+            '<div class="le-leg"><span data-tip="Weight bytes read once per token: parameters × bytes per parameter (layers dropped by pruning excluded)."><i class="le-c-w"></i>Weights <em data-x="bw1"></em></span><span data-tip="KV bytes read per token, averaged over the answer: the cache grows from empty to the full context, so the average is half the context × KV bytes per token."><i class="le-c-kv"></i>KV cache, average over the answer <em data-x="bw2"></em></span></div>' +
+            '<dl class="le-math"><dt data-tip="Weight bytes plus the average KV bytes read, per generated token.">Bytes read per token</dt><dd data-x="m1">—</dd><dt data-tip="Datasheet memory bandwidth × an assumed efficiency (60–70% depending on the device, shown on the card).">Effective bandwidth</dt><dd data-x="m2">—</dd><dt data-tip="Effective bandwidth ÷ bytes read per token.">Decode speed</dt><dd data-x="m3">—</dd><dt data-tip="The slowest point: with the KV cache full, every token reads the whole context.">At the end of the context</dt><dd data-x="m4">—</dd></dl></div>' +
+          '<div data-x="trs" hidden><div class="le-sec" data-tip="Memory a QLoRA fine-tune needs on the device, against the same usable limit. The base stays 4-bit; adapters, gradients, optimiser state and activations come on top.">Fine-tuning memory<span data-x="tcap">—</span></div>' +
             '<div class="le-bw"><div class="le-bar" role="img" data-x="tbar"><i class="le-c-w"></i><i class="le-c-v"></i><i class="le-c-tr"></i><i class="le-c-kv"></i><i class="le-c-rt"></i><i class="le-c-over"></i></div><div class="le-lim" data-x="tlim"><span>usable</span></div></div>' +
-            '<div class="le-leg"><span><i class="le-c-w"></i>4-bit base <em data-x="tw"></em></span><span data-x="tvs"><i class="le-c-v"></i>Vision encoder <em data-x="tv"></em></span><span><i class="le-c-tr"></i>Adapter, gradients, optimiser <em data-x="ta"></em></span><span><i class="le-c-kv"></i>Activations <em data-x="tact"></em></span><span><i class="le-c-rt"></i>Runtime <em data-x="trt"></em></span></div></div>' +
+            '<div class="le-leg"><span data-tip="The frozen base model in 4-bit (0.56 bytes per parameter including scales), as QLoRA keeps it."><i class="le-c-w"></i>4-bit base <em data-x="tw"></em></span><span data-x="tvs" data-tip="The vision encoder, frozen, at the inference precision."><i class="le-c-v"></i>Vision encoder <em data-x="tv"></em></span><span data-tip="Rank-16 LoRA adapters on every linear layer at 16 bytes per adapter parameter: fp16 weight and gradient, fp32 master copy and two Adam moments."><i class="le-c-tr"></i>Adapter, gradients, optimiser <em data-x="ta"></em></span><span data-tip="Activations kept for the backward pass with gradient checkpointing, for 512-token samples, plus fp32 logits over a 152k vocabulary."><i class="le-c-kv"></i>Activations <em data-x="tact"></em></span><span data-tip="Training runtime and scratch buffers: 0.4 GB, an assumption."><i class="le-c-rt"></i>Runtime <em data-x="trt"></em></span></div></div>' +
         '</div></div>' +
         '<div data-x="msg"></div>' +
         '<details class="le-how"><summary>How this is calculated</summary><ul>' +
@@ -194,7 +195,7 @@
           '<li>"Usable" memory is an assumption per device, shown on the card with its reason. Devices without a licensed photo show a labelled outline.</li>' +
           '<li>Not modelled: accuracy loss from quantisation and pruning, thermals, NPU operator coverage, CPU-only compute limits on the Raspberry Pi. Edge measures all of these on the device before anything ships.</li>' +
         '</ul></details>' +
-        '<p class="le-note">A first-order estimate from public device specs. Edge measures the real fit, speed and accuracy on your device.</p>' +
+        '<p class="le-note">A first-order estimate from public device specifications. Edge measures the real fit, speed and accuracy on the device.</p>' +
       '</div></div>';
 
     var X = {}; [].forEach.call(root.querySelectorAll('[data-x]'), function (e) { X[e.getAttribute('data-x')] = e; });
@@ -205,9 +206,11 @@
       var rows = [['Memory', d.mem + ' GB'], ['Usable by the model', d.usable + ' GB'], ['Memory bandwidth', d.bw + ' GB/s'], ['Bandwidth efficiency', Math.round(d.eff * 100) + '% assumed']];
       var c = HW.card(d, { photo: !shell, rows: rows, sub: d.kind, note: d.note || '' });
       c.querySelector('.hwc-slot').innerHTML =
-        '<div class="le-sec">Inference memory<span data-x="cap">—</span></div>' +
+        '<div class="le-sec" data-tip="Memory the model needs at inference, drawn against the usable limit. The hatched part beyond the limit is what the OS and other apps keep.">Inference memory<span data-x="cap">—</span></div>' +
         '<div class="le-bw"><div class="le-bar" role="img" data-x="bar"><i class="le-c-w"></i><i class="le-c-v"></i><i class="le-c-kv"></i><i class="le-c-rt"></i><i class="le-c-over"></i></div><div class="le-lim" data-x="lim"><span>usable</span></div></div>' +
-        '<div class="le-leg"><span><i class="le-c-w"></i>Weights <em data-x="lw"></em></span><span data-x="lvs"><i class="le-c-v"></i>Vision encoder <em data-x="lv"></em></span><span><i class="le-c-kv"></i>KV cache <em data-x="lkv"></em></span><span><i class="le-c-rt"></i>Runtime buffers <em data-x="lrt"></em></span><span><i class="le-c-os"></i>OS and apps <em data-x="los"></em></span></div>';
+        '<div class="le-leg"><span data-tip="Parameters × bytes per parameter at the chosen precision."><i class="le-c-w"></i>Weights <em data-x="lw"></em></span><span data-x="lvs" data-tip="The 0.6B vision encoder: fp16 with fp16 weights, int8 otherwise."><i class="le-c-v"></i>Vision encoder <em data-x="lv"></em></span><span data-tip="Key and value cache for the full context: 2 × layers × KV heads × head dimension × bytes × context tokens."><i class="le-c-kv"></i>KV cache <em data-x="lkv"></em></span><span data-tip="Compute buffers and scratch space: 0.3 GB plus 5% of the weights and encoder, an assumption."><i class="le-c-rt"></i>Runtime buffers <em data-x="lrt"></em></span><span data-tip="Total device memory minus the usable figure: what the operating system and other apps keep. An assumption per device, see the card."><i class="le-c-os"></i>OS and apps <em data-x="los"></em></span></div>';
+      var tips = ['Total memory on the device, from the datasheet. CPU and GPU share it on all of these.', 'What one process can expect after the operating system and other apps: an assumption per device, the reason is noted below.', 'Datasheet memory bandwidth. Decode speed is bound by it.', 'Share of the datasheet bandwidth a decode loop reaches in practice: an assumption.'];
+      [].forEach.call(c.querySelectorAll('.hwc-kv dt'), function (dt, i) { if (tips[i]) dt.setAttribute('data-tip', tips[i]); });
       X.card.innerHTML = ''; X.card.appendChild(c);
       [].forEach.call(c.querySelectorAll('[data-x]'), function (e) { X[e.getAttribute('data-x')] = e; });
     }
@@ -267,7 +270,7 @@
       X.need.textContent = gb(r.need);
       X.needs.textContent = 'of ' + d.usable + ' GB usable';
       X.best.textContent = best ? best.label : 'None';
-      X.bests.innerHTML = best ? (best.id === m.id ? 'selected' : '<button type="button" class="le-use" data-use="' + best.id + '">Use ' + best.label + '</button>') : 'try int4 or a shorter context';
+      X.bests.innerHTML = best ? (best.id === m.id ? 'selected' : '<button type="button" class="le-use" data-use="' + best.id + '">Use ' + best.label + '</button>') : 'none at these settings';
       X.cap.textContent = 'of ' + d.usable + ' GB';
       setBar(X.bar, X.lim, [r.weights, r.vision, r.kv, r.rt], r.usable, r.total);
       X.bar.setAttribute('aria-label', 'Needs ' + gb(r.need) + ' of ' + d.usable + ' GB usable');
@@ -293,7 +296,7 @@
       var label = m.label + (st.vlm ? ' VLM' : '') + ' at ' + PREC.filter(function (p) { return p[0] === st.prec; })[0][1];
       var msg;
       if (!r.fits) msg = '<div class="le-msg le-bad">' + label + ' needs ' + gb(r.need) + ' but the ' + d.name + ' leaves ' + d.usable + ' GB for the model. ' + (best ? 'The largest that fits with these settings is ' + best.label + '.' : 'Nothing on the ladder fits with these settings.') + '</div>';
-      else if (st.train && !r.trainFits) msg = '<div class="le-msg le-bad">Inference fits, but fine-tuning ' + label + ' needs ' + gb(r.train) + '. Train a smaller model on the device, or train elsewhere and push the adapter.</div>';
+      else if (st.train && !r.trainFits) msg = '<div class="le-msg le-bad">Inference fits, but fine-tuning ' + label + ' needs ' + gb(r.train) + ' of ' + d.usable + ' GB usable. A smaller model trains on the device; an adapter trained elsewhere can still be pushed to it.</div>';
       else if (st.train) msg = '<div class="le-msg le-good">' + label + ' runs and fine-tunes on the ' + d.name + ': adapters are ' + gb(r.adapter * 2) + ' to push to every device on the same base.</div>';
       else msg = '<div class="le-msg">' + label + ' fits the ' + d.name + ' at ' + tok(CTX[st.ctx]) + ' context with ' + gb(r.usable - r.need) + ' to spare, at about ' + Math.round(r.tps) + ' tok/s.</div>';
       X.msg.innerHTML = msg;
