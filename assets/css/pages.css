@@ -321,3 +321,13 @@ body.nav-open{overflow:hidden}
 .ladder{border-top:1px solid var(--line)}
 .tour-bar{top:62px}
 .step{scroll-margin-top:120px}
+
+/* ── open source band ── */
+.oss2{padding:64px 0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.oss2-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:40px;align-items:center}
+.oss2 h2{margin-top:10px}.oss2 .lede{margin-top:12px;font-size:16.5px}
+.oss2-links{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.oss2-term{margin:0;background:#0b1020;color:#c3cbdc;border:1px solid #1f2a44;border-radius:12px;padding:16px 18px;font:12.5px/1.6 var(--mono);overflow-x:auto;white-space:pre}
+.oss2-term code{font:inherit;color:inherit}
+.lab-cli{margin-top:18px;font-size:14px;color:var(--ink2);max-width:80ch}.lab-cli code{font-family:var(--mono);font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink)}.lab-cli a{color:var(--brand);font-weight:600}
+@media(max-width:900px){.oss2-grid{grid-template-columns:1fr;gap:24px}}

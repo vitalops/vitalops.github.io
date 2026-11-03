@@ -125,7 +125,7 @@ def footer(root):
       <p class="foot-soc"><a href="https://github.com/vitalops" target="_blank" rel="noopener" aria-label="GitHub">{lg("github")}</a><a href="https://x.com/vitalopsai" target="_blank" rel="noopener" aria-label="X">X</a><a href="mailto:{MAIL}">{MAIL}</a></p></div>
     <div><h4>Products</h4>{col(PRODUCTS, "products")}</div>
     <div><h4>Solutions</h4>{col(SOLUTIONS, "solutions")}</div>
-    <div><h4>Resources</h4><a href="{root}lab/">Live demos</a><a href="{root}platform/">Platform</a><a href="{root}platform/#stack">Supported stack</a><a href="{root}services/">Services</a><a href="{root}services/#engage">How we engage</a></div>
+    <div><h4>Resources</h4><a href="{root}lab/">Live demos</a><a href="https://github.com/vitalops/tokplan" target="_blank" rel="noopener">tokplan (open source)</a><a href="{root}platform/">Platform</a><a href="{root}platform/#stack">Supported stack</a><a href="{root}services/">Services</a><a href="{root}services/#engage">How we engage</a></div>
     <div><h4>Company</h4><a href="{root}company/">About</a><a href="{root}security/">Security</a><a href="{BOOK}" target="_blank" rel="noopener">Book a review</a><a href="mailto:{MAIL}">Contact</a><a href="{root}credits/">Photo credits</a></div>
   </div>
   <p class="foot-legal">© <span id="yr">2026</span> VitalOps Inc · vitalops.ai</p>
@@ -525,6 +525,19 @@ def solution_pages():
 
 SCREEN_PLAN_CACHE = ""
 
+# ───────────────────────── open source ─────────────────────────
+OSS = """<section class="oss2" id="open-source"><div class="wrap"><div class="oss2-grid">
+  <div><span class="k">Open source</span><h2>tokplan</h2><p class="lede">The capacity planner as a command-line tool and a Python library: pure Python, no dependencies, MIT. It reads any model's shapes from the Hugging Face Hub, applies the same first-order physics as the demo above, and prints the layout, the speed and the cost, or JSON for a script.</p>
+    <p class="oss2-links"><a class="btn btn-p" href="https://github.com/vitalops/tokplan" target="_blank" rel="noopener">GitHub</a><a class="btn btn-s" href="{R}tokplan/">Docs and live demo</a></p></div>
+  <pre class="oss2-term"><code>$ pip install tokplan
+$ tokplan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64
+  layout     TP2 × 1 replica = 2 GPUs · batch 64 per replica (max 218)
+  decode     20.4 tok/s per stream · 1,304 tok/s aggregate · 4.35 requests/s
+  TTFT       155 ms = prefill 135 ms + one step 20.3 ms · target met
+  step       20.3 ms = weights 14.0 ms + KV 4.59 ms + all-reduces 1.65 ms (8%)
+  cost       $1.07 per 1M output tokens · $3,648 / month at $2.50 per GPU-hour</code></pre>
+</div></div></section>"""
+
 # ───────────────────────── home ─────────────────────────
 FAQ_HOME = [
  ("Do we have to send you our weights or data?", "No. Everything runs in your cloud account or data centre, and evals run on your data where it is. During sprints our engineers work inside your environment."),
@@ -566,6 +579,7 @@ def home():
             + f'<section class="prods" id="products"><div class="wrap">{sec_head("Products", "What we build", "Each product can be used on its own. Used together, they share one configuration format, so the setup Plan sizes for is the one Optimize tunes and Serve runs.")}{cards(prods, "products", root="")}</div></section>'
             + ladder + tour
             + f'<section class="labs" id="lab"><div class="wrap">{sec_head("Live demos", "Interactive demos", "Six estimators built on the first-order models our products start from. The products then measure the real numbers on your hardware.")}<div class="lcards">{labs}</div></div></section>'
+            + OSS
             + f'<section class="sols" id="solutions"><div class="wrap">{sec_head("Solutions", "Where we work")}<div class="scards">{sols}</div></div></section>'
             + svc + clients)
     page("", "VitalOps · Inference optimisation for open-weight models", "VitalOps helps teams plan, tune and run open-weight models on their own hardware: capacity planning, inference optimisation, a GPU simulator for kernels, serving and monitoring, edge deployment and agent scheduling.", "home", body, faqs=FAQ_HOME)
@@ -582,7 +596,7 @@ def lab_page():
              "edgefit": "Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi, with an optional on-device fine-tune."}
     body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Estimators for the questions that come up before a model is measured: how many GPUs, what the scheduler does to latency, what quantisation costs, where a kernel is bound, what fits on a device. All of them are first-order models from public specifications; the products measure the real numbers.</p></div></section>"""
     items = "".join(f'<li><a href="#{k}">{ic(DEMOS[k][2])}<b>{DEMOS[k][0]}</b></a><p>{intro[k]}</p></li>' for k in order)
-    body += f'<section class="labsec" id="demos"><div class="wrap"><div class="lab" data-lab-shell data-tabs="{",".join(order)}" data-gpu="h100"><noscript><p class="lab-ns">These demos need JavaScript.</p></noscript></div><ul class="lab-list">{items}</ul></div></section>'
+    body += f'<section class="labsec" id="demos"><div class="wrap"><div class="lab" data-lab-shell data-tabs="{",".join(order)}" data-gpu="h100"><noscript><p class="lab-ns">These demos need JavaScript.</p></noscript></div><p class="lab-cli">The capacity planner is also a command-line tool and a Python library, <a href="https://github.com/vitalops/tokplan" target="_blank" rel="noopener">tokplan</a>: <code>pip install tokplan</code>, then <code>tokplan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64</code>. It reads any model\'s shapes from the Hugging Face Hub and applies the same physics. <a href="{{R}}tokplan/">Docs</a>.</p><ul class="lab-list">{items}</ul></div></section>'
 
     page("lab/", "Live demos | VitalOps", "Interactive inference estimators: a GPU capacity planner, a batching simulator, a kernel occupancy lab, a quantisation lab, a speculative decoding race and an edge memory fit.", "lab", body, demos=order,
          cta_args=("For measured numbers", "These demos are first-order estimates. A review call covers your model and your hardware specifically."))
