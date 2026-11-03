@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
-<title>Live demos · the physics of inference | VitalOps</title>
+<title>Live demos | VitalOps</title>
 <meta name="description" content="Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a quantisation lab, a speculative decoding race and an edge memory fit.">
 <link rel="canonical" href="https://vitalops.ai/lab/">
 <meta name="theme-color" content="#f5f6fa">
@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="VitalOps">
-<meta property="og:title" content="Live demos · the physics of inference | VitalOps">
+<meta property="og:title" content="Live demos | VitalOps">
 <meta property="og:description" content="Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a quantisation lab, a speculative decoding race and an edge memory fit.">
 <meta property="og:url" content="https://vitalops.ai/lab/">
 <meta property="og:image" content="https://vitalops.ai/assets/og.png">
@@ -49,35 +49,35 @@
   </div>
 </div></header>
 <main id="main" tabindex="-1">
-<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>The physics of inference, in your browser.</h1><p class="lede">Five tools our engineers use to reason about a workload before measuring it. They run entirely on this page: no sign-up, no server, nothing sent anywhere. When you want the real number for your model on your hardware, that's what the products are for.</p><nav class="lsub" aria-label="Demos"><a href="#planner"><svg class="ic"><use href="#i-gauge"/></svg>Capacity planner</a><a href="#batching"><svg class="ic"><use href="#i-layers"/></svg>Batching simulator</a><a href="#quant"><svg class="ic"><use href="#i-boxes"/></svg>Quantisation lab</a><a href="#specdec"><svg class="ic"><use href="#i-zap"/></svg>Speculative decoding</a><a href="#edgefit"><svg class="ic"><use href="#i-smartphone"/></svg>Edge fit</a></nav></div></section><section class="labsec" id="planner"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Capacity planner</span><h2>How many GPUs do you need?</h2><p class="lede">How many GPUs, of which kind, and what each million tokens costs. Decode is bound by memory bandwidth and prefill by compute; this is the first-order model Plan starts from before it simulates your traffic.</p></div></div>
+<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. For real numbers on your own model and hardware, you would use the products.</p><nav class="lsub" aria-label="Demos"><a href="#planner"><svg class="ic"><use href="#i-gauge"/></svg>Capacity planner</a><a href="#batching"><svg class="ic"><use href="#i-layers"/></svg>Batching simulator</a><a href="#quant"><svg class="ic"><use href="#i-boxes"/></svg>Quantisation lab</a><a href="#specdec"><svg class="ic"><use href="#i-zap"/></svg>Speculative decoding</a><a href="#edgefit"><svg class="ic"><use href="#i-smartphone"/></svg>Edge fit</a></nav></div></section><section class="labsec" id="planner"><div class="wrap">
+  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Capacity planner</span><h2>How many GPUs do you need?</h2><p class="lede">Estimates how many GPUs you need and the cost per million tokens. It assumes decode is limited by memory bandwidth and prefill by compute, which is where Plan starts before running a full simulation.</p></div></div>
   <div class="lab" data-lab="planner"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section><section class="labsec" id="batching"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Batching simulator</span><h2>Why the scheduler decides your latency</h2><p class="lede">A discrete-event simulation of a model server. Static batching, continuous batching, chunked prefill and prefix caching, on chat, RAG and agent traffic.</p></div></div>
+  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Batching simulator</span><h2>How batching affects latency</h2><p class="lede">Simulates a model server using static batching, continuous batching, chunked prefill and prefix caching on chat, RAG and agent traffic.</p></div></div>
   <div class="lab" data-lab="batching"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section><section class="labsec" id="quant"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Quantisation lab</span><h2>What quantisation does to the weights</h2><p class="lede">Real FP8, INT8, INT4 and NVFP4 rounding on a synthetic layer with outlier channels, the way LLM weights really look. See what grouping and outlier protection buy.</p></div></div>
+  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Quantisation lab</span><h2>Quantisation, up close</h2><p class="lede">Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights. You can see the effect of group size and outlier protection.</p></div></div>
   <div class="lab" data-lab="quant"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section><section class="labsec" id="specdec"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Speculative decoding</span><h2>Speculative decoding, on one clock</h2><p class="lede">A draft model guesses several tokens; the target verifies them in one pass. Move the acceptance rate and the draft length and find the best k.</p></div></div>
+  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Speculative decoding</span><h2>Speculative decoding</h2><p class="lede">A draft model proposes several tokens and the main model checks them in one pass. Adjust the acceptance rate and draft length to find the best setting.</p></div></div>
   <div class="lab" data-lab="specdec"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section><section class="labsec" id="edgefit"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Edge fit</span><h2>Will it fit on the device?</h2><p class="lede">Weights, KV cache, the vision encoder and the runtime reserve, against what a Jetson, a phone or a Pi really has free. Add an on-device fine-tune and see if it still fits.</p></div></div>
+  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Edge fit</span><h2>Will it fit on the device?</h2><p class="lede">Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi. You can also check whether on-device fine-tuning would fit.</p></div></div>
   <div class="lab" data-lab="edgefit"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section><section class="cta2" id="contact"><div class="wrap cta2-in">
-  <div class="cta2-copy"><span class="k">Get started</span><h2>Want the measured number?</h2><p class="lede">These are first-order estimates. Book a review and we'll tell you what your model will really do on your hardware, and what it would take to hit your target.</p>
+  <div class="cta2-copy"><span class="k">Get started</span><h2>Want real numbers?</h2><p class="lede">These demos give rough estimates. On a review call we'll look at your actual model and hardware and tell you what's realistic.</p>
     <div class="hero-cta"><a class="btn btn-p" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener"><svg class="ic"><use href="#i-calendar"/></svg>Book an inference review</a><a class="btn btn-s" href="mailto:hello@vitalops.ai"><svg class="ic"><use href="#i-send"/></svg>hello@vitalops.ai</a></div></div>
   <ol class="cta2-steps">
-    <li><b><svg class="ic"><use href="#i-calendar"/></svg>Review</b><span>Free, 30 minutes. Your model, your hardware and your target; an honest estimate back.</span></li>
-    <li><b><svg class="ic"><use href="#i-flask-conical"/></svg>Sprint</b><span>Two weeks, fixed fee, on your hardware. If we don't beat your baseline, you don't pay.</span></li>
-    <li><b><svg class="ic"><use href="#i-server"/></svg>Run</b><span>Serve, monitoring and continuous re-optimisation, with an SLO we sign.</span></li>
+    <li><b><svg class="ic"><use href="#i-calendar"/></svg>Review</b><span>A free 30-minute call. We look at your model, hardware and target and give you an honest estimate.</span></li>
+    <li><b><svg class="ic"><use href="#i-flask-conical"/></svg>Sprint</b><span>Two weeks at a fixed fee, on your hardware. If we can't beat your current setup, you don't pay.</span></li>
+    <li><b><svg class="ic"><use href="#i-server"/></svg>Run</b><span>We run Serve and monitoring for you and keep re-tuning as traffic changes, under an agreed SLO.</span></li>
   </ol>
 </div></section>
 </main>
 <footer class="vfoot"><div class="wrap">
   <div class="foot-grid">
     <div class="foot-brand"><a class="logo" href="../"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps</a>
-      <p>Inference engineering: plan, optimise, serve and run open-weight models on the hardware you choose.</p>
+      <p>We make open-weight models run faster and cheaper, on GPU clusters and on devices.</p>
       <p class="foot-soc"><a href="https://github.com/vitalops" target="_blank" rel="noopener" aria-label="GitHub"><svg class="lg" style="color:#181717"><use href="#l-github"/></svg></a><a href="https://x.com/vitalopsai" target="_blank" rel="noopener" aria-label="X">X</a><a href="mailto:hello@vitalops.ai">hello@vitalops.ai</a></p></div>
     <div><h4>Products</h4><a href="../products/plan/">Plan</a><a href="../products/optimize/">Optimize</a><a href="../products/sim/">Sim</a><a href="../products/serve/">Serve</a><a href="../products/edge/">Edge</a><a href="../products/fleet/">Fleet</a></div>
     <div><h4>Solutions</h4><a href="../solutions/llm-apis/">LLM products and APIs</a><a href="../solutions/agents/">AI agents</a><a href="../solutions/multimodal/">Vision and multimodal</a><a href="../solutions/robotics/">Robotics and devices</a><a href="../solutions/gpu-clouds/">GPU clouds</a><a href="../solutions/on-prem/">Regulated and on-prem</a></div>

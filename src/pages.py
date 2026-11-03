@@ -36,11 +36,11 @@ SOLUTIONS = {
  "on-prem":    dict(name="Regulated and on-prem", icon="shield-check", short="Air-gapped, in your data centre"),
 }
 DEMOS = {
- "planner":  ("Capacity planner", "How many GPUs, of which kind, and what each million tokens costs.", "gauge"),
- "batching": ("Batching simulator", "Why the scheduler decides your time to first token.", "layers"),
- "quant":    ("Quantisation lab", "What FP8, INT4 and NVFP4 do to real weight distributions.", "boxes"),
- "specdec":  ("Speculative decoding", "Draft, verify, and the speed-up you get per acceptance rate.", "zap"),
- "edgefit":  ("Edge fit", "The largest model that fits a Jetson, a phone or a Pi.", "smartphone"),
+ "planner":  ("Capacity planner", "Estimate GPU count and cost per million tokens for a model and traffic level.", "gauge"),
+ "batching": ("Batching simulator", "See how the batching strategy changes time to first token.", "layers"),
+ "quant":    ("Quantisation lab", "Compare FP8, INT4 and NVFP4 error on a layer with outlier weights.", "boxes"),
+ "specdec":  ("Speculative decoding", "See how acceptance rate and draft length affect the speed-up.", "zap"),
+ "edgefit":  ("Edge fit", "Check whether a model fits on a Jetson, a phone or a Raspberry Pi.", "smartphone"),
 }
 
 # ───────────────────────── shell ─────────────────────────
@@ -120,7 +120,7 @@ def footer(root):
     return f"""<footer class="vfoot"><div class="wrap">
   <div class="foot-grid">
     <div class="foot-brand"><a class="logo" href="{root or './'}"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps</a>
-      <p>Inference engineering: plan, optimise, serve and run open-weight models on the hardware you choose.</p>
+      <p>We make open-weight models run faster and cheaper, on GPU clusters and on devices.</p>
       <p class="foot-soc"><a href="https://github.com/vitalops" target="_blank" rel="noopener" aria-label="GitHub">{lg("github")}</a><a href="https://x.com/vitalopsai" target="_blank" rel="noopener" aria-label="X">X</a><a href="mailto:{MAIL}">{MAIL}</a></p></div>
     <div><h4>Products</h4>{col(PRODUCTS, "products")}</div>
     <div><h4>Solutions</h4>{col(SOLUTIONS, "solutions")}</div>
@@ -130,17 +130,17 @@ def footer(root):
   <p class="foot-legal">© <span id="yr">2026</span> VitalOps Inc · vitalops.ai</p>
 </div></footer>"""
 
-CTA_DEFAULT = ("What's the number you need to hit?",
-               "Tokens per second, time to first token, a memory budget, a cost per million tokens. Bring it and the model. In 30 minutes we'll tell you whether it's reachable and what it would take.")
+CTA_DEFAULT = ("Tell us what you need the model to do",
+               "Send us the model, the hardware and your target, whether that's tokens per second, latency, memory or cost. In a 30-minute call we'll tell you whether we think it's doable and roughly what it would take.")
 def cta(h2=None, lede=None):
     h2, lede = h2 or CTA_DEFAULT[0], lede or CTA_DEFAULT[1]
     return f"""<section class="cta2" id="contact"><div class="wrap cta2-in">
   <div class="cta2-copy"><span class="k">Get started</span><h2>{h2}</h2><p class="lede">{lede}</p>
     <div class="hero-cta"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}Book an inference review</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div>
   <ol class="cta2-steps">
-    <li><b>{ic("calendar")}Review</b><span>Free, 30 minutes. Your model, your hardware and your target; an honest estimate back.</span></li>
-    <li><b>{ic("flask-conical")}Sprint</b><span>Two weeks, fixed fee, on your hardware. If we don't beat your baseline, you don't pay.</span></li>
-    <li><b>{ic("server")}Run</b><span>Serve, monitoring and continuous re-optimisation, with an SLO we sign.</span></li>
+    <li><b>{ic("calendar")}Review</b><span>A free 30-minute call. We look at your model, hardware and target and give you an honest estimate.</span></li>
+    <li><b>{ic("flask-conical")}Sprint</b><span>Two weeks at a fixed fee, on your hardware. If we can't beat your current setup, you don't pay.</span></li>
+    <li><b>{ic("server")}Run</b><span>We run Serve and monitoring for you and keep re-tuning as traffic changes, under an agreed SLO.</span></li>
   </ol>
 </div></section>"""
 
@@ -202,7 +202,7 @@ def row(no, title, para, fig, bullets, link=None, flip=None):
 def lab_block(key, k=None, h2=None, lede=None, id_=None):
     t, d, i = DEMOS[key]
     return f"""<section class="labsec" id="{id_ or 'demo-' + key}"><div class="wrap">
-  <div class="labsec-head"><div><span class="k">{ic("play")}{k or "Live demo · runs in your browser"}</span><h2>{h2 or t}</h2><p class="lede">{lede or d}</p></div></div>
+  <div class="labsec-head"><div><span class="k">{ic("play")}{k or "Live demo"}</span><h2>{h2 or t}</h2><p class="lede">{lede or d}</p></div></div>
   <div class="lab" data-lab="{key}"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section>"""
 
@@ -216,7 +216,7 @@ def chips(items):
 
 LOGOS = [("NVIDIA", "nvidia"), ("AMD", "amd"), ("Apple silicon", "apple"), ("Qualcomm", "qualcomm"), ("Arm", "arm"), ("Raspberry Pi", "raspberrypi"),
          ("PyTorch", "pytorch"), ("Hugging Face", "huggingface"), ("Kubernetes", "kubernetes"), ("Llama", "meta"), ("Qwen", "qwen"), ("DeepSeek", "deepseek"), ("Mistral", "mistralai"), ("Gemma", "google")]
-def logo_strip(title="Runs on the hardware and the stack you already have"):
+def logo_strip(title="Hardware and software we support"):
     items = "".join(f"<span>{lg(s)}{t}</span>" for t, s in LOGOS)
     return f'<section class="logos"><div class="wrap"><p>{title}</p><div class="logo-row"><div class="logo-track">{items}{items.replace("<span>", "<span aria-hidden=\"true\">")}</div></div></div></section>'
 
@@ -226,7 +226,7 @@ def vig(k):
     if k == "plan":
         bars = "".join(f'<g class="pb pb{i}"><text x="14" y="{30 + i * 26}">{n}</text><rect class="tr" x="58" y="{21 + i * 26}" width="150" height="12" rx="3"/><rect class="fl" x="58" y="{21 + i * 26}" width="{w}" height="12" rx="3"/><text class="v" x="{66 + w}" y="{31 + i * 26}">{c}</text></g>'
                        for i, (n, w, c) in enumerate((("L40S", 132, "$0.61"), ("H100", 92, "$0.31"), ("H200", 70, "$0.24"), ("B200", 84, "$0.27"))))
-        return f'<svg viewBox="0 0 260 130" class="vg vg-plan" aria-hidden="true">{bars}<path class="ck" d="M232 73l5 5 9-10"/><text class="cap" x="14" y="124">$ per 1M tokens at your peak · H200 wins</text></svg>'
+        return f'<svg viewBox="0 0 260 130" class="vg vg-plan" aria-hidden="true">{bars}<path class="ck" d="M232 73l5 5 9-10"/><text class="cap" x="14" y="124">$ per 1M tokens at peak traffic</text></svg>'
     if k == "optimize":
         pts = [(18, 92), (64, 92), (64, 70), (108, 70), (108, 62), (156, 62), (156, 38), (206, 38), (206, 26), (246, 26)]
         d = "M" + " L".join(f"{x} {y}" for x, y in pts)
@@ -244,20 +244,20 @@ def vig(k):
             '<g class="alert"><circle cx="140" cy="26" r="5"/><text x="150" y="22">alert · prefix hit 71% → 44%</text></g><g class="fix"><rect x="14" y="98" width="232" height="22" rx="5"/><text x="24" y="113">fix proposed · chunked prefill · canary 10%</text></g></svg>')
 
 STAGES = [
- dict(k="plan", n="01", t="Plan", h="Size it before you buy it", photo="racks-art",
-      d="Pick the hardware, the count and the contract from your traffic, not from a vendor's benchmark. Plan simulates your workload on every GPU in the catalogue and prices each option, so the purchase order is a decision you can defend.",
+ dict(k="plan", n="01", t="Plan", h="Choose the hardware", photo="racks-art",
+      d="Plan simulates your traffic on each GPU type you're considering and prices the result. You can compare options on latency and cost per million tokens before committing to a purchase or a cloud contract.",
       dl=["GPU type and count per SLO", "Cost per million tokens by option", "Buy-versus-rent break-even", "Headroom for next year's traffic"],
       res=[("−38%", "hardware spend against the first quote"), ("±8%", "forecast against measured throughput")], prods=["plan", "sim"]),
- dict(k="optimize", n="02", t="Optimise", h="Make it fast, keep it right", photo="racks-teal",
-      d="Optimize searches the serving engine, quantisation, scheduling, speculative decoding and kernels for your model on your target, and holds every candidate to your accuracy floor. The result is a reproducible bundle, not a tuning diary.",
+ dict(k="optimize", n="02", t="Optimise", h="Tune the model and server", photo="racks-teal",
+      d="Optimize tries changes to the serving engine, quantisation, scheduling, speculative decoding and kernels on your target GPU. Each change is checked against your eval set, and the best configuration is saved as a bundle that can be rerun.",
       dl=["Verified configuration bundle", "Custom kernels, SASS-checked", "Eval report against your floor", "Draft model trained on your traffic"],
       res=[("3.3×", "throughput on the same GPUs"), ("0", "points below your accuracy floor")], prods=["optimize", "sim"]),
- dict(k="deploy", n="03", t="Deploy", h="Ship it as a canary", photo="gpu-cluster",
-      d="The bundle goes to Serve, in your cloud or data centre, as a canary with instant rollback, or to Edge, exported and signed for every device in the fleet. What you optimised is exactly what runs.",
+ dict(k="deploy", n="03", t="Deploy", h="Roll it out", photo="gpu-cluster",
+      d="Serve deploys the bundle to your cloud or data centre as a canary, with one-click rollback. For devices, Edge exports and signs the model for each target. Production runs the same configuration that was benchmarked.",
       dl=["OpenAI-compatible endpoints", "Canary rollouts and rollback", "Device exports: GGUF, MLX, ExecuTorch, TensorRT", "Signed over-the-air updates"],
       res=[("Seconds", "to roll back a release"), ("1", "endpoint for every model you run")], prods=["serve", "edge"]),
- dict(k="operate", n="04", t="Operate", h="Hold the SLO as traffic changes", photo="racks-dark",
-      d="Monitoring reads inference in the numbers that decide the bill: time to first token, tokens per second, KV-cache hit rate, cost per million tokens and quality drift. When something moves, the fix comes back through Optimize; Fleet keeps agent swarms within budget.",
+ dict(k="operate", n="04", t="Operate", h="Monitor and adjust", photo="racks-dark",
+      d="Monitoring tracks time to first token, tokens per second, KV-cache hit rate, cost per million tokens and output quality. When something gets worse it suggests a fix, which can go back through Optimize. Fleet handles scheduling for agent workloads.",
       dl=["Inference-native dashboards and alerts", "Alerts with a proposed fix", "Continuous re-optimisation", "Capacity checks before a launch"],
       res=[("< 1 h", "from a regression to a proposed fix"), ("−69%", "cost per million tokens over a year")], prods=["serve", "fleet"]),
 ]
@@ -275,9 +275,9 @@ def lifecycle():
   <div class="lc-b"><h4>Products</h4><div class="lc-pr">{pr}</div></div>
 </div>""")
     return f"""<section class="life" id="lifecycle"><div class="wrap">
-  {sec_head("Across the model's life", "From GPU budget to production SLO.", "Pick a stage to see what you get from it, what changes, and which products do the work.")}
+  {sec_head("How it fits together", "From buying hardware to running in production", "Click a stage to see what it produces and which products are involved.")}
   <div class="lc"><div class="lc-rail" role="tablist" aria-label="Lifecycle stages">{rail}</div>{"".join(panels)}</div>
-  <p class="lc-also">The same four stages apply wherever the model runs: <a href="{{R}}solutions/gpu-clouds/">GPU clouds and data centres {ic("arrow-up-right")}</a> <a href="{{R}}solutions/robotics/">devices in the field {ic("arrow-up-right")}</a></p>
+  <p class="lc-also">This works the same way for data-centre GPUs and for edge devices: <a href="{{R}}solutions/gpu-clouds/">GPU clouds and data centres {ic("arrow-up-right")}</a> <a href="{{R}}solutions/robotics/">devices in the field {ic("arrow-up-right")}</a></p>
 </div></section>"""
 
 # ───────────────────────── the Plan screen ─────────────────────────
@@ -335,93 +335,93 @@ def product_pages():
     SP = screen_plan()
     data = {
      "plan": dict(photo="racks-art", k="Plan · capacity and hardware planning",
-        h1="Know the GPU bill before you sign it.",
-        lede="Plan simulates your traffic on every accelerator in the catalogue, with your model, your SLO and the configuration Optimize would ship, and prices each option. You choose the hardware, the count and the contract from numbers you can defend.",
-        metrics=[("−38%", "hardware spend against the first quote"), ("±8%", "forecast against measured throughput"), ("40+", "accelerators and cloud SKUs modelled"), ("Minutes", "per scenario, not a month of benchmarking")],
-        rows=[("01 · Scenarios", "Every option, simulated on your traffic", "Describe the workload once: model, prompt and output lengths, arrival pattern, growth and the SLO. Plan runs a discrete-event simulation of the serving engine on each GPU and cloud SKU and returns throughput, latency at the tail, power and cost side by side.", SP,
-               [("check", "Options that miss the SLO are marked before anyone gets a quote."), ("check", "Cost per million tokens, not cost per GPU-hour."), ("check", "Buy, reserve or rent, with the break-even month.")])],
-        demo=("planner", "Plan, in miniature", "Pick a model, a GPU and your traffic. The estimate uses the same first-order physics Plan starts from: decode is bound by memory bandwidth, prefill by compute."),
-        feats=[("database", "A catalogue that knows the quirks", "H100 to B200, MI300X, L40S, consumer cards and edge modules, with the details that change answers: NVLink domains, HBM sizes, FP8 and FP4 support, and real interconnect bandwidth."),
-               ("trending-up", "Traffic that grows", "Seasonality, launches and growth curves. Plan tells you when the cluster runs out of headroom, not just whether it fits today."),
-               ("badge-check", "Calibrated against measurements", "Every forecast is checked against Optimize runs on real hardware; the error is reported with the plan.")],
+        h1="Compare GPU options against your own traffic",
+        lede="Plan models how your workload would run on each GPU and cloud instance you're considering, using your model, your latency target and the settings Optimize would use. You get throughput, latency and cost for each option, so the hardware decision is based on numbers.",
+        metrics=[("−38%", "hardware spend compared with the first quote"), ("±8%", "forecast error against measured throughput"), ("40+", "GPUs and cloud instance types"), ("Minutes", "to run a scenario")],
+        rows=[("01 · Scenarios", "Compare options side by side", "You describe the workload once: the model, prompt and output lengths, arrival rate, expected growth and latency target. Plan simulates the serving engine on each GPU and cloud instance and shows throughput, tail latency, power and cost in one table.", SP,
+               [("check", "Options that miss the latency target are flagged."), ("check", "Costs are shown per million tokens as well as per GPU-hour."), ("check", "Buying, reserving and renting are compared, including when buying pays off.")])],
+        demo=("planner", "Try a simplified version", "Choose a model, a GPU and a traffic level. This demo uses rough estimates, where decode speed is limited by memory bandwidth and prefill by compute. Plan itself runs a full simulation."),
+        feats=[("database", "Detailed hardware catalogue", "Covers H100 to B200, MI300X, L40S, consumer cards and edge modules, including the details that affect results, such as NVLink, memory size, FP8 and FP4 support and interconnect bandwidth."),
+               ("trending-up", "Traffic growth", "Add seasonality, launches and growth, and Plan shows when you would run out of capacity."),
+               ("badge-check", "Checked against real runs", "Forecasts are compared with Optimize runs on real hardware, and the error is included in the report.")],
         works="NVIDIA H100, H200, B200, GB200, L40S, L4 · AMD MI300X, MI325X · AWS, Google Cloud, Azure, CoreWeave, Lambda and on-prem price books · vLLM, SGLang and TensorRT-LLM performance models.",
-        faq=[("Is Plan a spreadsheet?", "No. It runs a discrete-event simulation of the serving engine, scheduler and KV cache against your traffic, using performance models calibrated on measured runs. The spreadsheet view is an export."),
-             ("Does it include the optimisation?", "Yes. Each option is simulated with the configuration Optimize would ship on that hardware, so you don't buy for an unoptimised baseline."),
-             ("Can it plan for edge devices?", "Yes. Edge fits use the same models: memory, bandwidth and power per device, with the largest model that meets your accuracy floor.")]),
+        faq=[("Is Plan a spreadsheet?", "No. It simulates the serving engine, scheduler and KV cache against your traffic, using performance models calibrated on measured runs. You can export the results to a spreadsheet."),
+             ("Does it account for optimisation?", "Yes. Each option is simulated with the settings Optimize would use on that hardware, so you aren't sizing for an untuned setup."),
+             ("Can it plan for edge devices?", "Yes. Edge uses the same performance models, with memory, bandwidth and power per device, to find the largest model that meets your accuracy threshold.")]),
      "optimize": dict(photo="racks-teal", k="Optimize · agentic inference optimisation",
-        h1="The same model, three times the tokens per second.",
-        lede="Give Optimize a model, a GPU target, an SLO and your eval set. An agent searches the serving engine, quantisation, parallelism, scheduling, speculative decoding and custom kernels, and every candidate is held to your accuracy floor.",
-        metrics=[("3.3×", "throughput on the sample run, same GPUs"), ("−55%", "time to first token at p99"), ("84.1", "accuracy held above the 83.5 floor"), ("2 h 14 m", "of search, not weeks of trial and error")],
-        rows=[("01 · Runs", "Every run, ranked against the number you need", "The runs list shows each model and target with its best verified result, the speed-up against the baseline and whether it held the accuracy floor. Ship to Serve is one click.", g["SCREEN_HERO"],
-               [("check", "Weeks of trial and error become one run with a report."), ("check", "Every speed-up is tied to an accuracy number."), ("check", "A reproducible bundle anyone on the team can rerun.")]),
-              ("02 · Search", "A search you can read, candidate by candidate", "Each candidate is a concrete change: fp8 weights and KV cache, chunked prefill, an EAGLE-3 draft trained on your traffic, a fused kernel. Each is measured on the target GPU and evaluated with several seeds; anything below the floor is rejected, however fast.", g["SCREEN_OPT"],
-               [("check", "INT4 tried and rejected when the eval says so."), ("check", "Kernels verified numerically and at SASS level."), ("check", "The best configuration exported as a bundle.")])],
-        demo=("quant", "What quantisation does to the weights", "Real FP8, INT8, INT4 and NVFP4 rounding on a synthetic layer with outlier channels. Optimize makes the same trade on your weights, then checks it on your eval set."),
-        demo2=("specdec", "Speculative decoding, on one clock", "A small draft model guesses tokens; the target verifies them in one pass. Optimize trains the draft on your traffic, which is what moves the acceptance rate."),
-        feats=[("sliders-horizontal", "The whole stack, not just flags", "Engine choice and flags, weight and KV quantisation, tensor and pipeline parallelism, batching and prefill policy, speculative decoding, CUDA graphs, torch.compile and custom kernels."),
-               ("flask-conical", "Your eval is the judge", "Bring lm-eval tasks or your own set. You set the floor; Optimize reports accuracy with every throughput number and never ships below it."),
-               ("package", "Bundles, not tuning notes", "The winning configuration, kernels and draft model are packaged with the exact engine version, so Serve runs what was measured.")],
+        h1="Get more throughput from the same model and GPUs",
+        lede="You give Optimize a model, a target GPU, a latency target and an eval set. It tries changes to the serving engine, quantisation, parallelism, scheduling, speculative decoding and kernels, and only keeps the ones that stay above your accuracy threshold.",
+        metrics=[("3.3×", "throughput in a sample run, same GPUs"), ("−55%", "lower p99 time to first token"), ("84.1", "accuracy, above an 83.5 threshold"), ("2 h 14 m", "search time on two H100s")],
+        rows=[("01 · Runs", "All runs in one list", "The runs list shows each model and GPU with its best verified result, the speed-up over the baseline and whether it stayed above the accuracy threshold. You can send a result to Serve from here.", g["SCREEN_HERO"],
+               [("check", "One run and a report instead of weeks of manual tuning."), ("check", "Each speed-up is reported with its accuracy score."), ("check", "Results are saved as bundles anyone on the team can rerun.")]),
+              ("02 · Search", "See what was tried", "Each candidate is a specific change, such as fp8 weights and KV cache, chunked prefill, an EAGLE-3 draft model trained on your traffic, or a fused kernel. Each one is benchmarked on the target GPU and evaluated over several seeds. Anything below the accuracy threshold is rejected.", g["SCREEN_OPT"],
+               [("check", "In this run, INT4 was tried and rejected by the eval."), ("check", "Custom kernels are checked numerically and at the SASS level."), ("check", "The best configuration is exported as a bundle.")])],
+        demo=("quant", "Quantisation, up close", "This applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels. Optimize does the same with your weights and then checks the result on your eval set."),
+        demo2=("specdec", "Speculative decoding", "A small draft model proposes several tokens and the main model checks them in one pass. Optimize trains the draft model on your traffic, which raises the acceptance rate."),
+        feats=[("sliders-horizontal", "Covers the whole stack", "Engine choice and settings, weight and KV-cache quantisation, tensor and pipeline parallelism, batching and prefill settings, speculative decoding, CUDA graphs, torch.compile and custom kernels."),
+               ("flask-conical", "Your evals decide", "Use lm-eval tasks or your own test set and set a minimum score. Accuracy is reported next to every throughput number, and nothing below the minimum ships."),
+               ("package", "Reproducible results", "The winning settings, kernels and draft model are packaged with the exact engine version, so Serve runs what was benchmarked.")],
         works="vLLM, SGLang, TensorRT-LLM, llama.cpp, Hugging Face Transformers · lm-eval or your own evals · targets: tokens/s, TTFT, TPOT, p99, memory, cost per million tokens.",
-        faq=[("Which models can it speed up?", "Open-weight models and your fine-tunes: Llama, Qwen, DeepSeek, Mistral, Gemma, GLM, Whisper, VLMs, embedding and reranker models."),
-             ("How is the faster model still correct?", "You set an accuracy floor on your eval set. Every candidate is evaluated against it with several seeds, and anything below the floor is rejected. Custom kernels are checked numerically against the reference and inspected at SASS level."),
-             ("Do our weights leave our environment?", "No. Optimize runs in your cloud account or data centre, and evals run where your data already lives.")]),
+        faq=[("Which models can it speed up?", "Open-weight models and your own fine-tunes, including Llama, Qwen, DeepSeek, Mistral, Gemma, GLM, Whisper, vision-language models, and embedding and reranker models."),
+             ("How do you know the faster model is still correct?", "You set a minimum score on your eval set. Every candidate is tested against it over several seeds and rejected if it falls short. Custom kernels are compared numerically with the reference and inspected at the SASS level."),
+             ("Do our weights leave our environment?", "No. Optimize runs in your cloud account or data centre, and evals run where your data already is.")]),
      "sim": dict(photo="racks-dark", k="Sim · a GPU simulator for kernel work",
-        h1="Rank kernels without a GPU attached.",
-        lede="A replacement libcuda.so takes your unchanged binary, loads the cubin into a SASS interpreter and executes the launches on CPU threads under a timing model. You get predicted time per target, a per-instruction stall breakdown and a ranking of candidates, on a laptop or in CI.",
-        metrics=[("0", "GPUs needed to rank candidates"), ("ms → h", "three fidelities, static to cycle-level"), ("ρ 0.9+", "rank correlation reported on every run"), ("6", "NVIDIA architectures modelled")],
-        rows=[("01 · Kernels", "The SASS listing, stall by stall", "Optimize's kernel page shows the SASS the compiler produced for each candidate, with stall shares per instruction, register pressure and occupancy, and the predicted time on each GPU you target.", g["SCREEN_SIM"],
-               [("check", "Kernel work no longer waits for a GPU slot."), ("check", "Agents rank thousands of variants for the cost of CPU time."), ("check", "A performance regression fails CI before it reaches hardware.")]),
-              ("02 · Kernel IDE", "An agent that rewrites the kernel and checks its work", "The agent edits the CUDA or Triton source, recompiles, reads the new SASS, simulates and then verifies the winner on a real GPU before opening a pull request.", g["SCREEN_IDE"],
-               [("check", "Source, SASS and terminal side by side."), ("check", "Every accepted change verified on real hardware."), ("check", "A pull request with the numbers attached.")])],
+        h1="Benchmark CUDA kernels without a GPU",
+        lede="Sim replaces libcuda.so, so your binary runs unchanged. It loads the compiled kernel into a SASS interpreter, runs it on CPU threads with a timing model, and reports the estimated time on each GPU and where each instruction stalls. It runs on a laptop or in CI.",
+        metrics=[("0", "GPUs needed to compare candidates"), ("3", "levels of detail, from milliseconds to hours"), ("0.9+", "rank correlation with real hardware"), ("6", "NVIDIA architectures supported")],
+        rows=[("01 · Kernels", "Kernel analysis", "The kernel page shows the SASS produced for each candidate, with the stall percentage for each instruction, register use, occupancy and the estimated time on each target GPU.", g["SCREEN_SIM"],
+               [("check", "Kernel work doesn't have to wait for a free GPU."), ("check", "Agents can compare thousands of variants on ordinary CPUs."), ("check", "A slower kernel can fail CI before it reaches real hardware.")]),
+              ("02 · Kernel IDE", "Kernel editor with an agent", "The agent edits the CUDA or Triton source, recompiles, reads the new SASS and simulates it. The best version is tested on a real GPU before a pull request is opened.", g["SCREEN_IDE"],
+               [("check", "Source, SASS and terminal in one window."), ("check", "Accepted changes are always tested on real hardware."), ("check", "Pull requests include the benchmark numbers.")])],
         flow=True,
-        feats=[("gauge", "Three fidelities", "Static analysis in milliseconds, sampled simulation in seconds, cycle-level in hours. Use the cheap one to prune and the expensive one to decide."),
-               ("badge-check", "Honest about its error", "Rank correlation against real hardware is reported with every run, and the best candidates are verified on a real GPU before anything ships."),
-               ("git-branch", "Built for CI", "Run on GitHub Actions or any CPU runner. Fail the build when a kernel gets slower on a GPU you don't have in the rack.")],
+        feats=[("gauge", "Three levels of detail", "Static analysis takes milliseconds, sampled simulation takes seconds and cycle-level simulation takes hours. Use the fast ones to narrow the candidates down and the slow one to choose between the last few."),
+               ("badge-check", "Reports its own error", "Each run reports how closely its ranking matches real hardware, and the top candidates are tested on a real GPU before anything ships."),
+               ("git-branch", "Works in CI", "Runs on GitHub Actions or any CPU runner, so a build can fail when a kernel gets slower on a GPU you don't own.")],
         works="CUDA C++, Triton, CUTLASS, PyTorch through a driver shim · KernelBench and TritonBench · GitHub Actions · targets: H100, H200, B200, L40S, RTX 4090 and 5090, Jetson Orin and Thor.",
-        faq=[("What does 'down to the SASS' mean?", "We inspect what the compiler produced: register pressure, spills, occupancy, shared-memory bank conflicts and stall reasons in the SASS the GPU executes. We don't write SASS; ptxas does. We steer it through PTX intrinsics, launch bounds and compiler flags, and check the result."),
-             ("How accurate is a CPU simulation?", "Good enough to rank, which is what it's for. Each run reports its rank correlation against measured hardware, and nothing ships without a real-GPU verification."),
-             ("Does it model AMD GPUs?", "Not yet. Sim models NVIDIA architectures; AMD kernels are tuned on hardware.")]),
+        faq=[("What do you mean by working at the SASS level?", "We look at what the compiler actually produced: register use, spills, occupancy, shared-memory bank conflicts and stall reasons in the SASS. We don't write SASS by hand; ptxas does. We influence it with PTX intrinsics, launch bounds and compiler flags, then check the output."),
+             ("How accurate is a CPU simulation?", "Accurate enough to rank candidates, which is what it's for. Each run reports its rank correlation with real hardware, and nothing ships without a test on a real GPU."),
+             ("Does it model AMD GPUs?", "Not yet. Sim only models NVIDIA architectures for now, so we tune AMD kernels on real hardware.")]),
      "serve": dict(photo="gpu-cluster", k="Serve · model serving and monitoring",
-        h1="Run the optimised model. Watch it in the numbers that decide the bill.",
-        lede="An OpenAI-compatible server built around the bundles Optimize produces: multi-model pools, continuous batching, prefix caching, chunked prefill, speculative decoding and structured output, with canary rollouts and inference-native monitoring. In your cloud or your data centre.",
-        metrics=[("Seconds", "to roll back a release"), ("71%", "prefix-cache hit rate on agent traffic"), ("1", "endpoint for every model you run"), ("Air-gapped", "deployments supported")],
-        rows=[("01 · Pools", "Ship the bundle as a canary, promote when the numbers hold", "Deploy a bundle to a pool, send it ten per cent of the traffic, and compare TTFT, cost and errors against the release it replaces. Promote or roll back in one click.", g["SCREEN_SERVE"],
-               [("check", "The optimised configuration is the one in production."), ("check", "Rollouts you can reverse in seconds."), ("check", "One endpoint for every model you run.")]),
-              ("02 · Monitoring", "Alerts that arrive with the fix", "Generic APM shows CPU and memory. Serve shows TTFT, TPOT, tokens per second, KV-cache hit rate, queue depth, cost per million tokens and quality drift, per model, pool, tenant and prompt template, and hands the fix back to Optimize.", g["SCREEN_MON"],
-               [("check", "The cost of a prompt change, the hour it ships."), ("check", "Sampled evals catch quality regressions."), ("check", "Attaches to existing vLLM, SGLang and TensorRT-LLM deployments.")])],
-        demo=("batching", "Why the scheduler decides your latency", "A discrete-event simulation of a model server. Switch from static to continuous batching, add chunked prefill and prefix caching, and watch time to first token move."),
-        feats=[("network", "OpenAI-compatible", "/v1/chat/completions, /v1/embeddings, tool calls, JSON-schema and grammar-constrained decoding. Point your SDK at a new base URL."),
-               ("git-branch", "Rollouts built in", "Canaries, traffic splits, shadow traffic and instant rollback, with the comparison against the previous release on one screen."),
-               ("chart-line", "Monitoring that knows inference", "Prometheus and OpenTelemetry out, Grafana dashboards included, PagerDuty and Slack alerts with the cause and a proposed fix.")],
+        h1="Serve tuned models and monitor them in production",
+        lede="Serve is an OpenAI-compatible model server that runs Optimize bundles. It supports several models per pool, continuous batching, prefix caching, chunked prefill, speculative decoding and structured output, along with canary rollouts and monitoring. It runs in your cloud account or data centre.",
+        metrics=[("Seconds", "to roll back a release"), ("71%", "prefix-cache hit rate on agent traffic"), ("1", "endpoint for all your models"), ("Air-gapped", "installs supported")],
+        rows=[("01 · Pools", "Canary rollouts", "Deploy a bundle to a pool, send it 10% of traffic, and compare latency, cost and errors with the current release. Then promote it or roll it back.", g["SCREEN_SERVE"],
+               [("check", "Production runs the configuration that was benchmarked."), ("check", "A rollback takes seconds."), ("check", "All models are served from one endpoint.")]),
+              ("02 · Monitoring", "Monitoring", "Serve tracks time to first token, time per output token, tokens per second, KV-cache hit rate, queue depth, cost per million tokens and output quality. You can break these down by model, pool, tenant and prompt template. When a metric gets worse, Serve suggests a fix and can pass it to Optimize.", g["SCREEN_MON"],
+               [("check", "See what a prompt change costs within an hour."), ("check", "Sampled evals flag drops in output quality."), ("check", "Also works with existing vLLM, SGLang and TensorRT-LLM deployments.")])],
+        demo=("batching", "How batching affects latency", "This simulates a model server. Switch between static and continuous batching, then turn on chunked prefill and prefix caching to see how time to first token changes."),
+        feats=[("network", "OpenAI-compatible API", "Supports /v1/chat/completions, /v1/embeddings, tool calls, and JSON-schema and grammar-constrained output. Existing SDKs only need a new base URL."),
+               ("git-branch", "Rollouts", "Canaries, traffic splits, shadow traffic and rollback, with a side-by-side comparison against the previous release."),
+               ("chart-line", "Inference metrics", "Exports to Prometheus and OpenTelemetry, comes with Grafana dashboards, and sends alerts to PagerDuty and Slack.")],
         works="OpenAI SDKs, LangChain and LlamaIndex · Kubernetes and Slurm · NVIDIA and AMD GPUs · Prometheus, OpenTelemetry, Grafana, PagerDuty and Slack.",
-        faq=[("Do we have to use Serve to use Optimize?", "No. Bundles export to stock vLLM, SGLang and TensorRT-LLM. Serve adds the rollouts, the monitoring and the loop back into Optimize."),
-             ("Can it monitor our existing deployment?", "Yes. Monitoring attaches to existing vLLM, SGLang and TensorRT-LLM servers through their metrics endpoints and a lightweight sidecar."),
-             ("Where does it run?", "In your cloud account or data centre, including air-gapped environments. We never see your prompts or completions.")]),
+        faq=[("Do we have to use Serve to use Optimize?", "No. Bundles can be exported to standard vLLM, SGLang and TensorRT-LLM. Serve adds rollouts, monitoring and the link back to Optimize."),
+             ("Can it monitor our existing deployment?", "Yes. It connects to existing vLLM, SGLang and TensorRT-LLM servers through their metrics endpoints and a small sidecar."),
+             ("Where does it run?", "In your cloud account or data centre, including air-gapped environments. We don't see your prompts or outputs.")]),
      "edge": dict(photo="jetson-board", k="Edge · on-device models and training", pos="center 40%",
-        h1="The largest model that fits, on every device, kept up to date.",
-        lede="Each device gets the largest model that meets your accuracy floor inside its memory and latency budget. Where data can't leave the device, fine-tuning runs on it, and the adapter is pushed to every device on the same base.",
-        metrics=[("3B", "vision-language model on an 8 GB Jetson"), ("18 MB", "adapter pushed over the air"), ("+2.3 pts", "eval gain from on-device QLoRA"), ("0 bytes", "of training data leaving the device")],
-        rows=[("01 · Devices", "A fleet of phones, Pis and Jetsons, each with its own fit", "Edge tracks every device with the model it serves, its tokens per second and its memory headroom, and runs fine-tunes where the data lives.", g["SCREEN_EDGE"],
-               [("check", "A model that didn't fit now runs on a phone, a Pi or a Jetson."), ("check", "Accuracy is measured after every compression step."), ("check", "Signed, staged over-the-air updates.")])],
-        demo=("edgefit", "Will it fit?", "Pick a device and a model. Weights, KV cache, the vision encoder and the runtime reserve, against the memory the device really has."),
-        feats=[("boxes", "Compression with a guard", "Quantise weights, KV cache and the vision encoder, prune a couple of layers, and measure accuracy after every step; stop when the floor is reached."),
-               ("brain", "Training on the device", "QLoRA within the memory budget, with gradient checkpointing, a live loss curve and the expected eval gain before the job starts."),
-               ("upload", "Exports for every runtime", "GGUF, MLX, ExecuTorch, Core ML, QNN and TensorRT, signed and versioned, with staged rollouts across the fleet.")],
+        h1="Run larger models on phones, Jetsons and Raspberry Pis",
+        lede="Edge finds the largest model that stays above your accuracy threshold within each device's memory and latency limits. If data can't leave the device, it can fine-tune there and push the resulting adapter to every device running the same base model.",
+        metrics=[("3B", "vision-language model on an 8 GB Jetson"), ("18 MB", "adapter update sent over the air"), ("+2.3 pts", "eval improvement from on-device QLoRA"), ("0 bytes", "of training data sent off the device")],
+        rows=[("01 · Devices", "Device fleet", "Edge lists every device with the model it runs, its tokens per second and its free memory, and can run fine-tuning jobs on the devices that hold the data.", g["SCREEN_EDGE"],
+               [("check", "Models that didn't fit before can run on a phone, a Pi or a Jetson."), ("check", "Accuracy is checked after each compression step."), ("check", "Updates are signed and rolled out in stages.")])],
+        demo=("edgefit", "Check whether a model fits", "Choose a device and a model to see how the weights, KV cache, vision encoder and runtime overhead compare with the memory actually available."),
+        feats=[("boxes", "Compression with accuracy checks", "Quantise the weights, KV cache and vision encoder, prune layers if needed, and check accuracy after each step. Edge stops before the model drops below your threshold."),
+               ("brain", "On-device training", "QLoRA fine-tuning within the device's memory using gradient checkpointing, with a live loss curve and an estimate of the improvement before you start."),
+               ("upload", "Export formats", "GGUF, MLX, ExecuTorch, Core ML, QNN and TensorRT, signed and versioned, with staged rollouts.")],
         works="NVIDIA Jetson Orin and Thor · iPhone and Apple silicon · Pixel and Android NPUs · Qualcomm Snapdragon and Dragonwing · Raspberry Pi 5 with Hailo · x86 and Arm CPUs.",
-        faq=[("Can you really train on the edge device?", "For many devices, yes. QLoRA fine-tunes of 1–8B models fit within the memory of a Jetson Orin, an Apple M-series machine or a workstation GPU. Edge plans the job within the device's budget and tells you the time and the expected eval gain before it starts."),
-             ("What about devices with an NPU?", "Exports target Qualcomm QNN, Apple's Neural Engine through Core ML, and Hailo on the Raspberry Pi, with the same accuracy check after conversion.")]),
+        faq=[("Can you really train on the edge device?", "On many devices, yes. QLoRA fine-tunes of 1–8B models fit in the memory of a Jetson Orin, an Apple M-series machine or a workstation GPU. Edge plans the job to fit the device and estimates the time and the improvement before it starts."),
+             ("What about devices with an NPU?", "Edge exports to Qualcomm QNN, to Apple's Neural Engine through Core ML, and to Hailo on the Raspberry Pi, and checks accuracy again after conversion.")]),
      "fleet": dict(photo="racks-art", k="Fleet · agent fleets on your GPUs",
-        h1="Run N agents on M GPUs, on your premises.",
-        lede="Agent workloads don't look like chat: long shared prefixes, bursts of parallel sub-agents and long idle gaps while tools run. Fleet schedules a swarm of agents across your GPUs with KV-aware routing, prefix sharing between agents and preemption while an agent waits on a tool.",
-        metrics=[("12×", "more agents per GPU than naive serving"), ("8 → 96", "agents with one command"), ("64%", "of prompt tokens served from shared prefixes"), ("Air-gapped", "by default")],
-        rows=[("01 · Agents", "A GPU map you can schedule against", "Every GPU with its agents, utilisation and KV cache, the scheduler's decisions as they happen, and a capacity check that tells you where the SLO breaks before you scale.", g["SCREEN_FLEET"],
-               [("check", "More agents per GPU, because the KV cache stops being thrown away."), ("check", "Scaling means changing one number."), ("check", "A straight answer to how many agents you can run.")])],
-        demo=("batching", "Prefix caching, on agent traffic", "Choose the Agents traffic shape and switch prefix caching on: shared system prompts and tool schemas stop being recomputed for every call."),
-        feats=[("network", "KV-aware routing", "Requests go to the GPU that already holds their prefix, so a sub-agent burst doesn't recompute the same 20k tokens sixteen times."),
-               ("pause", "Preemption while tools run", "An agent waiting on a tool call yields its slot; its KV cache is kept warm or offloaded, not thrown away."),
-               ("gauge-circle", "Budgets and policies", "Per-team GPU budgets, priorities and quotas, enforced by the scheduler rather than by a spreadsheet.")],
+        h1="Run more AI agents on your own GPUs",
+        lede="Agent workloads behave differently from chat. Agents share long prompts, start sub-agents in bursts and sit idle while tools run. Fleet schedules agents across your GPUs, sends requests to GPUs that already have their prompt cached, and frees an agent's slot while it waits on a tool.",
+        metrics=[("12×", "more agents per GPU than a default setup"), ("8 → 96", "agents, scaled with one command"), ("64%", "of prompt tokens served from shared prefixes"), ("Air-gapped", "by default")],
+        rows=[("01 · Agents", "GPU and agent overview", "See each GPU with its agents, utilisation and KV-cache use, the scheduler's decisions as they happen, and a capacity check that estimates when you would miss the latency target.", g["SCREEN_FLEET"],
+               [("check", "More agents per GPU, because cached prompts are reused."), ("check", "Scaling is a single setting."), ("check", "A clear estimate of how many agents your cluster can handle.")])],
+        demo=("batching", "Prefix caching with agent traffic", "Select the Agents traffic preset and turn on prefix caching. Shared system prompts and tool definitions are then no longer recomputed on every call."),
+        feats=[("network", "Prefix-aware routing", "Requests go to the GPU that already has their prompt prefix cached, so a burst of sub-agents doesn't recompute the same 20k tokens sixteen times."),
+               ("pause", "Pausing during tool calls", "While an agent waits on a tool, its slot is given to another agent and its KV cache is kept in memory or offloaded."),
+               ("gauge-circle", "Budgets and policies", "Set GPU budgets, priorities and quotas per team. The scheduler enforces them.")],
         works="Claude Agent SDK, OpenAI Agents, LangGraph, or your own loop · Kubernetes and Slurm · air-gapped by default.",
-        faq=[("Does Fleet replace our agent framework?", "No. Your agents keep their framework and call an OpenAI-compatible endpoint; Fleet schedules the inference underneath them."),
+        faq=[("Does Fleet replace our agent framework?", "No. Your agents keep using their framework and call an OpenAI-compatible endpoint. Fleet schedules the inference behind it."),
              ("Which models can the agents use?", "Any open-weight model Serve runs, including several at once with per-model pools.")]),
     }
     related = {"plan": ["optimize", "serve", "sim"], "optimize": ["sim", "serve", "plan"], "sim": ["optimize", "plan", "serve"], "serve": ["optimize", "fleet", "edge"], "edge": ["optimize", "plan", "serve"], "fleet": ["serve", "optimize", "plan"]}
@@ -432,15 +432,15 @@ def product_pages():
                      [("btn-w", BOOK, "Book an inference review", "calendar", True)] + ([("btn-g", "#demo-" + d["demo"][0], "Try the live demo", "play", False)] if d.get("demo") else []), d.get("pos", "center"))
         body += '<section class="prows">' + "".join(row(*r) for r in d["rows"]) + "</section>"
         if d.get("flow"):
-            body += f'<section class="flowband"><div class="wrap"><div class="flow-head"><span class="k">How Sim works</span><h2>Python to SASS, then a CPU pretending to be an H100</h2><p class="lede">The kernel compiles exactly as it would for the GPU. Sim interprets the SASS on CPU threads and reports the CPU wall time beside the predicted GPU time.</p></div>{g["FLOW"]}</div></section>'
+            body += f'<section class="flowband"><div class="wrap"><div class="flow-head"><span class="k">How Sim works</span><h2>From Python to SASS, then simulated on a CPU</h2><p class="lede">The kernel is compiled exactly as it would be for the GPU. Sim then runs the SASS on CPU threads and shows how long that took next to the estimated GPU time.</p></div>{g["FLOW"]}</div></section>'
         if d.get("demo"):
             body += lab_block(d["demo"][0], h2=d["demo"][1], lede=d["demo"][2])
         feats = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{x}</p></div>' for i, t, x in d["feats"])
-        body += f'<section class="feats"><div class="wrap">{sec_head("What you get", "Built for the people who carry the pager.")}<div class="feat-grid">{feats}</div><div class="works"><h4>Works with</h4><p>{d["works"]}</p></div></div></section>'
+        body += f'<section class="feats"><div class="wrap">{sec_head("Features", "What's included")}<div class="feat-grid">{feats}</div><div class="works"><h4>Works with</h4><p>{d["works"]}</p></div></div></section>'
         if d.get("demo2"):
             body += lab_block(d["demo2"][0], h2=d["demo2"][1], lede=d["demo2"][2])
         rel = {k: PRODUCTS[k] for k in related[key]}
-        body += f'<section class="related"><div class="wrap">{sec_head("Across the platform", "Works with the rest of VitalOps.")}{cards(rel, "products")}</div></section>'
+        body += f'<section class="related"><div class="wrap">{sec_head("Related", "Other products")}{cards(rel, "products")}</div></section>'
         demos = [x[0] for x in (d.get("demo"), d.get("demo2")) if x]
         page(f"products/{key}/", f"{p['name']} · {p['short']} | VitalOps", d["lede"], f"products/{key}", body, faqs=d["faq"], demos=demos)
 
@@ -449,98 +449,98 @@ def solution_pages():
     g = G
     data = {
      "llm-apis": dict(photo="gpu-cluster", k="Solutions · LLM products and APIs",
-        h1="Serve more users from the GPUs you already pay for.",
-        lede="Chat assistants, copilots and model APIs live or die on time to first token and cost per million tokens. We take the model you trust and make it fast and cheap enough to price your product the way you want.",
-        metrics=[("3.3×", "tokens per second on the same GPUs"), ("−69%", "cost per million tokens"), ("< 400 ms", "TTFT at p99, held at peak")],
-        pains=[("Latency spikes at peak", "Long prompts block short ones and TTFT blows through the SLO exactly when traffic is highest."),
-               ("A bill that scales with success", "Every new customer is another GPU, because the serving stack was never tuned past its defaults."),
-               ("Fear of touching it", "Nobody wants to quantise the model that passed evaluation, so it runs in bf16 forever.")],
-        how=[("plan", "Size the cluster for next year's peak and price every option."), ("optimize", "Search quantisation, scheduling, speculative decoding and kernels under your accuracy floor."), ("serve", "Ship the bundle as a canary and watch TTFT and cost per tenant.")],
-        fig=g["SCREEN_OPT"], fig_t="Every candidate measured and evaluated", demo="batching"),
+        h1="Serve more users on the GPUs you have",
+        lede="For chat assistants, copilots and model APIs, latency and cost per token decide your margins. We take the model you've already validated and make it faster and cheaper to run.",
+        metrics=[("3.3×", "tokens per second on the same GPUs"), ("−69%", "lower cost per million tokens"), ("< 400 ms", "p99 time to first token at peak")],
+        pains=[("Latency spikes at peak", "Long prompts hold up short ones, and time to first token goes over the target when traffic is highest."),
+               ("Costs grow with usage", "Each new customer means another GPU, because the serving setup still uses its default settings."),
+               ("Nobody wants to touch the model", "Teams avoid quantising a model that has passed evaluation, so it stays in bf16.")],
+        how=[("plan", "Size the cluster for next year's peak and compare the cost of each option."), ("optimize", "Test quantisation, scheduling, speculative decoding and kernels against your accuracy threshold."), ("serve", "Roll out the result as a canary and track latency and cost per tenant.")],
+        fig=g["SCREEN_OPT"], fig_t="Each candidate is benchmarked and evaluated", demo="batching"),
      "agents": dict(photo="racks-teal", k="Solutions · AI agents",
-        h1="Agents that share the GPU instead of fighting over it.",
-        lede="Agent traffic has long shared prefixes, bursts of parallel sub-agents and idle gaps while tools run. Chat-shaped serving throws the KV cache away between calls. We schedule for the shape your agents actually have.",
+        h1="Run more agents on the same hardware",
+        lede="Agent traffic has long shared prompts, bursts of parallel sub-agents and gaps while tools run. Servers built for chat discard the KV cache between calls. We schedule around how agents actually behave.",
         metrics=[("12×", "more agents per GPU"), ("64%", "of prompt tokens from shared prefixes"), ("8 → 96", "agents with one command")],
-        pains=[("The same 20k tokens, recomputed", "System prompts and tool schemas are prefilled again for every step of every agent."),
-               ("Sub-agent bursts", "A planner fans out sixteen workers and the queue explodes for everyone else."),
-               ("Unknown capacity", "Nobody can say how many agents the cluster can run before the SLO breaks.")],
-        how=[("fleet", "Schedule agents across GPUs with KV-aware routing and prefix sharing."), ("serve", "Pool the models your agents call behind one endpoint, with prefix caching on."), ("plan", "Run the capacity check before the launch, not after the incident.")],
+        pains=[("The same prompt, processed again", "System prompts and tool definitions are processed again on every step of every agent."),
+               ("Sub-agent bursts", "When a planner starts sixteen workers at once, everyone else's requests queue up."),
+               ("Unknown capacity", "It's unclear how many agents the cluster can run before latency suffers.")],
+        how=[("fleet", "Schedule agents across GPUs, routing requests to where their prompt is already cached."), ("serve", "Serve the models your agents use from one endpoint, with prefix caching."), ("plan", "Check capacity before a launch.")],
         fig=g["SCREEN_FLEET"], fig_t="Agents per GPU, live", demo="batching"),
      "multimodal": dict(photo="racks-dark", k="Solutions · vision and multimodal",
-        h1="Vision-language models at the speed of a text model.",
-        lede="Document understanding, visual inspection and speech pipelines carry image and audio encoders that most serving stacks treat as an afterthought. We optimise the encoder, the prefill and the decode together.",
+        h1="Faster vision-language and speech models",
+        lede="Document understanding, visual inspection and speech pipelines include image and audio encoders that most serving setups don't optimise. We tune the encoder, prefill and decode together.",
         metrics=[("2.4×", "throughput on a 7B VLM on one L40S"), ("−60%", "image-encoder latency"), ("3.1×", "Whisper requests per second")],
-        pains=[("Encoders on the critical path", "Each image adds thousands of tokens of prefill and an encoder pass before the first word."),
-               ("Memory that disappears", "High-resolution images blow up the KV cache and the batch size collapses."),
-               ("Pipelines, not models", "OCR, layout, VLM and speech are tuned one at a time, never as a system.")],
-        how=[("optimize", "Quantise the vision tower and the language model separately, each under the eval."), ("serve", "Batch encoders and decoders independently, with image-token caching."), ("edge", "Fit the same VLM onto cameras and inspection devices.")],
-        fig=g["SCREEN_HERO"], fig_t="VLMs and speech models among the runs", demo="quant"),
+        pains=[("Encoders add latency", "Each image adds thousands of prefill tokens and an encoder pass before the first output token."),
+               ("Memory runs out", "High-resolution images inflate the KV cache, so batch sizes drop."),
+               ("Components tuned separately", "OCR, layout, VLM and speech models are each tuned on their own rather than as one pipeline.")],
+        how=[("optimize", "Quantise the vision encoder and the language model separately, each checked against the eval."), ("serve", "Batch encoders and decoders separately and cache image tokens."), ("edge", "Run the same VLM on cameras and inspection devices.")],
+        fig=g["SCREEN_HERO"], fig_t="VLM and speech model runs in Optimize", demo="quant"),
      "robotics": dict(photo="robot-plant", k="Solutions · robotics and devices", pos="center 60%",
-        h1="Models that think on the robot, not in the cloud.",
-        lede="Inspection robots, drones, cameras and handhelds need answers without a round trip and without sending data off the device. We fit the largest model that meets your accuracy floor onto the hardware you ship, and keep it learning there.",
+        h1="Run models on the robot instead of in the cloud",
+        lede="Inspection robots, drones, cameras and handheld devices often can't wait for a round trip to the cloud or send data off the device. We fit the largest model that meets your accuracy threshold onto the hardware you ship, and it can keep training there.",
         metrics=[("3B", "VLM on an 8 GB Jetson Orin Nano"), ("< 120 ms", "per decision on device"), ("0 bytes", "of field data leaving the device")],
-        pains=[("Doesn't fit", "The model that passed evaluation needs 16 GB and the module has 8."),
-               ("No connectivity", "Sites with no network can't call a cloud model, and latency budgets are measured in milliseconds."),
-               ("Data you can't move", "Field data is sensitive or simply too large to upload for training.")],
-        how=[("edge", "Compress with an accuracy guard and export for Jetson, Snapdragon, Apple or Hailo."), ("optimize", "Tune the kernels for the module's GPU and memory bandwidth."), ("plan", "Choose the module: the cheapest device that runs the model you need.")],
-        fig=g["SCREEN_EDGE"], fig_t="A fleet of devices, each with its own fit", demo="edgefit"),
+        pains=[("The model is too big", "The model that passed evaluation needs 16 GB and the module has 8."),
+               ("No network", "Some sites have no connection, and latency budgets are measured in milliseconds."),
+               ("Data can't be moved", "Field data is sensitive or too large to upload for training.")],
+        how=[("edge", "Compress with accuracy checks and export for Jetson, Snapdragon, Apple or Hailo."), ("optimize", "Tune kernels for the module's GPU and memory bandwidth."), ("plan", "Find the cheapest device that can run the model you need.")],
+        fig=g["SCREEN_EDGE"], fig_t="Devices and the models running on them", demo="edgefit"),
      "gpu-clouds": dict(photo="aisle-white", k="Solutions · GPU clouds and data centres",
-        h1="More tokens from every GPU you rent out.",
-        lede="Neoclouds, inference providers and enterprise data centres sell throughput. We raise the tokens per second each GPU delivers, help you plan what to buy next, and give your customers serving that's tuned from day one.",
+        h1="Get more tokens out of every GPU you rent out",
+        lede="GPU clouds, inference providers and enterprise data centres sell throughput. We increase tokens per second per GPU, help plan future purchases, and give your customers serving that is already tuned.",
         metrics=[("+2.6×", "median tokens per second per GPU"), ("−38%", "capex against the first quote"), ("40+", "accelerators modelled")],
-        pains=[("Utilisation you can't sell", "GPUs sit at 30% because the serving stack can't keep them busy."),
-               ("Buying blind", "Next quarter's order is placed on vendor benchmarks, not your customers' traffic."),
-               ("Customers who churn on latency", "Tenants move to whoever serves their model fastest.")],
-        how=[("plan", "Model next year's fleet against real tenant traffic, per accelerator."), ("optimize", "Ship tuned bundles for the models your customers run most."), ("serve", "Multi-tenant pools with per-tenant monitoring and cost.")],
+        pains=[("Low utilisation", "GPUs sit at around 30% because the serving stack can't keep them busy."),
+               ("Buying without data", "Hardware orders are based on vendor benchmarks rather than your customers' traffic."),
+               ("Customers leave over latency", "Tenants move to whichever provider serves their model fastest.")],
+        how=[("plan", "Model next year's fleet against real tenant traffic for each GPU type."), ("optimize", "Provide tuned bundles for the models your customers use most."), ("serve", "Run multi-tenant pools with monitoring and cost per tenant.")],
         fig=SCREEN_PLAN_CACHE, fig_t="Hardware options, simulated and priced", demo="planner"),
      "on-prem": dict(photo="technician", k="Solutions · regulated and on-prem",
-        h1="Your models, your data centre, no data leaving it.",
-        lede="Banks, hospitals, governments and manufacturers run open-weight models where the data lives. Everything we ship installs inside your environment, air-gapped if you need it, and our engineers work there too.",
+        h1="Run models in your own data centre",
+        lede="Banks, hospitals, government agencies and manufacturers often need to run open-weight models where their data is. All our software installs inside your environment, including air-gapped networks, and our engineers work there too.",
         metrics=[("0", "prompts or weights leaving your network"), ("Air-gapped", "installs and updates"), ("SSO", "and audit logs on every action")],
-        pains=[("No cloud APIs allowed", "Policy rules out hosted models, so the team inherits the whole serving stack."),
-               ("Hardware that's already bought", "The GPUs are fixed for three years; the models are not."),
-               ("Auditors", "Every model change needs to be traceable to an evaluation and an approval.")],
-        how=[("serve", "Install in your cluster, with SSO, role-based access and audit logs."), ("optimize", "Get the most out of the GPUs you already own, with every change evaluated."), ("fleet", "Run internal agents on premises with budgets per team.")],
+        pains=[("Cloud APIs aren't allowed", "Policy rules out hosted models, so the team has to run the whole serving stack itself."),
+               ("The hardware is fixed", "The GPUs were bought for three years, but the models keep changing."),
+               ("Audit requirements", "Every model change has to be traceable to an evaluation and an approval.")],
+        how=[("serve", "Install in your cluster with SSO, role-based access and audit logs."), ("optimize", "Get more out of the GPUs you own, with every change evaluated."), ("fleet", "Run internal agents on-premises with per-team budgets.")],
         fig=g["SCREEN_SERVE"], fig_t="A pool in your own data centre", demo="planner"),
     }
     for key, d in data.items():
         s = SOLUTIONS[key]
         body = phero(d["photo"], d["k"], d["h1"], d["lede"], d["metrics"], None, d.get("pos", "center"))
         pains = "".join(f'<div class="pain"><span class="pn">{i + 1:02d}</span><h3>{t}</h3><p>{x}</p></div>' for i, (t, x) in enumerate(d["pains"]))
-        body += f'<section class="pains"><div class="wrap">{sec_head("The problem", "What gets in the way.")}<div class="pain-grid">{pains}</div></div></section>'
+        body += f'<section class="pains"><div class="wrap">{sec_head("Common problems", "What usually goes wrong")}<div class="pain-grid">{pains}</div></div></section>'
         how = "".join(f'<a class="hw" href="{{R}}products/{p}/"><span class="pc-i">{ic(PRODUCTS[p]["icon"])}</span><div><b>{PRODUCTS[p]["name"]}</b><p>{t}</p></div>{ic("arrow-up-right")}</a>' for p, t in d["how"])
-        body += f'<section class="howsec"><div class="wrap bleed"><div class="split"><div class="step-copy">{sec_head("How VitalOps helps", "Three products, one bundle.")}<div class="hws">{how}</div></div><div class="step-shot">{d["fig"]}<p class="fig-cap">{d["fig_t"]}</p></div></div></div></section>'
+        body += f'<section class="howsec"><div class="wrap bleed"><div class="split"><div class="step-copy">{sec_head("How we help", "Products involved")}<div class="hws">{how}</div></div><div class="step-shot">{d["fig"]}<p class="fig-cap">{d["fig_t"]}</p></div></div></div></section>'
         body += lab_block(d["demo"], h2=DEMOS[d["demo"]][0])
         others = {k: v for k, v in SOLUTIONS.items() if k != key}
-        body += f'<section class="related"><div class="wrap">{sec_head("Other solutions", "Where else we work.")}{cards(others, "solutions")}</div></section>'
+        body += f'<section class="related"><div class="wrap">{sec_head("More solutions", "Other use cases")}{cards(others, "solutions")}</div></section>'
         page(f"solutions/{key}/", f"{s['name']} | VitalOps", d["lede"], f"solutions/{key}", body, demos=[d["demo"]])
 
 SCREEN_PLAN_CACHE = ""
 
 # ───────────────────────── home ─────────────────────────
 FAQ_HOME = [
- ("Do we have to send you our weights or data?", "No. Everything runs in your cloud account or data centre. Evals run on your data where it already lives. For sprints, our engineers work inside your environment."),
- ("Which models can you speed up?", "Open-weight models and your own fine-tunes: Llama, Qwen, DeepSeek, Mistral, Gemma, GLM, Whisper, VLMs, embedding and reranker models. We can't make a closed API model faster, but we can route, cache and batch around it."),
- ("How do you make sure the faster model is still correct?", "You set an accuracy floor on your eval set. Every candidate configuration is evaluated against it, with several seeds, and anything below the floor is rejected however fast it is. Custom kernels are checked numerically against the reference and inspected at SASS level."),
- ("Can we start with one product?", "Yes. Most teams start with an Optimize sprint on one model, or with Plan before a hardware purchase. Bundles also export to stock vLLM, SGLang and TensorRT-LLM."),
- ("Do you support AMD or non-NVIDIA hardware?", "AMD MI300-class GPUs through ROCm, with kernels written in Triton where possible. Edge covers Apple, Qualcomm, Arm and Hailo targets. Sim currently models NVIDIA GPUs."),
+ ("Do we have to send you our weights or data?", "No. Everything runs in your cloud account or data centre, and evals run on your data where it is. During sprints our engineers work inside your environment."),
+ ("Which models can you speed up?", "Open-weight models and your own fine-tunes, including Llama, Qwen, DeepSeek, Mistral, Gemma, GLM, Whisper, vision-language models, and embedding and reranker models. We can't speed up closed API models, but we can help with routing, caching and batching around them."),
+ ("How do you make sure the faster model is still correct?", "You set a minimum score on your eval set. Every candidate configuration is tested against it over several seeds and rejected if it falls short, however fast it is. Custom kernels are compared numerically with the reference and inspected at the SASS level."),
+ ("Can we start with one product?", "Yes. Most teams start with an Optimize sprint on one model, or use Plan before buying hardware. Bundles can also be exported to standard vLLM, SGLang and TensorRT-LLM."),
+ ("Do you support AMD or non-NVIDIA hardware?", "We support AMD MI300-class GPUs through ROCm, writing kernels in Triton where we can. Edge supports Apple, Qualcomm, Arm and Hailo devices. Sim only models NVIDIA GPUs for now."),
 ]
 
 def home():
     g = G
     hero = phero("racks-teal", "AI inference engineering",
-                 "Make every model <em>fast, small and cheap</em> enough to ship.",
-                 "VitalOps plans, optimises, serves and runs open-weight models on the hardware you choose, from a rack of H100s to a Jetson in the field, with an accuracy floor on every change.",
-                 [("3.3×", "more tokens per second from the same GPUs"), ("−69%", "cost per million tokens"), ("−55%", "time to first token at p99"), ("0 pts", "accuracy lost below your floor")],
+                 "Faster, cheaper inference for <em>open-weight models</em>",
+                 "We help teams plan, tune and run open-weight models on their own hardware, from GPU clusters to Jetson boards. Every change is tested against your evals before it ships.",
+                 [("3.3×", "throughput on the same GPUs in a sample run"), ("−69%", "lower cost per million tokens"), ("−55%", "lower p99 time to first token"), ("84.1", "accuracy, kept above an 83.5 threshold")],
                  [("btn-w", BOOK, "Book an inference review", "calendar", True), ("btn-g", "lab/", "Try the live demos", "play", False)],
                  shot=g["carousel"]([g["SCREEN_HERO"], g["SCREEN_IDE"]], "Optimize · the runs list · a run ships to production as the clip plays"))
     prods = {k: dict(v) for k, v in PRODUCTS.items()}
-    blurbs = {"plan": "Simulate your traffic on every GPU in the catalogue and price each option before you buy.",
-              "optimize": "An agent searches the stack from engine flags to kernels, held to your accuracy floor.",
-              "sim": "A CPU-side GPU simulator that ranks kernels in CI, no GPU attached.",
-              "serve": "OpenAI-compatible serving with canary rollouts and inference-native monitoring.",
-              "edge": "The largest model that fits each device, fine-tuned where the data lives.",
-              "fleet": "Schedule agent swarms across your GPUs with KV-aware routing."}
+    blurbs = {"plan": "Estimates throughput, latency and cost for each GPU option, using your traffic.",
+              "optimize": "Finds the fastest engine settings, quantisation and kernels that still pass your evals.",
+              "sim": "Simulates NVIDIA GPUs on a CPU, so you can benchmark kernels in CI without a GPU.",
+              "serve": "An OpenAI-compatible model server with canary rollouts and inference metrics.",
+              "edge": "Compresses models to fit phones, Jetsons and Pis, and fine-tunes them on the device.",
+              "fleet": "Schedules agent workloads across your GPUs and reuses shared prompt prefixes."}
     for k in prods:
         prods[k]["blurb"] = blurbs[k]
     labs = "".join(f'<a class="lcard" href="lab/#{k}"><span class="pc-i">{ic(i)}</span><b>{t}</b><span>{d}</span><em>{ic("play")}Open</em></a>' for k, (t, d, i) in DEMOS.items())
@@ -552,56 +552,56 @@ def home():
         return html[i:j]
     ladder = cut('<section class="ladder"', "</section>")
     tour = cut('<section class="tour"', '<span id="usecases"></span>').replace('<span id="usecases"></span>', "")
-    svc = cut('<section class="svc"', "</section>").replace("</div>\n</div></section>", f'</div>\n<p class="svc-more"><a class="more" href="services/">All services and how we engage{ic("arrow-up-right")}</a></p></div></section>')
+    svc = cut('<section class="svc"', "</section>").replace("</div>\n</div></section>", f'</div>\n<p class="svc-more"><a class="more" href="services/">All services{ic("arrow-up-right")}</a></p></div></section>')
     clients = cut('<section class="clients"', "</section>")
     body = (hero + logo_strip() + lifecycle()
-            + f'<section class="prods" id="products"><div class="wrap">{sec_head("Products", "Six products, one bundle format.", "Each product works alone. Together, what Plan sizes, Optimize tunes and Serve runs is the same configuration, measured once.")}{cards(prods, "products", root="")}</div></section>'
+            + f'<section class="prods" id="products"><div class="wrap">{sec_head("Products", "What we build", "Each product can be used on its own. Used together, they share one configuration format, so the setup Plan sizes for is the one Optimize tunes and Serve runs.")}{cards(prods, "products", root="")}</div></section>'
             + ladder + tour
-            + f'<section class="labs" id="lab"><div class="wrap">{sec_head("Live demos", "Try the maths in your browser.", "Five interactive tools built on the same first-order physics our products start from. No sign-up, nothing leaves the page.")}<div class="lcards">{labs}</div></div></section>'
-            + f'<section class="sols" id="solutions"><div class="wrap">{sec_head("Solutions", "Wherever the model has to run.")}<div class="scards">{sols}</div></div></section>'
+            + f'<section class="labs" id="lab"><div class="wrap">{sec_head("Live demos", "Interactive demos", "Five small tools that run in your browser with no sign-up. They use rough first-order estimates, the same starting point our products use before measuring on real hardware.")}<div class="lcards">{labs}</div></div></section>'
+            + f'<section class="sols" id="solutions"><div class="wrap">{sec_head("Solutions", "Where we work")}<div class="scards">{sols}</div></div></section>'
             + svc + clients)
-    page("", "VitalOps · AI inference engineering: plan, optimise, serve, run", "VitalOps makes open-weight models fast, small and cheap enough to ship: capacity planning, agentic inference optimisation, a GPU simulator for kernels, serving with monitoring, edge deployment and agent fleets.", "home", body, faqs=FAQ_HOME)
+    page("", "VitalOps · Inference optimisation for open-weight models", "VitalOps helps teams plan, tune and run open-weight models on their own hardware: capacity planning, inference optimisation, a GPU simulator for kernels, serving and monitoring, edge deployment and agent scheduling.", "home", body, faqs=FAQ_HOME)
 
 # ───────────────────────── other pages ─────────────────────────
 def lab_page():
     order = ["planner", "batching", "quant", "specdec", "edgefit"]
     sub = "".join(f'<a href="#{k}">{ic(DEMOS[k][2])}{DEMOS[k][0]}</a>' for k in order)
-    intro = {"planner": "How many GPUs, of which kind, and what each million tokens costs. Decode is bound by memory bandwidth and prefill by compute; this is the first-order model Plan starts from before it simulates your traffic.",
-             "batching": "A discrete-event simulation of a model server. Static batching, continuous batching, chunked prefill and prefix caching, on chat, RAG and agent traffic.",
-             "quant": "Real FP8, INT8, INT4 and NVFP4 rounding on a synthetic layer with outlier channels, the way LLM weights really look. See what grouping and outlier protection buy.",
-             "specdec": "A draft model guesses several tokens; the target verifies them in one pass. Move the acceptance rate and the draft length and find the best k.",
-             "edgefit": "Weights, KV cache, the vision encoder and the runtime reserve, against what a Jetson, a phone or a Pi really has free. Add an on-device fine-tune and see if it still fits."}
-    body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>The physics of inference, in your browser.</h1><p class="lede">Five tools our engineers use to reason about a workload before measuring it. They run entirely on this page: no sign-up, no server, nothing sent anywhere. When you want the real number for your model on your hardware, that's what the products are for.</p><nav class="lsub" aria-label="Demos">{sub}</nav></div></section>"""
+    intro = {"planner": "Estimates how many GPUs you need and the cost per million tokens. It assumes decode is limited by memory bandwidth and prefill by compute, which is where Plan starts before running a full simulation.",
+             "batching": "Simulates a model server using static batching, continuous batching, chunked prefill and prefix caching on chat, RAG and agent traffic.",
+             "quant": "Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights. You can see the effect of group size and outlier protection.",
+             "specdec": "A draft model proposes several tokens and the main model checks them in one pass. Adjust the acceptance rate and draft length to find the best setting.",
+             "edgefit": "Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi. You can also check whether on-device fine-tuning would fit."}
+    body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. For real numbers on your own model and hardware, you would use the products.</p><nav class="lsub" aria-label="Demos">{sub}</nav></div></section>"""
     for k in order:
-        body += lab_block(k, k=f"{DEMOS[k][0]}", h2={"planner": "How many GPUs do you need?", "batching": "Why the scheduler decides your latency", "quant": "What quantisation does to the weights", "specdec": "Speculative decoding, on one clock", "edgefit": "Will it fit on the device?"}[k], lede=intro[k], id_=k)
-    page("lab/", "Live demos · the physics of inference | VitalOps", "Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a quantisation lab, a speculative decoding race and an edge memory fit.", "lab", body, demos=order,
-         cta_args=("Want the measured number?", "These are first-order estimates. Book a review and we'll tell you what your model will really do on your hardware, and what it would take to hit your target."))
+        body += lab_block(k, k=f"{DEMOS[k][0]}", h2={"planner": "How many GPUs do you need?", "batching": "How batching affects latency", "quant": "Quantisation, up close", "specdec": "Speculative decoding", "edgefit": "Will it fit on the device?"}[k], lede=intro[k], id_=k)
+    page("lab/", "Live demos | VitalOps", "Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a quantisation lab, a speculative decoding race and an edge memory fit.", "lab", body, demos=order,
+         cta_args=("Want real numbers?", "These demos give rough estimates. On a review call we'll look at your actual model and hardware and tell you what's realistic."))
 
 def platform_page():
     g = G
     html = g["HTML"]
     i = html.index('<section class="stack"'); j = html.index("</section>", i) + 10
     stack = html[i:j].replace('<span class="k">Stack</span>', '<span class="k">Supported stack</span>')
-    layers = [("Your traffic, models and evals", "Prompts, weights and eval sets stay where they are. VitalOps reads them in place.", "database"),
-              ("Plan", "Sizes hardware against the traffic and the SLO.", "gauge"),
-              ("Optimize and Sim", "Search and verify the configuration; rank kernels on CPU.", "zap"),
+    layers = [("Your traffic, models and evals", "Prompts, weights and eval sets stay where they are, and VitalOps reads them there.", "database"),
+              ("Plan", "Sizes the hardware for your traffic and latency target.", "gauge"),
+              ("Optimize and Sim", "Find and test the best configuration, and compare kernels on CPU.", "zap"),
               ("The bundle", "Engine version, flags, quantised weights, kernels and draft model, measured together.", "package"),
               ("Serve, Edge and Fleet", "Run the bundle on GPUs, devices or agent swarms.", "server"),
-              ("Monitoring", "Reads production and hands regressions back to Optimize.", "chart-line")]
+              ("Monitoring", "Watches production and sends regressions back to Optimize.", "chart-line")]
     ls = "".join(f'<li><span class="pc-i">{ic(i)}</span><div><b>{t}</b><p>{d}</p></div></li>' for t, d, i in layers)
-    deploy = [("Your cloud account", "AWS, Google Cloud, Azure, CoreWeave, Lambda or any Kubernetes cluster. Installed with Helm or Terraform; we never hold your keys.", "cloud"),
+    deploy = [("Your cloud account", "AWS, Google Cloud, Azure, CoreWeave, Lambda or any Kubernetes cluster. Installed with Helm or Terraform. We don't hold your keys.", "cloud"),
               ("Your data centre", "Bare metal or Kubernetes, Slurm for batch work. NVIDIA and AMD GPUs, InfiniBand or Ethernet.", "server"),
-              ("Air-gapped", "Offline installs and signed update bundles, with no call home. Licence checks work offline.", "lock"),
+              ("Air-gapped", "Offline installs and signed updates. Nothing connects back to us, and licence checks work offline.", "lock"),
               ("Devices", "Jetson, Apple, Android, Qualcomm, Raspberry Pi and x86. Signed exports and staged over-the-air updates.", "smartphone")]
     ds = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for t, d, i in deploy)
-    body = phero("aisle-white", "Platform", "One bundle, from plan to production.",
-                 "Every VitalOps product speaks the same unit: a bundle that pins the engine, the configuration, the quantised weights, the kernels and the draft model that were measured together. What Plan sizes and Optimize verifies is exactly what Serve, Edge and Fleet run.",
-                 [("1", "unit of deployment across every product"), ("0", "weights or prompts leaving your environment"), ("4", "ways to deploy: cloud, data centre, air-gapped, device")], None)
-    body += f'<section class="arch"><div class="wrap"><div class="arch-grid"><div>{sec_head("Architecture", "How the products fit together.", "Each layer works on its own. Together they close the loop: production regressions become optimisation runs, and optimisation runs become plans.")}</div><ol class="arch-l">{ls}</ol></div></div></section>'
-    body += f'<section class="feats"><div class="wrap">{sec_head("Deployment", "Runs where your models already live.")}<div class="feat-grid four">{ds}</div></div></section>'
+    body = phero("aisle-white", "Platform", "How the products work together",
+                 "All VitalOps products use the same unit, called a bundle. It records the engine version, settings, quantised weights, kernels and draft model that were tested together. The configuration Plan sizes for and Optimize tests is the one Serve, Edge and Fleet run.",
+                 [("1", "deployment format across all products"), ("0", "weights or prompts sent outside your environment"), ("4", "deployment options: cloud, data centre, air-gapped, devices")], None)
+    body += f'<section class="arch"><div class="wrap"><div class="arch-grid"><div>{sec_head("Architecture", "Architecture", "Each part can be used on its own. Used together, problems found in production can start new Optimize runs, and those results feed back into Plan.")}</div><ol class="arch-l">{ls}</ol></div></div></section>'
+    body += f'<section class="feats"><div class="wrap">{sec_head("Deployment", "Where it runs")}<div class="feat-grid four">{ds}</div></div></section>'
     body += stack.replace('class="stack"', 'class="stack" id="stack"', 1)
-    body += f'<section class="related"><div class="wrap">{sec_head("Products", "The pieces.")}{cards(PRODUCTS, "products")}</div></section>'
-    page("platform/", "Platform · one bundle, from plan to production | VitalOps", "How VitalOps products fit together, where they deploy and the stack they support.", "platform", body)
+    body += f'<section class="related"><div class="wrap">{sec_head("Products", "Products")}{cards(PRODUCTS, "products")}</div></section>'
+    page("platform/", "Platform | VitalOps", "How VitalOps products fit together, where they deploy and the stack they support.", "platform", body)
 
 def services_page():
     g = G
@@ -612,41 +612,41 @@ def services_page():
     svc = cut('<section class="svc"')
     eng = cut('<section class="engage"')
     clients = cut('<section class="clients"').replace('src="assets/', 'src="{R}assets/')
-    body = phero("technician", "Services", "Engineers on your problem, fixed scope.",
-                 "The products came out of this work, and we still do it: two-week sprints, custom kernels, speculative decoding, quantisation, edge deployment and capacity planning, delivered inside your environment.",
-                 [("2 weeks", "from model and target to a verified configuration"), ("Fixed fee", "agreed before we start"), ("No win, no fee", "if we don't beat your baseline")], None)
+    body = phero("technician", "Services", "Fixed-scope engineering work",
+                 "We did this work by hand before we built the products, and we still do: two-week tuning sprints, custom kernels, speculative decoding, quantisation, edge deployment and capacity planning, all inside your environment.",
+                 [("2 weeks", "for a typical tuning sprint"), ("Fixed fee", "agreed before we start"), ("No fee", "if we can't beat your current setup")], None)
     body += svc + eng + clients
-    page("services/", "Services · inference engineering, fixed scope | VitalOps", "Inference optimisation sprints, custom kernels, speculative decoding, quantisation, edge deployment and capacity planning, delivered fixed-scope.", "services", body, faqs=FAQ_HOME[:3])
+    page("services/", "Services | VitalOps", "Inference optimisation sprints, custom kernels, speculative decoding, quantisation, edge deployment and capacity planning, delivered fixed-scope.", "services", body, faqs=FAQ_HOME[:3])
 
 def security_page():
-    items = [("lock", "Your data stays put", "Products install in your cloud account, data centre or air-gapped network. Prompts, completions, weights and eval sets never leave it, and nothing calls home."),
-             ("users", "Access you control", "Single sign-on through SAML or OIDC, SCIM provisioning, and role-based access down to the pool, model and run."),
-             ("history", "Every change traceable", "Each bundle records the run, the eval and the person who approved it. Audit logs export to your SIEM."),
-             ("shield-check", "Signed artefacts", "Bundles, kernels and device exports are signed and verified before they load, and over-the-air updates are staged."),
-             ("key", "Secrets in your vault", "Model registry, cloud and API credentials stay in your secrets manager; we read them at runtime and never store them."),
-             ("user", "Engineers inside your boundary", "On sprints, our engineers work in your environment under your access policies, with no copies of anything on our side.")]
+    items = [("lock", "Data stays in your environment", "The software installs in your cloud account, data centre or air-gapped network. Prompts, outputs, weights and eval sets stay there, and nothing is sent back to us."),
+             ("users", "Access control", "Single sign-on with SAML or OIDC, SCIM provisioning, and role-based access for pools, models and runs."),
+             ("history", "Audit trail", "Each bundle records the run, the eval and who approved it. Audit logs can be exported to your SIEM."),
+             ("shield-check", "Signed artefacts", "Bundles, kernels and device exports are signed and checked before they load. Over-the-air updates roll out in stages."),
+             ("key", "Secrets", "Credentials for model registries, clouds and APIs stay in your secrets manager. We read them at runtime and don't store them."),
+             ("user", "Our engineers", "During sprints our engineers work in your environment under your access policies, and we keep no copies of your data.")]
     feats = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in items)
-    body = phero("racks-dark", "Security", "Built to run inside your boundary.",
-                 "VitalOps is software you run, not a service you send data to. Everything installs in your environment, air-gapped if you need it, and every model change is traceable to an evaluation and an approval.",
+    body = phero("racks-dark", "Security", "Runs inside your environment",
+                 "VitalOps is software you install and run yourself, rather than a hosted service. It can run fully air-gapped, and every model change is linked to an evaluation and an approval.",
                  [("0", "prompts or weights leaving your network"), ("Air-gapped", "installs and signed updates"), ("SSO", "SAML and OIDC, with SCIM")], None)
-    body += f'<section class="feats"><div class="wrap">{sec_head("Controls", "What we do, and what we never do.")}<div class="feat-grid">{feats}</div></div></section>'
+    body += f'<section class="feats"><div class="wrap">{sec_head("Controls", "Security controls")}<div class="feat-grid">{feats}</div></div></section>'
     page("security/", "Security | VitalOps", "VitalOps installs in your environment: no data leaves it, SSO and role-based access, audit logs, signed artefacts and air-gapped installs.", "security", body,
-         faqs=[("Do you ever see our prompts or weights?", "No. The products run in your environment and don't send telemetry about your data. On sprints our engineers work inside your environment under your access controls."),
+         faqs=[("Do you ever see our prompts or weights?", "No. The products run in your environment and don't send any data about your usage to us. During sprints our engineers work inside your environment under your access controls."),
                ("Can it run with no internet access?", "Yes. Air-gapped installs use offline bundles and signed updates, and licence checks work offline."),
                ("How do you handle a security report?", f"Email {MAIL} with the details. We acknowledge within one working day.")])
 
 def company_page():
-    vals = [("badge-check", "Measured, not promised", "Every number we quote a customer is measured on their model and their hardware, with the eval beside it."),
-            ("flask-conical", "Accuracy first", "A faster model that answers worse is not faster. The floor is set by you and enforced by the software."),
-            ("lock", "Your environment", "We build software you run, so your data never has to come to us."),
-            ("code", "Down to the metal", "We go below the framework when the bottleneck is there: kernels, compilers and the SASS the GPU executes.")]
+    vals = [("badge-check", "We measure", "Any number we give a customer is measured on their model and hardware, with the eval result next to it."),
+            ("flask-conical", "Accuracy comes first", "A faster model that gives worse answers isn't an improvement. You set the accuracy threshold and the software enforces it."),
+            ("lock", "We don't take your data", "Our software runs in your environment, so your data doesn't need to come to us."),
+            ("code", "We go low-level when needed", "If the bottleneck is in a kernel or in the compiler output, that's where we work.")]
     vs = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in vals)
-    body = phero("racks-art", "Company", "We make AI fast, small and cheap enough to ship.",
-                 "VitalOps is an inference engineering company. We spent years making models run faster for clients, one engagement at a time. The products are those years, written down, so every team can get the result.",
+    body = phero("racks-art", "Company", "About VitalOps",
+                 "VitalOps works on inference: making open-weight models run faster and cheaper. We spent several years doing this for clients one project at a time, and built the products from what we learned.",
                  [], None)
-    body += f'<section class="feats"><div class="wrap">{sec_head("How we work", "Four things we don't compromise on.")}<div class="feat-grid four">{vs}</div></div></section>'
-    body += f'<section class="feats alt"><div class="wrap"><div class="split2"><div>{sec_head("Talk to us", "Bring the model and the number.", "Book a 30-minute review, or write to us. We reply within one working day.")}<div class="hero-cta" style="margin-top:20px"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}Book a review</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div><div class="co-ph" style="background-image:url(\'{{R}}assets/stock/pair-review.jpg\')"></div></div></div></section>'
-    page("company/", "Company | VitalOps", "VitalOps is an inference engineering company: software and engineers that make open-weight models fast, small and cheap enough to ship.", "company", body, ctaband=False)
+    body += f'<section class="feats"><div class="wrap">{sec_head("How we work", "How we work")}<div class="feat-grid four">{vs}</div></div></section>'
+    body += f'<section class="feats alt"><div class="wrap"><div class="split2"><div>{sec_head("Contact", "Get in touch", "Book a 30-minute call or email us. We usually reply within a working day.")}<div class="hero-cta" style="margin-top:20px"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}Book a review</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div><div class="co-ph" style="background-image:url(\'{{R}}assets/stock/pair-review.jpg\')"></div></div></div></section>'
+    page("company/", "Company | VitalOps", "VitalOps makes open-weight models run faster and cheaper, with software and engineering services.", "company", body, ctaband=False)
 
 def credits_page():
     cr = json.load(open(os.path.join(HERE, "photo_credits.json")))

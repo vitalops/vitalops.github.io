@@ -1018,30 +1018,30 @@ def tour_step(n, id_, title, para, fig, works, changes, label="What changes"):
     </article>"""
 
 STEPS = [
- tour_step("01 · Optimize","w-opt","Point it at the model, the hardware and the number you need",
-   "Give the optimizer a model, a GPU target, an SLO and your eval set. The agent searches the serving engine's knobs, quantisation, parallelism, scheduling, speculative decoding and custom kernels, ranks candidates in the built-in simulator, verifies the best on real GPUs and ships a reproducible bundle. Every candidate is held to your accuracy floor; kernels are checked at PTX and SASS level and numerically verified.",
+ tour_step("01 · Optimize","w-opt","Tune a model for a specific GPU and latency target",
+   "You give Optimize a model, a target GPU, a latency target and an eval set. It tries different engine settings, quantisation, parallelism, scheduling, speculative decoding and custom kernels, ranks the candidates in a simulator, then benchmarks the best ones on real GPUs. Any candidate that scores below your accuracy threshold is dropped. Kernels are checked numerically and at the PTX and SASS level. The result is saved as a bundle you can rerun.",
    SCREEN_OPT,"vLLM, SGLang, TensorRT-LLM, llama.cpp, Hugging Face Transformers; lm-eval or your own evals. Targets: tokens/s, TTFT, TPOT, p99, memory, cost per million tokens.",
-   [("timer","Weeks of trial and error become one run with a report."),("badge-check","Every speed-up is tied to an accuracy number."),("history","The result is a reproducible bundle anyone on the team can rerun.")]),
- tour_step("02 · Optimize · Kernels","w-sim","Rank kernels without a GPU attached",
-   "Optimize's kernel page runs your candidates on real GPUs when you have them. When you don't, it runs them on Sim: an optional GPU simulator. A replacement <code>libcuda.so</code> takes the same binary, loads the cubin into a SASS interpreter and executes the launches on CPU threads under a timing model, so you get a predicted time per target, a per-instruction stall breakdown and a ranking of candidates on a laptop or in CI. Three fidelities: static in milliseconds, sampled in seconds, cycle-level in hours. Rank correlation against real hardware is reported on every run, and the best candidates are verified on a real GPU before anything ships.",
+   [("timer","One run and a report instead of weeks of manual tuning."),("badge-check","Each speed-up is reported with its accuracy score."),("history","Anyone on the team can rerun the bundle and get the same result.")]),
+ tour_step("02 · Optimize · Kernels","w-sim","Compare kernels without a GPU",
+   "Optimize benchmarks kernel candidates on real GPUs when they're available. When they aren't, it can use Sim, our GPU simulator. A replacement <code>libcuda.so</code> takes the same binary, loads the cubin into a SASS interpreter and executes the launches on CPU threads under a timing model, which gives you an estimated time per GPU, stall counts per instruction and a ranking of candidates, on a laptop or in CI. There are three levels of detail: static analysis (milliseconds), sampled simulation (seconds) and cycle-level simulation (hours). Each run reports how well its ranking matches real hardware, and the top candidates are tested on a real GPU before anything ships.",
    SCREEN_SIM + FLOW,"CUDA C++, Triton, CUTLASS, PyTorch through a driver shim; KernelBench and TritonBench; GitHub Actions. Targets: H100, H200, B200, L40S, RTX 4090 and 5090, Jetson Orin and Thor.",
-   [("cpu","Kernel work no longer waits for a GPU slot."),("bot","Agents rank thousands of variants for the cost of CPU time."),("git-branch","A performance regression fails CI before it reaches hardware.")], label="What it unlocks"),
- tour_step("03 · Serve","w-serve","Ship the bundle as a canary, promote when the numbers hold",
-   "An OpenAI-compatible server built around the bundles Optimize produces: multi-model pools, continuous batching, prefix caching, chunked prefill, speculative decoding, structured output, and canary rollouts with instant rollback. Runs in your cloud account or data centre; air-gapped supported.",
+   [("cpu","Kernel work doesn't have to wait for a free GPU."),("bot","Agents can compare thousands of variants on ordinary CPUs."),("git-branch","A slower kernel can fail CI before it reaches real hardware.")], label="Why it helps"),
+ tour_step("03 · Serve","w-serve","Roll out a new configuration gradually",
+   "Serve is an OpenAI-compatible server that runs the bundles Optimize produces. It supports multiple models per pool, continuous batching, prefix caching, chunked prefill, speculative decoding and structured output. New releases go out as canaries and can be rolled back immediately. It runs in your cloud account or data centre, including air-gapped setups.",
    SCREEN_SERVE,"OpenAI SDKs, LangChain and LlamaIndex, Kubernetes, NVIDIA and AMD GPUs. <code>/v1/chat/completions</code>, <code>/v1/embeddings</code>, tool calls, JSON-schema and grammar-constrained decoding.",
-   [("rocket","The optimised configuration is the one actually in production."),("rotate-ccw","Rollouts you can reverse in seconds."),("network","One endpoint for every model you run.")], label="What you get"),
- tour_step("04 · Serve · Monitoring","w-mon","Watch it in production, in the numbers that decide your bill",
-   "Generic APM shows CPU and memory. Serve's monitoring shows TTFT, TPOT, tokens per second, KV-cache hit rate, queue depth, cost per million tokens, and whether model quality is drifting, per model, pool, tenant and prompt template. When something moves, the fix is handed back to Optimize. It also attaches to an existing vLLM, SGLang or TensorRT-LLM deployment.",
+   [("rocket","Production runs the same configuration that was benchmarked."),("rotate-ccw","A rollback takes seconds."),("network","All your models sit behind one endpoint.")], label="What you get"),
+ tour_step("04 · Serve · Monitoring","w-mon","Monitor latency, cost and quality in production",
+   "General-purpose monitoring tools track CPU and memory. Serve tracks time to first token, time per output token, tokens per second, KV-cache hit rate, queue depth, cost per million tokens and output quality, broken down by model, pool, tenant and prompt template. When a metric gets worse, it can pass a suggested fix to Optimize. It also works with existing vLLM, SGLang and TensorRT-LLM deployments.",
    SCREEN_MON,"Prometheus, OpenTelemetry, Grafana, PagerDuty and Slack; existing vLLM, SGLang and TensorRT-LLM deployments.",
-   [("chart-line","You see the cost of a prompt change the hour it ships."),("shield-check","Evals catch quality regressions before they reach users."),("bell-ring","Every alert arrives with a proposed fix.")], label="What you catch"),
- tour_step("05 · Edge","w-edge","Fit it on the device, and train it there",
-   "Each device gets the largest model that meets your accuracy floor inside its memory and latency budget. A Jetson or a flagship phone takes a 3B vision-language model once the weights, KV cache and encoder are quantised and a couple of layers pruned; a Raspberry Pi gets a 0.5 to 1.5B model and the same accuracy guard. Where the data can't leave the device, fine-tuning runs on it: QLoRA inside the memory budget, a live loss curve, and the adapter pushed to every device on the same base.",
+   [("chart-line","See what a prompt change costs within an hour of shipping it."),("shield-check","Sampled evals flag drops in quality."),("bell-ring","Alerts include a suggested fix.")], label="What it shows"),
+ tour_step("05 · Edge","w-edge","Fit models onto devices and fine-tune them there",
+   "Edge picks the largest model that stays above your accuracy threshold within each device's memory and latency limits. A Jetson or a flagship phone takes a 3B vision-language model once the weights, KV cache and encoder are quantised and a couple of layers pruned; a Raspberry Pi gets a 0.5 to 1.5B model and the same accuracy guard. If the data can't leave the device, fine-tuning can run there with QLoRA, and the resulting adapter is pushed to every device using the same base model.",
    SCREEN_EDGE,"NVIDIA Jetson, iPhone and Apple silicon, Pixel and Android NPUs, Qualcomm Snapdragon and Dragonwing, Raspberry Pi 5, x86 CPUs. Exports to GGUF, MLX, ExecuTorch, CoreML, QNN and TensorRT.",
-   [("smartphone","A model that didn't fit now runs on a phone, a Pi or a Jetson."),("badge-check","Accuracy is measured after every step."),("lock","Fine-tuning runs on the device, so the data never leaves it.")], label="What becomes possible"),
- tour_step("06 · Fleet","w-fleet","Run N agents on M GPUs, on your premises",
-   "Agent workloads don't look like chat: long shared prefixes, bursts of parallel sub-agents, and long idle gaps while tools run. Fleet schedules a swarm of agents across your GPUs with KV-aware routing, prefix sharing between agents, and preemption while an agent waits on a tool. Scaling from 8 agents to 96 is one command, and the capacity check tells you where the SLO breaks.",
+   [("smartphone","Models that didn't fit before can run on a phone, a Pi or a Jetson."),("badge-check","Accuracy is checked after each compression step."),("lock","Training data stays on the device.")], label="What it allows"),
+ tour_step("06 · Fleet","w-fleet","Run many agents on your own GPUs",
+   "Agent traffic is different from chat. Agents share long prompts, start sub-agents in bursts and sit idle while tools run. Fleet schedules agents across your GPUs, sends requests to GPUs that already have their prompt cached, and frees an agent's slot while it waits on a tool. Going from 8 agents to 96 takes one command, and a capacity check estimates how far you can scale before latency suffers.",
    SCREEN_FLEET,"Claude Agent SDK, OpenAI Agents, LangGraph, or your own loop; Kubernetes and Slurm; air-gapped by default.",
-   [("layers","More agents per GPU, because the KV cache stops being thrown away."),("sliders-horizontal","Scaling means changing one number."),("users","A straight answer to how many agents you can run.")], label="What it buys you"),
+   [("layers","More agents per GPU, because cached prompts are reused."),("sliders-horizontal","Scaling is a single setting."),("users","A clear estimate of how many agents your cluster can handle.")], label="What you get"),
 ]
 
 PLAY = r"""
@@ -1219,7 +1219,7 @@ __JSONLD__
 <section class="ladder" aria-labelledby="h-ladder"><div class="wrap">
   <h2 class="sr-only" id="h-ladder">Where the work happens</h2><span class="k" aria-hidden="true">Where the work happens</span>
   {layers_html()}
-  <p class="lad-out">Most teams stop at the first layer. We work all five and verify at the bottom, in the SASS the GPU actually executes.</p>
+  <p class="lad-out">Most tuning happens at the serving-engine level. We work on all five layers and check the results in the SASS that actually runs on the GPU.</p>
 </div></section>
 
 <section class="tour" id="tour" aria-labelledby="h-tour">
@@ -1234,16 +1234,16 @@ __JSONLD__
 <section class="svc" id="services">
   <div class="svc-bg" aria-hidden="true"></div>
   <div class="wrap">
-  <div class="svc-head"><span class="k">Services</span><h2>Engineers on your problem, fixed scope</h2><p class="lede">The products came out of this work. We still do it, fixed-scope, for teams who want the result delivered.</p></div>
+  <div class="svc-head"><span class="k">Services</span><h2>Engineering services</h2><p class="lede">We built the products from client work, and we still take on projects at a fixed scope and price for teams who'd rather have us do it.</p></div>
   <div class="svc-grid">
-    {svc("timer","Inference optimisation sprint","Model, hardware and SLO in; verified configuration and report out. Two weeks, fixed fee.","vLLM · SGLang · TensorRT-LLM · FP8 · INT4 · NVFP4 · speculative decoding · prefix caching")}
-    {svc("cpu","Custom kernels","Fused and specialised kernels where the stock path leaves throughput on the table, tuned down to the SASS.","Triton · CUDA · CUTLASS · wgmma · TMA · cp.async · Hopper · Blackwell · Ada")}
-    {svc("zap","Speculative decoding","Draft models trained on your traffic, so the speed-up holds on your prompts.","EAGLE-3 · Medusa · n-gram and prompt-lookup drafts · acceptance tuning")}
-    {svc("boxes","Quantisation and distillation","Smaller models that keep the accuracy you signed off on, with the eval to prove it.","AWQ · GPTQ · SmoothQuant · KV-cache quantisation · distillation · pruning")}
-    {svc("smartphone","Edge deployment and on-device training","From a model that doesn't fit to one that runs, updates and fine-tunes in the field.","Jetson · Apple silicon · Qualcomm · Raspberry Pi · ExecuTorch · GGUF · MLX · QLoRA on device")}
-    {svc("bot","Serving for agent workloads","Design and tuning of the serving layer for long prefixes, sub-agent bursts and tool-call gaps.","KV-aware routing · prefix sharing · capacity planning")}
-    {svc("bar-chart-3","Benchmarking and capacity planning","Tokens per second per dollar across GPUs and clouds, measured on your workload.","H100 · H200 · B200 · MI300X · L40S · consumer cards · buy-versus-rent models")}
-    {svc("trending-up","Training throughput","When the bottleneck is the training run: data loading, parallelism, kernels and memory.","FSDP · DeepSpeed · Megatron · torch.compile · fused optimisers · MFU audits")}
+    {svc("timer","Inference optimisation sprint","You give us the model, the hardware and the latency target. Two weeks later you get a tested configuration and a report. Fixed fee.","vLLM · SGLang · TensorRT-LLM · FP8 · INT4 · NVFP4 · speculative decoding · prefix caching")}
+    {svc("cpu","Custom kernels","Fused and specialised kernels for the cases where the standard ones are slow, tuned and checked at the SASS level.","Triton · CUDA · CUTLASS · wgmma · TMA · cp.async · Hopper · Blackwell · Ada")}
+    {svc("zap","Speculative decoding","Draft models trained on your own traffic, so the speed-up holds up on your real prompts.","EAGLE-3 · Medusa · n-gram and prompt-lookup drafts · acceptance tuning")}
+    {svc("boxes","Quantisation and distillation","Smaller models that keep the accuracy you approved, with eval results to show it.","AWQ · GPTQ · SmoothQuant · KV-cache quantisation · distillation · pruning")}
+    {svc("smartphone","Edge deployment and on-device training","Getting a model to fit on your device, run well, take updates and fine-tune in the field.","Jetson · Apple silicon · Qualcomm · Raspberry Pi · ExecuTorch · GGUF · MLX · QLoRA on device")}
+    {svc("bot","Serving for agent workloads","Serving setups designed for long shared prompts, bursts of sub-agents and pauses during tool calls.","KV-aware routing · prefix sharing · capacity planning")}
+    {svc("bar-chart-3","Benchmarking and capacity planning","Tokens per second per dollar on different GPUs and clouds, measured on your workload.","H100 · H200 · B200 · MI300X · L40S · consumer cards · buy-versus-rent models")}
+    {svc("trending-up","Training throughput","Speeding up training runs: data loading, parallelism, kernels and memory use.","FSDP · DeepSpeed · Megatron · torch.compile · fused optimisers · MFU audits")}
   </div>
 </div></section>
 
@@ -1252,11 +1252,11 @@ __JSONLD__
     <div class="eng-photo" aria-hidden="true"></div>
     <div class="eng-steps">
       <span class="k">How we work together</span>
-      <h2>Start small, prove it on your hardware, then run it</h2>
+      <h2>How a project usually goes</h2>
       <ol class="steps">
-        <li><div class="sp-i">{ic("calendar")}</div><div><small>Start here</small><h3>Inference review <i>Free · 30 minutes</i></h3><p>Bring the model, the hardware you have or plan to buy, and the number you need to hit. You leave with an honest estimate of what's achievable and how.</p><a class="btn btn-s" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener">Book the review</a></div></li>
-        <li class="hl"><div class="sp-i">{ic("flask-conical")}</div><div><small>Prove it</small><h3>Optimisation sprint <i>Fixed fee · 2 weeks</i></h3><p>We run Optimize and our engineers on your model and hardware. You get the verified configuration, the kernels, the eval numbers and a report.</p><b class="guar">{ic("shield-check")}If we don't beat your baseline, you don't pay.</b></div></li>
-        <li><div class="sp-i">{ic("server")}</div><div><small>Run it</small><h3>Managed inference <i>Monthly</i></h3><p>Serve with its monitoring, and continuous re-optimisation as your models and traffic change, in your environment, with an SLO we sign.</p></div></li>
+        <li><div class="sp-i">{ic("calendar")}</div><div><small>Start here</small><h3>Inference review <i>Free · 30 minutes</i></h3><p>Tell us about the model, the hardware you have or plan to buy, and the target you're aiming for. We'll give you an honest estimate of what's possible.</p><a class="btn btn-s" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener">Book the review</a></div></li>
+        <li class="hl"><div class="sp-i">{ic("flask-conical")}</div><div><small>Prove it</small><h3>Optimisation sprint <i>Fixed fee · 2 weeks</i></h3><p>Our engineers use Optimize on your model and hardware. You get the tested configuration, any custom kernels, the eval results and a report.</p><b class="guar">{ic("shield-check")}If we don't beat your baseline, you don't pay.</b></div></li>
+        <li><div class="sp-i">{ic("server")}</div><div><small>Run it</small><h3>Managed inference <i>Monthly</i></h3><p>We run Serve and its monitoring in your environment and keep re-tuning as your models and traffic change, under an agreed SLO.</p></div></li>
       </ol>
     </div>
   </div>
