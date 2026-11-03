@@ -44,8 +44,8 @@
   }
 
   var PRESETS = {
-    chat:   { label: 'Chat',   shared: 0,    uniq: [700, 0.6, 120, 3000],  out: [220, 0.5, 24, 600],
-              hint: 'Short prompts, medium answers.' },
+    chat:   { label: 'Chat',   shared: 300,  uniq: [500, 0.6, 80, 2500],   out: [220, 0.5, 24, 600], turns: { share: 0.6, hist: [900, 0.6, 200, 4000] },
+              hint: 'A 300-token system prompt on every request; 60% of requests are follow-up turns whose history (about 900 tokens) is already cached.' },
     rag:    { label: 'RAG',    shared: 1200, uniq: [4200, 0.3, 2000, 7000], out: [160, 0.4, 30, 400],
               hint: 'Long prompts from retrieved documents, a shared 1.2k-token system prompt.' },
     agents: { label: 'Agents', shared: 6000, uniq: [400, 0.5, 80, 1500],   out: [70, 0.5, 12, 200],
@@ -60,18 +60,19 @@
 
   /* Steady-state capacity of the step model for a preset: the arrival rate at which step time diverges, and
      the rate that fills 70% of it (or 80% of the KV cache or batch limit, whichever binds first). */
+  function histMean(p) { return p.turns ? p.turns.share * lnMean(p.turns.hist) : 0; }
   function capacity(ph, preset, prefix) {
-    var p = PRESETS[preset], cached = prefix && p.shared > 0;
-    var P = lnMean(p.uniq) + (cached ? 0 : p.shared);   // prompt tokens prefilled per request
-    var O = lnMean(p.out);                               // output tokens per request
-    var C = lnMean(p.uniq) + (cached ? 0 : p.shared) + O / 2;   // KV tokens read per decode step, per stream
+    var p = PRESETS[preset], cached = prefix && p.shared > 0, H = histMean(p);
+    var P = lnMean(p.uniq) + (cached ? 0 : p.shared + H);   // prompt tokens prefilled per request
+    var O = lnMean(p.out);                                   // output tokens per request
+    var C = lnMean(p.uniq) + H + (cached ? 0 : p.shared) + O / 2;   // KV tokens read per decode step, per stream
     var k = (ph.b * O * C + ph.pf * P) / 1000;           // seconds of step time each request adds per second of arrivals
     var lmax = 1 / k;
     // with prefill capped at BUDGET tokens per step, prompt throughput is BUDGET / step; find the rate where that binds
     var kd = ph.b * O * C / 1000, lc = lmax / 2, it;
     for (it = 0; it < 40; it++) { var dtc = ph.base / Math.max(1e-6, 1 - lc * kd) + ph.pf * BUDGET; lc = 0.5 * lc + 0.5 * Math.min(lmax, BUDGET / (P * dtc / 1000)); }
     lmax = Math.min(lmax, lc);
-    var ncap = Math.min(ph.maxB, ph.kvBudget / (lnMean(p.uniq) + (cached ? 0 : p.shared) + O));
+    var ncap = Math.min(ph.maxB, ph.kvBudget / (lnMean(p.uniq) + H + (cached ? 0 : p.shared) + O));
     var rate = 0.7 * lmax;
     var dt = ph.base / (1 - rate * k), n = rate * O * dt / 1000;
     if (n > 0.8 * ncap) rate = 0.8 * ncap / (O * ph.base / 1000 + 0.8 * ncap * k);
@@ -108,14 +109,15 @@
   Engine.prototype.arrive = function () {
     while (this.nextArr <= this.t) {
       var p = this.p;
-      this.queue.push({ id: this.id++, arr: this.nextArr, shared: p.shared, uniq: lognorm(this.r, p.uniq), out: lognorm(this.r, p.out),
-        gen: 0, slot: -1, admit: null, pfEnd: null, first: null, fin: null, rel: null, hit: false, kv: 0, pfLeft: 0 });
+      var hist = p.turns && this.r() < p.turns.share ? lognorm(this.r, p.turns.hist) : 0;   // a follow-up turn carries its conversation so far
+      this.queue.push({ id: this.id++, arr: this.nextArr, shared: p.shared, hist: hist, uniq: lognorm(this.r, p.uniq), out: lognorm(this.r, p.out),
+        gen: 0, slot: -1, admit: null, pfEnd: null, first: null, fin: null, rel: null, hit: false, owner: false, kv: 0, pfLeft: 0 });
       this.nextArr += this.gap();
     }
   };
   Engine.prototype.sharedKv = function () { return this.prefix && this.warm ? this.p.shared : 0; };
   Engine.prototype.need = function (q) {
-    var ctx = this.prefix ? q.uniq : q.shared + q.uniq;
+    var ctx = (this.prefix ? 0 : q.shared) + q.hist + q.uniq;   // the history is resident either way; with caching it was kept from the last turn
     var extra = this.prefix && !this.warm && !this.anyShared ? q.shared : 0;
     return { kv: ctx + q.out, extra: extra };
   };
@@ -129,8 +131,8 @@
     if (owner) { this.kvUsed += q.shared; this.anyShared = true; }
     this.queue.shift();
     q.slot = s; q.admit = this.t; q.kv = n.kv; this.kvUsed += n.kv;
-    q.hit = this.prefix && !owner;
-    q.pfLeft = q.hit ? q.uniq : q.shared + q.uniq;
+    q.owner = owner; q.hit = this.prefix && (!owner || q.hist > 0);
+    q.pfLeft = this.prefix ? (owner ? q.shared : 0) + q.uniq : q.shared + q.hist + q.uniq;
     this.slots[s] = q; this.running.push(q); this.reqs.push(q);
     if (this.kvUsed > this.kvPeak) this.kvPeak = this.kvUsed;
     return true;
@@ -140,8 +142,8 @@
     for (i = 0; i < this.running.length; i++) {
       q = this.running[i];
       if (q.fin !== null) continue;
-      if (q.pfLeft > 0) { if (q.hit && !this.warm) continue; pf.push(q); }   // a hit waits until the prefix blocks exist
-      else { dec.push(q); kvRead += (this.prefix ? 0 : q.shared) + q.uniq + q.gen; }
+      if (q.pfLeft > 0) { if (q.hit && !q.owner && !this.warm) continue; pf.push(q); }   // a hit waits until the shared prefix blocks exist
+      else { dec.push(q); kvRead += (this.prefix ? 0 : q.shared) + q.hist + q.uniq + q.gen; }
     }
     var take = [];
     if (this.mode === 'chunked') {
@@ -350,13 +352,13 @@
     gpu: 'The GPU one replica runs on: memory sets the KV budget, bandwidth the step time, the fp8 or bf16 rate the prefill cost.',
     traffic: 'Arrival shape: the prompt and output length distributions (log-normal, fixed seed) and any shared prefix.',
     sched: 'How requests share the GPU across engine steps.',
-    cache: 'Keeps the preset\'s shared prefix resident after the first request, so later requests skip prefilling it and share its KV entries. No effect on traffic without a shared prefix.',
+    cache: 'Keeps the shared prefix resident after the first request, so later requests skip prefilling it and share its KV entries; a follow-up chat turn also skips its own history, which is assumed to have stayed resident since the previous turn.',
     rate: 'Mean arrival rate, Poisson. Defaults to 70% of the estimated capacity for this model, GPU and traffic; the top of the range is about 1.6× that.',
     play: 'Runs or pauses the simulated clock.', reset: 'Restarts the run with a new random seed.', speed: 'Simulated time per real second.',
     spd1: 'Real time.', spd4: 'Four simulated seconds per real second.',
     lane: 'GPU batch slots over time, newest at the right: each bar is one request.',
     lgPf: 'The request\'s prompt is being processed (prefill), before its first token.', lgDec: 'The request is generating output, one token per engine step.',
-    lgHit: 'Prefix-cache hit: the shared prefix was already resident, so only the unique part of the prompt was prefilled.',
+    lgHit: 'Prefix-cache hit: the shared prefix, or this conversation\'s earlier turns, were already resident, so only the new part of the prompt was prefilled.',
     lgHeld: 'Static batching: the request has finished but its slot stays taken until the batch\'s longest answer ends.',
     lgLong: 'An engine step over three times the median step on screen, usually a large prefill. Every running stream waits for it.',
     lgWait: 'A queued request that has waited more than two seconds.',
@@ -458,7 +460,7 @@
       rateOut.textContent = cap ? fmtRate(st.rate) + ' req/s' : '—';
       rateIn.disabled = !ph.fits;
       prefIn.disabled = !p.shared; prefLab.classList.toggle('lb-dis', !p.shared);
-      prefLab.setAttribute('data-tip', p.shared ? TIP.cache : 'Chat traffic here has no shared prefix, so there is nothing to cache.');
+      prefLab.setAttribute('data-tip', TIP.cache);
       playBtn.disabled = !ph.fits;
       // readout
       phys.hidden = !ph.fits;
@@ -526,7 +528,7 @@
         'Each engine step costs <code>' + ph.base.toFixed(1) + ' ms + ' + fmtSmall(ph.b) + ' × KV tokens read + ' + fmtSmall(ph.pf) + ' × prompt tokens prefilled</code>. The first term is the weights read once per step at ' + Math.round(BW_EFF * 100) + '% of ' + g.bw + ' TB/s plus ' + OVERHEAD + ' ms of launch overhead; the KV term is the same bandwidth applied to the cache read by decode attention; the prefill term is 2 FLOPs per parameter per token at ' + Math.round(FLOPS_EFF * 100) + '% of ' + HW.fmt(ph.tflops) + ' ' + (ph.fp8 ? 'fp8' : 'bf16') + ' TFLOPS. Decode is memory-bound and prefill compute-bound, which is the first-order picture of a transformer server. The efficiency factors are assumptions, not measurements.',
         'Arrivals are Poisson. Prompt and output lengths are log-normal, drawn from a fixed seed, so every scheduler sees the same requests. The slider defaults to 70% of the estimated capacity for the chosen traffic' + (cap ? ' (about ' + fmtRate(cap.lmax) + ' req/s here, where the step model or the prefill budget saturates)' : '') + ', or less if the KV cache or the batch limit would fill first.',
         'Static batching waits for ' + STATIC_B + ' requests or ' + (STATIC_WAIT / 1000) + ' s, prefills them in one step and runs the batch until its longest answer ends. Continuous batching admits and retires requests every step and prefills whole prompts, up to ' + fmtTok(BUDGET) + ' tokens per step or one prompt however long. Chunked prefill splits prompts so that prefill and decode together stay within the ' + fmtTok(BUDGET) + '-token step budget (vLLM\u2019s <code>max_num_batched_tokens</code>); a smaller budget smooths inter-token latency and lowers prompt throughput.',
-        'Prefix caching keeps the shared prefix (RAG system prompt, agent instructions and tools) in the cache after the first request, so later requests skip prefilling it and share its KV entries.',
+        'Prefix caching keeps the shared prefix (a chat system prompt, a RAG system prompt, agent instructions and tools) in the cache after the first request, so later requests skip prefilling it and share its KV entries. Chat traffic is also multi-turn: 60% of its requests are follow-up turns that resend the conversation so far (about 900 tokens on average), and with caching on that history is treated as still resident from the previous turn, so only the new message is prefilled. Eviction between turns is not modelled; on a busy server some of those blocks would be gone.',
         'A step is shaded as long when it takes over three times the median step on screen. Not modelled: tensor parallelism, speculative decoding, CUDA graphs, paged-attention fragmentation, and the real kernels’ efficiency at small batch sizes. TTFT counts requests still waiting with their wait so far. Inter-token p99 is the 99th percentile gap between tokens of a stream. The lane chart shows up to ' + lanes + ' streams; any beyond that are counted, not drawn. Figures are from this model, not measurements of any product.'
       ].map(function (t) { return '<li>' + t + '</li>'; }).join('');
     }
@@ -541,7 +543,8 @@
       if (!ph.fits) { note.className = 'lb-note lb-nofit'; note.innerHTML = '<b>Does not fit.</b> ' + esc(phys.textContent); return; }
       note.className = 'lb-note';
       var txt = '<b>' + MODES[st.mode].label + '.</b> ' + MODES[st.mode].note;
-      if (p.shared) txt += st.prefix ? ' Prefix caching is on: the shared ' + (p.shared / 1000).toFixed(1) + 'k-token prefix is prefilled once.' : ' Prefix caching is off: every request prefills the shared ' + (p.shared / 1000).toFixed(1) + 'k-token prefix again.';
+      var sh = p.shared >= 1000 ? (p.shared / 1000).toFixed(1) + 'k' : p.shared;
+      if (p.shared) txt += st.prefix ? ' Prefix caching is on: the shared ' + sh + '-token prefix is prefilled once' + (p.turns ? ', and follow-up turns skip their history' : '') + '.' : ' Prefix caching is off: every request prefills the shared ' + sh + '-token prefix' + (p.turns ? ' and its whole history' : '') + ' again.';
       note.innerHTML = txt;
     }
     function setPlay(v) {
