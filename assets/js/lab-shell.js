@@ -55,7 +55,8 @@
     '.vlab-head .hwcar-track{padding:4px 4px}',
     '.vlab-head .hwcar-ar{background:#0f1730;border-color:#263252;color:#c3cbdc}',
     '.vlab-wrap{scroll-margin-top:74px}',
-    '.vlab-tabs{display:flex;flex-wrap:nowrap;gap:8px;margin:0 0 10px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;padding:2px 2px}',
+    '.vlab-tabs{display:flex;flex-wrap:nowrap;gap:8px;margin:0 0 10px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;padding:2px 2px;cursor:grab;user-select:none;-webkit-user-select:none;min-height:38px;align-items:center}',
+    '.vlab-tabs.dragging{cursor:grabbing;scroll-snap-type:none}',
     '.vlab-tabs::-webkit-scrollbar{display:none}',
     '.vlab-tab{scroll-snap-align:center;flex:none}',
     '.vlab-tab{appearance:none;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--white);font:600 14px/1 var(--font);color:var(--ink2);cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s,background .15s}',
@@ -72,9 +73,15 @@
     '.vlab-full .vlab{flex:1;min-height:0;border:0;border-radius:0;display:flex;flex-direction:column}',
     '.vlab-full .vlab-body{flex:1;min-height:0;height:auto}',
     'body.vlab-lock{overflow:hidden}',
-    '.vlab-fs{width:32px;height:32px;border-radius:8px;border:1px solid #263252;background:#0f1730;color:#c3cbdc;cursor:pointer;display:grid;place-items:center;flex:none}',
-    '.vlab-fs:hover{border-color:#3b50a8;color:#fff}.vlab-fs svg{width:16px;height:16px}',
-    '.vlab-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}',
+    '.vlab-wrap{position:relative}',
+    '.vlab-fs{position:absolute;top:0;right:0;z-index:5;width:38px;height:38px;border-radius:999px;border:1px solid var(--line);background:var(--white);color:var(--ink2);cursor:pointer;display:grid;place-items:center;box-shadow:0 1px 2px rgba(15,23,42,.05)}',
+    '.vlab-fs:hover{border-color:var(--brand200);color:var(--brand)}.vlab-fs svg{width:17px;height:17px}',
+    '.vlab-fs:focus-visible{outline:2px solid var(--brand);outline-offset:2px}',
+    '.vlab-full .vlab-fs{position:fixed;top:10px;right:10px;background:#0f1730;border-color:#263252;color:#c3cbdc}.vlab-full .vlab-fs:hover{border-color:#3b50a8;color:#fff}',
+    /* the tab row fades out under the floating button so a scrolled row never collides with it */
+    '.vlab-tabs{padding-right:48px;mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent calc(100% - 4px));-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent calc(100% - 4px))}',
+    '.vlab-full .vlab-tabs{padding-right:56px}',
+
     '.vlab-body{position:relative;height:var(--lab-h,640px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2a365a #0b1020}',
     '.vlab-panel{padding:10px}',
     '.vlab-panel[hidden]{display:none}',
@@ -127,7 +134,7 @@
     var fs = document.createElement('button'); fs.type = 'button'; fs.className = 'vlab-fs'; fs.setAttribute('aria-label', 'Full screen'); fs.setAttribute('data-tip', 'Full screen. Esc leaves it.');
     var FS_IN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
     var FS_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
-    fs.innerHTML = FS_IN; head.appendChild(fs);
+    fs.innerHTML = FS_IN; root.appendChild(fs);
     var bar = document.createElement('div'); bar.className = 'vlab-tabs'; bar.setAttribute('role', 'tablist');
     var body = document.createElement('div'); body.className = 'vlab-body';
     var panels = {};
@@ -140,7 +147,7 @@
       if (i) p.hidden = true;
       var m = document.createElement('div'); m.setAttribute('data-lab', t); p.appendChild(m); body.appendChild(p); panels[t] = { btn: b, panel: p };
     });
-    if (tabs.length > 1) root.appendChild(bar);
+    root.appendChild(bar); HW.dragScroll(bar);
     box.appendChild(head); box.appendChild(body);
     var note = document.createElement('div'); note.className = 'vlab-note';
     note.innerHTML = '<span>Estimates from public specifications; the formulas are under "How this is calculated" in each demo. Not measurements of a VitalOps product.</span>';
@@ -167,7 +174,7 @@
     /* the whole shell fits the window under the site header, with a little air; the demo scrolls inside if it is taller */
     function fit() {
       if (root.classList.contains('vlab-full')) { box.style.removeProperty('--lab-h'); return; }
-      var h = Math.max(360, Math.min(960, innerHeight - 62 - 12 - head.offsetHeight - (tabs.length > 1 ? bar.offsetHeight + 10 : 0) - note.offsetHeight));
+      var h = Math.max(360, Math.min(960, innerHeight - 62 - 12 - head.offsetHeight - bar.offsetHeight - 10 - note.offsetHeight));
       box.style.setProperty('--lab-h', h + 'px');
     }
     function setFull(on) {
