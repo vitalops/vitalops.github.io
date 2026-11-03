@@ -440,7 +440,7 @@
       '<p class="lq-desc"></p>' +
       '<div class="lq-body"><div class="lq-load">Generating the layer…</div></div>' +
       '<details class="lq-more"><summary>What this shows</summary><div>' +
-        '<p>One linear layer of a transformer, generated here with a fixed seed: 1,024 input by 1,024 output channels, heavy-tailed like real checkpoints, with four input channels that carry outlier weights (118, 300, 640, 871) and eight that carry large activations in the 16-token calibration sample (37, 140, 262, 291, 455, 610, 777, 930). Every number is computed in your browser by quantising and dequantising the weights.</p>' +
+        '<p>One linear layer of a transformer, generated here with a fixed seed: 1,024 input by 1,024 output channels, heavy-tailed like real checkpoints, with four input channels that carry outlier weights (118, 300, 640, 871) and eight that carry large activations in the 16-token calibration sample (37, 140, 262, 291, 455, 610, 777, 930). Every number is computed by quantising and dequantising the weights.</p>' +
         '<dl>' +
           '<dt>BF16</dt><dd>The usual checkpoint precision; the error is rounding noise.</dd>' +
           '<dt>FP8 E4M3</dt><dd>A floating-point grid, so small and large weights keep similar relative precision under one tensor scale.</dd>' +
@@ -572,7 +572,7 @@
     function status() {
       var busy = qBusy && queue.length > 0;
       statusEl.classList.toggle('busy', busy);
-      statusEl.querySelector('span').textContent = !D ? 'Waiting' : busy ? 'Comparing formats…' : 'Computed in your browser';
+      statusEl.querySelector('span').textContent = !D ? 'Waiting' : busy ? 'Comparing formats…' : 'Computed';
     }
 
     function metrics(r) {

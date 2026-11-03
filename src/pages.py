@@ -36,11 +36,11 @@ SOLUTIONS = {
  "on-prem":    dict(name="Regulated and on-prem", icon="shield-check", short="Air-gapped, in your data centre"),
 }
 DEMOS = {
- "planner":  ("Capacity planner", "Estimate GPU count and cost per million tokens for a model and traffic level.", "gauge"),
- "batching": ("Batching simulator", "See how the batching strategy changes time to first token.", "layers"),
- "quant":    ("Quantisation lab", "Compare FP8, INT4 and NVFP4 error on a layer with outlier weights.", "boxes"),
- "specdec":  ("Speculative decoding", "See how acceptance rate and draft length affect the speed-up.", "zap"),
- "edgefit":  ("Edge fit", "Check whether a model fits on a Jetson, a phone or a Raspberry Pi.", "smartphone"),
+ "planner":  ("Capacity planner", "GPUs needed, latency and cost per million tokens for a model, a GPU and a traffic level.", "gauge"),
+ "batching": ("Batching simulator", "A simulated model server under static, continuous and chunked-prefill scheduling.", "layers"),
+ "quant":    ("Quantisation lab", "FP8, INT8, INT4 and NVFP4 rounding error on a layer with outlier channels.", "boxes"),
+ "specdec":  ("Speculative decoding", "Draft-and-verify decoding against the plain decoder, with the expected speed-up per draft length.", "zap"),
+ "edgefit":  ("Edge fit", "Whether a model fits the memory of a Jetson, a phone or a Raspberry Pi, and at what speed.", "smartphone"),
  "kernel":   ("Kernel lab", "Occupancy, register pressure and achievable bandwidth, per GPU architecture.", "cpu"),
 }
 
@@ -349,7 +349,7 @@ def product_pages():
         metrics=[("−38%", "hardware spend compared with the first quote"), ("±8%", "forecast error against measured throughput"), ("40+", "GPUs and cloud instance types"), ("Minutes", "to run a scenario")],
         rows=[("01 · Scenarios", "Compare options side by side", "You describe the workload once: the model, prompt and output lengths, arrival rate, expected growth and latency target. Plan simulates the serving engine on each GPU and cloud instance and shows throughput, tail latency, power and cost in one table.", SP,
                [("check", "Options that miss the latency target are flagged."), ("check", "Costs are shown per million tokens as well as per GPU-hour."), ("check", "Buying, reserving and renting are compared, including when buying pays off.")])],
-        demo=("planner", "Try a simplified version", "Choose a model, a GPU and a traffic level. This demo uses rough estimates, where decode speed is limited by memory bandwidth and prefill by compute. Plan itself runs a full simulation."),
+        demo=("planner", "A simplified Plan", "The same first-order model Plan starts from: decode limited by memory bandwidth, prefill by compute, tensor-parallel traffic over the real link. Plan itself runs a full simulation of the traffic."),
         feats=[("database", "Detailed hardware catalogue", "Covers H100 to B200, MI300X, L40S, consumer cards and edge modules, including the details that affect results, such as NVLink, memory size, FP8 and FP4 support and interconnect bandwidth."),
                ("trending-up", "Traffic growth", "Add seasonality, launches and growth, and Plan shows when you would run out of capacity."),
                ("badge-check", "Checked against real runs", "Forecasts are compared with Optimize runs on real hardware, and the error is included in the report.")],
@@ -383,7 +383,7 @@ def product_pages():
               ("02 · Kernel IDE", "Kernel editor with an agent", "The agent edits the CUDA or Triton source, recompiles, reads the new SASS and simulates it. The best version is tested on a real GPU before a pull request is opened.", g["SCREEN_IDE"],
                [("check", "Source, SASS and terminal in one window."), ("check", "Accepted changes are always tested on real hardware."), ("check", "Pull requests include the benchmark numbers.")])],
         flow=True,
-        demo=("kernel", "Register pressure, per architecture", "Pick a GPU and a kernel. The occupancy comes from the CUDA occupancy-calculator rules for that architecture, the achievable bandwidth from Little's law, and the bound from a roofline. Sim goes further by interpreting the SASS; this shows the mechanics."),
+        demo=("kernel", "Register pressure, per architecture", "Occupancy from the CUDA occupancy-calculator rules for the chosen architecture, achievable bandwidth from Little's law, and the bound from a roofline. Sim goes further by interpreting the SASS; this shows the mechanics."),
         feats=[("gauge", "Three levels of detail", "Static analysis takes milliseconds, sampled simulation takes seconds and cycle-level simulation takes hours. Use the fast ones to narrow the candidates down and the slow one to choose between the last few."),
                ("badge-check", "Reports its own error", "Each run reports how closely its ranking matches real hardware, and the top candidates are tested on a real GPU before anything ships."),
                ("git-branch", "Works in CI", "Runs on GitHub Actions or any CPU runner, so a build can fail when a kernel gets slower on a GPU you don't own.")],
@@ -399,7 +399,7 @@ def product_pages():
                [("check", "Production runs the configuration that was benchmarked."), ("check", "A rollback takes seconds."), ("check", "All models are served from one endpoint.")]),
               ("02 · Monitoring", "Monitoring", "Serve tracks time to first token, time per output token, tokens per second, KV-cache hit rate, queue depth, cost per million tokens and output quality. You can break these down by model, pool, tenant and prompt template. When a metric gets worse, Serve suggests a fix and can pass it to Optimize.", g["SCREEN_MON"],
                [("check", "See what a prompt change costs within an hour."), ("check", "Sampled evals flag drops in output quality."), ("check", "Also works with existing vLLM, SGLang and TensorRT-LLM deployments.")])],
-        demo=("batching", "How batching affects latency", "This simulates a model server. Switch between static and continuous batching, then turn on chunked prefill and prefix caching to see how time to first token changes."),
+        demo=("batching", "How batching affects latency", "A simulated model server under static batching, continuous batching, chunked prefill and prefix caching, with time to first token and inter-token latency measured on the same requests."),
         feats=[("network", "OpenAI-compatible API", "Supports /v1/chat/completions, /v1/embeddings, tool calls, and JSON-schema and grammar-constrained output. Existing SDKs only need a new base URL."),
                ("git-branch", "Rollouts", "Canaries, traffic splits, shadow traffic and rollback, with a side-by-side comparison against the previous release."),
                ("chart-line", "Inference metrics", "Exports to Prometheus and OpenTelemetry, comes with Grafana dashboards, and sends alerts to PagerDuty and Slack.")],
@@ -413,7 +413,7 @@ def product_pages():
         metrics=[("3B", "vision-language model on an 8 GB Jetson"), ("18 MB", "adapter update sent over the air"), ("+2.3 pts", "eval improvement from on-device QLoRA"), ("0 bytes", "of training data sent off the device")],
         rows=[("01 · Devices", "Device fleet", "Edge lists every device with the model it runs, its tokens per second and its free memory, and can run fine-tuning jobs on the devices that hold the data.", g["SCREEN_EDGE"],
                [("check", "Models that didn't fit before can run on a phone, a Pi or a Jetson."), ("check", "Accuracy is checked after each compression step."), ("check", "Updates are signed and rolled out in stages.")])],
-        demo=("edgefit", "Check whether a model fits", "Choose a device and a model to see how the weights, KV cache, vision encoder and runtime overhead compare with the memory actually available."),
+        demo=("edgefit", "Whether a model fits", "Weights, KV cache, vision encoder and runtime overhead against the memory the device actually has free, and the decode speed its bandwidth allows."),
         feats=[("boxes", "Compression with accuracy checks", "Quantise the weights, KV cache and vision encoder, prune layers if needed, and check accuracy after each step. Edge stops before the model drops below your threshold."),
                ("brain", "On-device training", "QLoRA fine-tuning within the device's memory using gradient checkpointing, with a live loss curve and an estimate of the improvement before you start."),
                ("upload", "Export formats", "GGUF, MLX, ExecuTorch, Core ML, QNN and TensorRT, signed and versioned, with staged rollouts.")],
@@ -426,7 +426,7 @@ def product_pages():
         metrics=[("12×", "more agents per GPU than a default setup"), ("8 → 96", "agents, scaled with one command"), ("64%", "of prompt tokens served from shared prefixes"), ("Air-gapped", "by default")],
         rows=[("01 · Agents", "GPU and agent overview", "See each GPU with its agents, utilisation and KV-cache use, the scheduler's decisions as they happen, and a capacity check that estimates when you would miss the latency target.", g["SCREEN_FLEET"],
                [("check", "More agents per GPU, because cached prompts are reused."), ("check", "Scaling is a single setting."), ("check", "A clear estimate of how many agents your cluster can handle.")])],
-        demo=("batching", "Prefix caching with agent traffic", "Select the Agents traffic preset and turn on prefix caching. Shared system prompts and tool definitions are then no longer recomputed on every call."),
+        demo=("batching", "Prefix caching with agent traffic", "With the Agents traffic preset and prefix caching on, shared system prompts and tool definitions are no longer recomputed on every call; the queue and time to first token show the difference."),
         feats=[("network", "Prefix-aware routing", "Requests go to the GPU that already has their prompt prefix cached, so a burst of sub-agents doesn't recompute the same 20k tokens sixteen times."),
                ("pause", "Pausing during tool calls", "While an agent waits on a tool, its slot is given to another agent and its KV cache is kept in memory or offloaded."),
                ("gauge-circle", "Budgets and policies", "Set GPU budgets, priorities and quotas per team. The scheduler enforces them.")],
@@ -565,7 +565,7 @@ def home():
     body = (hero + logo_strip() + lifecycle()
             + f'<section class="prods" id="products"><div class="wrap">{sec_head("Products", "What we build", "Each product can be used on its own. Used together, they share one configuration format, so the setup Plan sizes for is the one Optimize tunes and Serve runs.")}{cards(prods, "products", root="")}</div></section>'
             + ladder + tour
-            + f'<section class="labs" id="lab"><div class="wrap">{sec_head("Live demos", "Interactive demos", "Five small tools that run in your browser with no sign-up. They use rough first-order estimates, the same starting point our products use before measuring on real hardware.")}<div class="lcards">{labs}</div></div></section>'
+            + f'<section class="labs" id="lab"><div class="wrap">{sec_head("Live demos", "Interactive demos", "Six estimators built on the first-order models our products start from. The products then measure the real numbers on your hardware.")}<div class="lcards">{labs}</div></div></section>'
             + f'<section class="sols" id="solutions"><div class="wrap">{sec_head("Solutions", "Where we work")}<div class="scards">{sols}</div></div></section>'
             + svc + clients)
     page("", "VitalOps · Inference optimisation for open-weight models", "VitalOps helps teams plan, tune and run open-weight models on their own hardware: capacity planning, inference optimisation, a GPU simulator for kernels, serving and monitoring, edge deployment and agent scheduling.", "home", body, faqs=FAQ_HOME)
@@ -576,16 +576,16 @@ def lab_page():
     sub = ""
     intro = {"planner": "Estimates how many GPUs you need and the cost per million tokens. It assumes decode is limited by memory bandwidth and prefill by compute, which is where Plan starts before running a full simulation.",
              "batching": "Simulates a model server using static batching, continuous batching, chunked prefill and prefix caching on chat, RAG and agent traffic.",
-             "quant": "Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights. You can see the effect of group size and outlier protection.",
-             "specdec": "A draft model proposes several tokens and the main model checks them in one pass. Adjust the acceptance rate and draft length to find the best setting.",
+             "quant": "Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights, and shows the effect of group size and outlier protection.",
+             "specdec": "A draft model proposes several tokens and the main model checks them in one pass. The measured speed-up is shown against the closed-form expectation for each draft length.",
              "kernel": "Occupancy from the CUDA occupancy-calculator rules for each architecture, the register file and shared memory drawn to scale, spills under a register cap, achievable bandwidth from Little's law and a roofline for the chosen kernel.",
-             "edgefit": "Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi. You can also check whether on-device fine-tuning would fit."}
-    body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. Pick the hardware at the top of the panel; every tab follows it.</p></div></section>"""
+             "edgefit": "Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi, with an optional on-device fine-tune."}
+    body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Estimators for the questions that come up before a model is measured: how many GPUs, what the scheduler does to latency, what quantisation costs, where a kernel is bound, what fits on a device. All of them are first-order models from public specifications; the products measure the real numbers.</p></div></section>"""
     items = "".join(f'<li><a href="#{k}">{ic(DEMOS[k][2])}<b>{DEMOS[k][0]}</b></a><p>{intro[k]}</p></li>' for k in order)
     body += f'<section class="labsec" id="demos"><div class="wrap"><div class="lab" data-lab-shell data-tabs="{",".join(order)}" data-gpu="h100"><noscript><p class="lab-ns">These demos need JavaScript.</p></noscript></div><ul class="lab-list">{items}</ul></div></section>'
 
-    page("lab/", "Live demos | VitalOps", "Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a kernel occupancy lab, a quantisation lab, a speculative decoding race and an edge memory fit.", "lab", body, demos=order,
-         cta_args=("Want real numbers?", "These demos give rough estimates. On a review call we'll look at your actual model and hardware and tell you what's realistic."))
+    page("lab/", "Live demos | VitalOps", "Interactive inference estimators: a GPU capacity planner, a batching simulator, a kernel occupancy lab, a quantisation lab, a speculative decoding race and an edge memory fit.", "lab", body, demos=order,
+         cta_args=("For measured numbers", "These demos are first-order estimates. A review call covers your model and your hardware specifically."))
 
 def platform_page():
     g = G

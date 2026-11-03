@@ -152,5 +152,12 @@
   "author": "极客湾 Geekerwan",
   "license": "CC BY 3.0",
   "page": "https://commons.wikimedia.org/wiki/File:超级核显来袭！AMD新品现场体验_(2160p_60fps_VP9-128kbit_AAC)-00.06.51.561.png"
+ },
+ {
+  "file": "hw/l40s.webp",
+  "title": "NVIDIA L40S",
+  "author": "NVIDIA product image",
+  "license": "NVIDIA product image, used for identification",
+  "page": "https://www.nvidia.com/en-us/data-center/l40s/"
  }
 ]
