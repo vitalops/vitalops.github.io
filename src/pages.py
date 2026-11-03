@@ -125,7 +125,7 @@ def footer(root):
       <p class="foot-soc"><a href="https://github.com/vitalops" target="_blank" rel="noopener" aria-label="GitHub">{lg("github")}</a><a href="https://x.com/vitalopsai" target="_blank" rel="noopener" aria-label="X">X</a><a href="mailto:{MAIL}">{MAIL}</a></p></div>
     <div><h4>Products</h4>{col(PRODUCTS, "products")}</div>
     <div><h4>Solutions</h4>{col(SOLUTIONS, "solutions")}</div>
-    <div><h4>Resources</h4><a href="{root}lab/">Live demos</a><a href="https://github.com/vitalops/tokplan" target="_blank" rel="noopener">tokplan (open source)</a><a href="{root}platform/">Platform</a><a href="{root}platform/#stack">Supported stack</a><a href="{root}services/">Services</a><a href="{root}services/#engage">How we engage</a></div>
+    <div><h4>Resources</h4><a href="{root}lab/">Live demos</a><a href="{root}oss/">vitalops CLI (open source)</a><a href="{root}platform/">Platform</a><a href="{root}platform/#stack">Supported stack</a><a href="{root}services/">Services</a><a href="{root}services/#engage">How we engage</a></div>
     <div><h4>Company</h4><a href="{root}company/">About</a><a href="{root}security/">Security</a><a href="{BOOK}" target="_blank" rel="noopener">Book a review</a><a href="mailto:{MAIL}">Contact</a><a href="{root}credits/">Photo credits</a></div>
   </div>
   <p class="foot-legal">© <span id="yr">2026</span> VitalOps Inc · vitalops.ai</p>
@@ -527,10 +527,10 @@ SCREEN_PLAN_CACHE = ""
 
 # ───────────────────────── open source ─────────────────────────
 OSS = """<section class="oss2" id="open-source"><div class="wrap"><div class="oss2-grid">
-  <div><span class="k">Open source</span><h2>tokplan</h2><p class="lede">The capacity planner as a command-line tool and a Python library: pure Python, no dependencies, MIT. It reads any model's shapes from the Hugging Face Hub, applies the same first-order physics as the demo above, and prints the layout, the speed and the cost, or JSON for a script.</p>
-    <p class="oss2-links"><a class="btn btn-p" href="https://github.com/vitalops/tokplan" target="_blank" rel="noopener">GitHub</a><a class="btn btn-s" href="{R}tokplan/">Docs and live demo</a></p></div>
-  <pre class="oss2-term"><code>$ pip install tokplan
-$ tokplan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64
+  <div><span class="k">Open source</span><h2>The vitalops command line</h2><p class="lede">Pure Python, no dependencies, MIT. <code>vitalops plan</code> reads any model's shapes from the Hugging Face Hub, applies the same first-order physics as the planner demo, and prints the layout, the speed and the cost. <code>vitalops bench</code> measures a running OpenAI-compatible server at the concurrency you care about and prints the plan's estimate next to each measurement.</p>
+    <p class="oss2-links"><a class="btn btn-p" href="https://github.com/vitalops/vitalops" target="_blank" rel="noopener">GitHub</a><a class="btn btn-s" href="{R}oss/">Docs and live planner</a></p></div>
+  <pre class="oss2-term"><code>$ pip install vitalops
+$ vitalops plan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64
   layout     TP2 × 1 replica = 2 GPUs · batch 64 per replica (max 218)
   decode     20.4 tok/s per stream · 1,304 tok/s aggregate · 4.35 requests/s
   TTFT       155 ms = prefill 135 ms + one step 20.3 ms · target met
@@ -596,7 +596,7 @@ def lab_page():
              "edgefit": "Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi, with an optional on-device fine-tune."}
     body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Estimators for the questions that come up before a model is measured: how many GPUs, what the scheduler does to latency, what quantisation costs, where a kernel is bound, what fits on a device. All of them are first-order models from public specifications; the products measure the real numbers.</p></div></section>"""
     items = "".join(f'<li><a href="#{k}">{ic(DEMOS[k][2])}<b>{DEMOS[k][0]}</b></a><p>{intro[k]}</p></li>' for k in order)
-    body += f'<section class="labsec" id="demos"><div class="wrap"><div class="lab" data-lab-shell data-tabs="{",".join(order)}" data-gpu="h100"><noscript><p class="lab-ns">These demos need JavaScript.</p></noscript></div><p class="lab-cli">The capacity planner is also a command-line tool and a Python library, <a href="https://github.com/vitalops/tokplan" target="_blank" rel="noopener">tokplan</a>: <code>pip install tokplan</code>, then <code>tokplan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64</code>. It reads any model\'s shapes from the Hugging Face Hub and applies the same physics. <a href="{{R}}tokplan/">Docs</a>.</p><ul class="lab-list">{items}</ul></div></section>'
+    body += f'<section class="labsec" id="demos"><div class="wrap"><div class="lab" data-lab-shell data-tabs="{",".join(order)}" data-gpu="h100"><noscript><p class="lab-ns">These demos need JavaScript.</p></noscript></div><p class="lab-cli">The capacity planner is also a command-line tool and a Python library, <a href="{{R}}oss/">vitalops</a>: <code>pip install vitalops</code>, then <code>vitalops plan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64</code>. It reads any model\'s shapes from the Hugging Face Hub and applies the same physics, and <code>vitalops bench</code> measures a running server against it.</p><ul class="lab-list">{items}</ul></div></section>'
 
     page("lab/", "Live demos | VitalOps", "Interactive inference estimators: a GPU capacity planner, a batching simulator, a kernel occupancy lab, a quantisation lab, a speculative decoding race and an edge memory fit.", "lab", body, demos=order,
          cta_args=("For measured numbers", "These demos are first-order estimates. A review call covers your model and your hardware specifically."))
