@@ -16,6 +16,7 @@ python3 src/build.py          # writes every page; needs only Python 3
 | `pages.css`, `pages.js` | Styles and the small nav and lifecycle script for those pages. |
 | `photo_credits.json` | Source and licence of each photo under `assets/photos/`; the credits page is built from it. |
 | `../assets/js/hw.js` | The hardware catalogue the demos share: public specs per GPU and device, the compute-capability rules for the occupancy calculator, the photo card and the memory drawing. Every figure is from a datasheet or is marked as an assumption. |
+| `../assets/js/lab-shell.js` | The demo shell: a dark panel with the hardware carousel as the selector and one tab per demo (`<div data-lab-shell data-tabs="planner,kernel">`). Demos read the selection from `window.VO_LAB`. |
 | `../assets/js/lab-*.js` | The six live demos (planner, batching, kernel, quant, specdec, edgefit). Hand-written; each mounts on `[data-lab="name"]` and reads `window.VO_HW`. |
 | `icons/` | Lucide icons and brand marks, inlined as an SVG sprite that holds only the icons the page uses. See `icons/LICENSES.md`. |
 | `og.html` | Source of the social card. |

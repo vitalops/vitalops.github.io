@@ -225,11 +225,15 @@ body.nav-open{overflow:hidden}
 .svc-more{margin-top:22px}
 
 /* ── live demo bands ── */
-.labsec{padding:72px 0;border-top:1px solid var(--line)}
+.labsec{padding:56px 0 64px;border-top:1px solid var(--line)}
+.lab-list{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px;margin-top:28px}
+.lab-list a{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--ink)}.lab-list a .ic{width:16px;height:16px;color:var(--brand)}
+.lab-list p{font-size:13.5px;color:var(--ink3);margin-top:4px}
+@media(max-width:900px){.lab-list{grid-template-columns:1fr 1fr}}@media(max-width:560px){.lab-list{grid-template-columns:1fr}}
 .labsec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:24px}
 .labsec-head>div{max-width:760px}
 .labsec-head h2{margin-top:10px}.labsec-head .lede{margin-top:10px;font-size:16.5px}
-.lab{min-height:200px}
+.lab{min-height:200px;scroll-margin-top:72px}
 .lab-ns{padding:24px;border:1px dashed var(--line);border-radius:12px;color:var(--ink3)}
 .lhero{padding:72px 0 24px}
 .lhero h1{margin-top:12px;max-width:20ch}

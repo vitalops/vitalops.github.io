@@ -256,9 +256,10 @@
 
   /* ───────────── styles ───────────── */
   var CSS = [
-    '.lb{background:var(--white,#fff);border:1px solid var(--line,#e2e8f0);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);font-family:var(--font,system-ui,sans-serif);color:var(--ink2,#334155);font-size:13px;line-height:1.45;overflow:hidden;min-width:0}',
+    '.lb{--lb-pf:var(--brandD,#2737bd);--lb-dec:rgba(99,127,255,.55);--lb-hit:#0d9488;--lb-long:rgba(217,119,6,.13);--lb-longl:rgba(217,119,6,.55);--lb-wait:#d97706;--lb-lane:rgba(15,23,42,.035);background:var(--white,#fff);border:1px solid var(--line,#e2e8f0);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);font-family:var(--font,system-ui,sans-serif);color:var(--ink2,#334155);font-size:13px;line-height:1.45;overflow:hidden;min-width:0}',
+    '.vlab .lb{--lb-pf:#637fff;--lb-dec:rgba(99,127,255,.35);--lb-hit:#2dd4bf;--lb-long:rgba(251,191,36,.12);--lb-longl:rgba(251,191,36,.45);--lb-wait:#fbbf24;--lb-lane:rgba(255,255,255,.04);--ok:#34d399;--warn:#fbbf24;--bad:#f87171;box-shadow:none}',
     '.lb *{box-sizing:border-box}',
-    '.lb-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 18px;padding:14px 16px 12px;border-bottom:1px solid var(--line2,#eef2f7)}',
+    '.lb-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;padding:12px 14px 10px;border-bottom:1px solid var(--line2,#eef2f7)}',
     '.lb-grp{display:flex;flex-direction:column;gap:5px;min-width:0}',
     '.lb-lab{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3,#5b687c)}',
     '.lb-lab output{font-family:var(--mono,monospace);font-variant-numeric:tabular-nums;text-transform:none;letter-spacing:0;color:var(--ink,#0f172a);font-weight:500;margin-left:6px}',
@@ -267,7 +268,8 @@
     '.lb-seg{display:inline-flex;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:2px;background:var(--bg,#f5f6fa);flex-wrap:wrap}',
     '.lb-seg button,.lb-btn{font:inherit;font-size:12.5px;font-weight:500;color:var(--ink2,#334155);background:transparent;border:0;border-radius:6px;padding:5px 10px;cursor:pointer;white-space:nowrap;line-height:1.3}',
     '.lb-seg button:hover{color:var(--ink,#0f172a)}',
-    '.lb-seg button[aria-pressed="true"]{background:var(--white,#fff);color:var(--brand,#3f5cf6);box-shadow:0 0 0 1px var(--brand200,#bdcdff),0 1px 2px rgba(16,24,40,.06)}',
+    '.lb-seg button[aria-pressed="true"]{background:var(--white,#fff);color:var(--brand,#3f5cf6);box-shadow:0 0 0 1px var(--brand200,#bdcdff)}',
+    '.vlab .lb-seg button[aria-pressed="true"]{color:var(--brandD,#8fa3ff)}',
     '.lb-btn{border:1px solid var(--line,#e2e8f0);background:var(--white,#fff);display:inline-flex;align-items:center;gap:6px;padding:6px 11px}',
     '.lb-btn:hover{border-color:var(--brand200,#bdcdff)}',
     '.lb-btn.lb-pri{background:var(--brand,#3f5cf6);border-color:var(--brand,#3f5cf6);color:#fff}',
@@ -282,39 +284,41 @@
     '.lb-sw input:checked+i{background:var(--brand,#3f5cf6)}.lb-sw input:checked+i::after{transform:translateX(12px)}',
     '.lb-sw input:focus-visible+i{outline:2px solid var(--brand,#3f5cf6);outline-offset:2px}',
     '.lb-sw input:disabled+i{background:var(--line2,#eef2f7)}.lb-sw input:disabled+i::after{transform:none;box-shadow:0 0 0 1px var(--line,#e2e8f0)}.lb-sw.lb-dis{color:var(--ink4,#94a3b8);cursor:not-allowed}',
-    '.lb-rate input[type=range]{width:150px;accent-color:var(--brand,#3f5cf6);margin:3px 0}',
+    '.lb-rate input[type=range]{width:120px;accent-color:var(--brand,#3f5cf6);margin:3px 0}',
     '.lb-ctl{display:flex;gap:6px;align-items:center;margin-left:auto;flex-wrap:wrap}',
-    '.lb-phys{margin:0;padding:8px 16px 0;font-family:var(--mono,monospace);font-size:11.5px;color:var(--ink3,#5b687c);font-variant-numeric:tabular-nums;line-height:1.5}',
+    '.lb-phys{margin:0;padding:8px 14px 0;font-family:var(--mono,monospace);font-size:11.5px;color:var(--ink3,#5b687c);font-variant-numeric:tabular-nums;line-height:1.5}',
     '.lb-phys b{font-weight:500;color:var(--ink,#0f172a)}',
-    '.lb-note{margin:0;padding:8px 16px 0;color:var(--ink3,#5b687c);font-size:12.5px;min-height:2.9em}',
+    '.lb-note{margin:0;padding:8px 14px 0;color:var(--ink3,#5b687c);font-size:12.5px}',
     '.lb-note b{color:var(--ink,#0f172a);font-weight:600}',
     '.lb-note.lb-nofit{color:var(--bad,#be123c)}',
-    '.lb-main{display:grid;grid-template-columns:minmax(0,1fr) 248px;gap:0 16px;padding:6px 16px 0;align-items:start}',
+    '.lb-main{display:grid;grid-template-columns:minmax(0,1fr) 248px;gap:0 14px;padding:10px 14px 0;align-items:start}',
     '.lb-viz{position:relative;min-width:0}',
-    '.lb-viz canvas{display:block;width:100%;height:300px}',
-    '.lb-viz .lb-nf{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--ink3,#5b687c);font-size:13px;background:rgba(255,255,255,.7)}',
+    '.lb-viz canvas{display:block;width:100%;height:260px}',
+    '.lb-viz .lb-nf{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--ink3,#5b687c);font-size:13px;background:var(--white,#fff);opacity:.88}',
+    '.lb-viz .lb-nf[hidden]{display:none}',
+    '.lb-hw .hwc-kv{row-gap:1px}.lb-hw .hwc-b{padding:9px 11px 10px}',
     '.lb-hw{min-width:0}',
     '.lb-hw .hwc{box-shadow:none}',
     '.lb-hw .hwc-kv dd.lb-dim{color:var(--ink3,#5b687c)}',
     '.lb-kvline{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--ink3,#5b687c);margin-top:6px;font-family:var(--mono,monospace);font-variant-numeric:tabular-nums}',
     '.lb-kvline b{white-space:nowrap}',
     '.lb-kvline b{color:var(--ink,#0f172a);font-weight:500}',
-    '.lb-leg{display:flex;flex-wrap:wrap;gap:6px 16px;padding:8px 16px 12px;font-size:11.5px;color:var(--ink3,#5b687c)}',
+    '.lb-leg{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 14px 10px;font-size:11.5px;color:var(--ink3,#5b687c)}',
     '.lb-leg span{display:inline-flex;align-items:center;gap:6px}',
     '.lb-leg i{display:inline-block;width:16px;height:8px;border-radius:2px}',
     '.lb-met{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));border-top:1px solid var(--line2,#eef2f7);background:var(--bg,#f5f6fa)}',
-    '.lb-m{padding:10px 14px;border-right:1px solid var(--line2,#eef2f7);border-bottom:1px solid var(--line2,#eef2f7);min-width:0}',
+    '.lb-m{padding:8px 12px;border-right:1px solid var(--line2,#eef2f7);border-bottom:1px solid var(--line2,#eef2f7);min-width:0}',
     '.lb-m small{display:block;font-size:11px;color:var(--ink3,#5b687c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
     '.lb-m b{display:block;font-family:var(--mono,monospace);font-variant-numeric:tabular-nums;font-size:17px;font-weight:500;color:var(--ink,#0f172a);margin-top:2px;white-space:nowrap}',
     '.lb-m b em{font-style:normal;font-size:11.5px;color:var(--ink3,#5b687c);margin-left:3px}',
     '.lb-m b.lb-bad{color:var(--bad,#be123c)}.lb-m b.lb-warn{color:var(--warn,#b45309)}',
     '.lb-m svg{display:block;width:100%;height:16px;margin-top:4px;overflow:visible}',
-    '.lb-det{border-top:1px solid var(--line2,#eef2f7);padding:10px 16px;font-size:12.5px}',
+    '.lb-det{border-top:1px solid var(--line2,#eef2f7);padding:10px 14px;font-size:12.5px}',
     '.lb-det summary{cursor:pointer;font-weight:600;color:var(--ink,#0f172a);list-style-position:inside}',
     '.lb-det ul{margin:8px 0 2px 18px;padding:0;color:var(--ink3,#5b687c)}.lb-det li{margin:3px 0}',
     '.lb-det code{font-family:var(--mono,monospace);font-size:12px;color:var(--ink,#0f172a)}',
     '@media(max-width:760px){.lb-main{grid-template-columns:1fr;gap:12px}.lb-hw .hwc{display:grid;grid-template-columns:minmax(0,160px) minmax(0,1fr)}.lb-hw .hwc-ph{aspect-ratio:auto;height:100%;min-height:150px}}',
-    '@media(max-width:560px){.lb-bar{padding:12px}.lb-ctl{margin-left:0}.lb-main{padding:6px 10px 0}.lb-viz canvas{height:230px}.lb-hw .hwc{grid-template-columns:1fr}.lb-hw .hwc-ph{aspect-ratio:3/2;min-height:0}.lb-note,.lb-phys,.lb-leg,.lb-det{padding-left:12px;padding-right:12px}.lb-rate input[type=range]{width:130px}}'
+    '@media(max-width:560px){.lb-bar{padding:12px}.lb-ctl{margin-left:0}.lb-main{padding:6px 10px 0}.lb-viz canvas{height:230px}.lb-hw .hwc{grid-template-columns:1fr}.lb-hw .hwc-ph{aspect-ratio:3/2;min-height:0}.lb-note,.lb-phys,.lb-leg,.lb-det{padding-left:12px;padding-right:12px}.lb-rate input[type=range]{width:120px}}'
   ].join('\n');
   function injectCss() {
     if (document.getElementById('lab-batching-css')) return;
@@ -347,8 +351,9 @@
     var HW = window.VO_HW;
     if (!HW) { root.innerHTML = '<p>This demo needs the hardware catalogue (hw.js) loaded first.</p>'; return; }
     var id = 'lb' + (++uid);
+    var LAB = window.VO_LAB, shell = !!(LAB && root.closest('.vlab'));
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var st = { model: 'qwen32b', gpu: 'h100', preset: 'chat', mode: 'continuous', prefix: true, rate: 1, speed: 1, playing: !reduce, seed: 11 };
+    var st = { model: 'qwen32b', gpu: shell && HW.gpus[LAB.gpu] ? LAB.gpu : 'h100', preset: 'chat', mode: 'continuous', prefix: true, rate: 1, speed: 1, playing: !reduce, seed: 11 };
     var ph, cap;
 
     function seg(name, label, opts, cur) {
@@ -363,7 +368,7 @@
       '<div class="lb">' +
       '<div class="lb-bar">' +
       sel('model', 'Model · fp8', Object.keys(MODELS).map(function (k) { return [k, MODELS[k].label]; }), st.model) +
-      sel('gpu', 'GPU · one replica', GPU_KEYS.map(function (k) { return [k, HW.gpus[k].name]; }), st.gpu) +
+      (shell ? '' : sel('gpu', 'GPU · one replica', GPU_KEYS.map(function (k) { return [k, HW.gpus[k].name]; }), st.gpu)) +
       seg('preset', 'Traffic', Object.keys(PRESETS).map(function (k) { return [k, PRESETS[k].label]; }), st.preset) +
       seg('mode', 'Scheduler', Object.keys(MODES).map(function (k) { return [k, MODES[k].label]; }), st.mode) +
       '<div class="lb-grp"><span class="lb-lab">Cache</span><label class="lb-sw"><input type="checkbox" data-k="prefix" checked><i></i><span>Prefix caching</span></label></div>' +
@@ -371,12 +376,10 @@
       '<div class="lb-ctl"><button type="button" class="lb-btn lb-pri" data-a="play"></button><button type="button" class="lb-btn" data-a="reset">' + ICON_RESET + 'Reset</button>' +
       '<div class="lb-seg" role="group" aria-label="Playback speed" data-k="speed"><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="4" aria-pressed="false">4×</button></div></div>' +
       '</div>' +
-      '<p class="lb-phys" aria-live="polite"></p>' +
-      '<p class="lb-note" aria-live="polite"></p>' +
       '<div class="lb-main"><div class="lb-viz"><canvas role="img" aria-label="GPU batch slots over time: each bar is a request, darker while its prompt is prefilled, lighter while it generates."></canvas><div class="lb-nf" hidden></div></div><div class="lb-hw"></div></div>' +
-      '<div class="lb-leg"><span><i style="background:var(--brandD,#2737bd)"></i>Prefill</span><span><i style="background:var(--brand2,#637fff);opacity:.6"></i>Decode</span>' +
-      '<span><i style="background:#0d9488"></i>Prefix cache hit</span><span><i style="background:transparent;border-top:2px dashed var(--ink4,#94a3b8);height:0;border-radius:0"></i>Slot held, idle</span>' +
-      '<span><i style="background:rgba(217,119,6,.18);border-left:2px solid rgba(217,119,6,.6)"></i>Long step: every stream stalls</span><span><i style="background:#d97706;width:8px"></i>Waiting &gt; 2 s</span></div>' +
+      '<div class="lb-leg"><span><i style="background:var(--lb-pf)"></i>Prefill</span><span><i style="background:var(--lb-dec)"></i>Decode</span>' +
+      '<span><i style="background:var(--lb-hit)"></i>Prefix cache hit</span><span><i style="background:transparent;border-top:2px dashed var(--ink4,#94a3b8);height:0;border-radius:0"></i>Slot held, idle</span>' +
+      '<span><i style="background:var(--lb-long);border-left:2px solid var(--lb-longl)"></i>Long step: every stream stalls</span><span><i style="background:var(--lb-wait);width:8px"></i>Waiting &gt; 2 s</span></div>' +
       '<div class="lb-met">' +
       '<div class="lb-m"><small>Output throughput</small><b data-m="tps">—</b></div>' +
       '<div class="lb-m"><small>TTFT p50</small><b data-m="ttft50">—</b></div>' +
@@ -387,6 +390,8 @@
       '<div class="lb-m"><small>Queue</small><b data-m="queue">0</b></div>' +
       '<div class="lb-m"><small>KV cache in use</small><b data-m="kv">0<em>%</em></b></div>' +
       '</div>' +
+      '<p class="lb-note" aria-live="polite"></p>' +
+      '<p class="lb-phys" aria-live="polite"></p>' +
       '<details class="lb-det"><summary>What the simulation models</summary><ul data-det></ul></details></div>';
 
     var el = root.querySelector('.lb'), canvas = el.querySelector('canvas'), ctx = canvas.getContext('2d');
@@ -404,6 +409,8 @@
       C.brand = css('--brand', '#3f5cf6'); C.brand2 = css('--brand2', '#637fff'); C.brandD = css('--brandD', '#2737bd');
       C.brand200 = css('--brand200', '#bdcdff'); C.ink = css('--ink', '#0f172a'); C.ink3 = css('--ink3', '#5b687c'); C.ink4 = css('--ink4', '#94a3b8');
       C.line = css('--line', '#e2e8f0'); C.line2 = css('--line2', '#eef2f7'); C.mono = css('--mono', 'ui-monospace,monospace'); C.font = css('--font', 'system-ui,sans-serif');
+      C.white = css('--white', '#fff'); C.pf = css('--lb-pf', '#2737bd'); C.dec = css('--lb-dec', 'rgba(99,127,255,.55)'); C.hit = css('--lb-hit', '#0d9488');
+      C.long = css('--lb-long', 'rgba(217,119,6,.13)'); C.longl = css('--lb-longl', 'rgba(217,119,6,.55)'); C.wait = css('--lb-wait', '#d97706'); C.lane = css('--lb-lane', 'rgba(15,23,42,.035)');
     }
 
     /* the physics for the chosen model and GPU, and everything that depends on it */
@@ -448,9 +455,9 @@
         ['Prefill / token', fmtSmall(ph.pf)],
         ['KV cache budget', ph.fits ? fmtTok(ph.kvBudget) + ' tok' : '0']
       ];
-      var card = HW.card(g, { rows: rows, sub: g.arch === 'cdna3' ? g.cus + ' CUs · ' + HW.arch[g.arch].name : g.sms + ' SMs · ' + HW.arch[g.arch].name,
+      var card = HW.card(g, { photo: !shell, rows: rows, sub: g.arch === 'cdna3' ? g.cus + ' CUs · ' + HW.arch[g.arch].name : g.sms + ' SMs · ' + HW.arch[g.arch].name,
         note: (ph.fp8 ? '' : 'No fp8 tensor cores: weights stay fp8 in memory and are dequantised on the fly; prefill is priced at the bf16 rate. ') +
-              'Reads at ' + Math.round(BW_EFF * 100) + '% of peak bandwidth, prefill at ' + Math.round(FLOPS_EFF * 100) + '% of peak compute, ' + OVERHEAD + ' ms launch overhead per step, ' + Math.round(RESERVE * 100) + '% of memory reserved. All assumptions; see below.' });
+              (shell ? '' : 'Reads at ' + Math.round(BW_EFF * 100) + '% of peak bandwidth, prefill at ' + Math.round(FLOPS_EFF * 100) + '% of peak compute, ' + OVERHEAD + ' ms launch overhead per step, ' + Math.round(RESERVE * 100) + '% of memory reserved. All assumptions; see below.') });
       hwBox.innerHTML = ''; hwBox.appendChild(card);
       var slot = card.querySelector('.hwc-slot');
       kvLine = document.createElement('div'); kvLine.className = 'lb-kvline';
@@ -477,7 +484,7 @@
     }
     function memParts(kvTokens) {
       return [
-        { label: 'Weights', bytes: ph.weights, color: C.brandD || '#2737bd' },
+        { label: 'Weights', bytes: ph.weights, color: C.pf || '#2737bd' },
         { label: 'KV cache in use', bytes: kvTokens * ph.kvTok, color: C.brand2 || '#637fff' },
         { label: 'Reserve', bytes: ph.reserve, color: C.ink4 || '#94a3b8' }
       ];
@@ -540,7 +547,7 @@
     var W = 0, H = 0, dpr = 1, hatch = null;
     function resize() {
       // on desktop the lane chart is as tall as the hardware card beside it, so the two read as one panel
-      var wide = el.clientWidth > 760, ch = wide ? Math.max(300, hwBox.offsetHeight) : (el.clientWidth < 560 ? 230 : 300);
+      var wide = el.clientWidth > 760, ch = wide ? Math.max(240, Math.min(shell ? 340 : 600, hwBox.offsetHeight)) : (el.clientWidth < 560 ? 230 : 260);
       if (Math.abs(parseFloat(canvas.style.height || '0') - ch) > 1) canvas.style.height = ch + 'px';
       var r = canvas.getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1);
       W = Math.max(200, r.width); H = Math.max(120, r.height);
@@ -571,8 +578,8 @@
       ctx.fillText(narrow ? 'BATCH SLOTS' : 'GPU BATCH SLOTS', G + 8, 11);
       // lanes
       for (var i = 0; i < lanes; i++) {
-        ctx.fillStyle = i % 2 ? '#ffffff' : C.line2; ctx.globalAlpha = i % 2 ? 1 : .55;
-        ctx.fillRect(G + 8, top + i * laneH, R - G - 8, laneH);
+        if (i % 2) continue;
+        ctx.fillStyle = C.lane; ctx.fillRect(G + 8, top + i * laneH, R - G - 8, laneH);
       }
       ctx.globalAlpha = 1;
       // grid + axis
@@ -595,8 +602,8 @@
         var sp = eng.steps[j]; if (sp.t1 < clock - span) break;
         if (sp.dt < longStep || sp.t1 > clock) continue;
         var sx0 = X(sp.t1 - sp.dt), sx1 = X(sp.t1);
-        ctx.fillStyle = 'rgba(217,119,6,.13)'; ctx.fillRect(sx0, top, Math.max(1, sx1 - sx0), H - top - axis);
-        ctx.fillStyle = 'rgba(217,119,6,.55)'; ctx.fillRect(sx0, top, 1.5, H - top - axis);
+        ctx.fillStyle = C.long; ctx.fillRect(sx0, top, Math.max(1, sx1 - sx0), H - top - axis);
+        ctx.fillStyle = C.longl; ctx.fillRect(sx0, top, 1.5, H - top - axis);
       }
       var bh = Math.max(3, laneH - 3), rad = Math.min(3, bh / 2), hidden = 0;
       for (var k = 0; k < eng.reqs.length; k++) {
@@ -611,15 +618,15 @@
         ctx.globalAlpha = fade;
         // prefill
         if (xp - x0 > .3) {
-          ctx.fillStyle = C.brandD; rr(x0, y, Math.max(1, xp - x0), bh, rad); ctx.fill();
+          ctx.fillStyle = C.pf; rr(x0, y, Math.max(1, xp - x0), bh, rad); ctx.fill();
           ctx.fillStyle = hatchPat(); ctx.fill();
         }
         // decode
         if (pe !== null && xe - xp > .3) {
-          ctx.fillStyle = C.brand2; ctx.globalAlpha = fade * .55; rr(xp, y, Math.max(1, xe - xp), bh, rad); ctx.fill();
-          ctx.globalAlpha = fade; ctx.fillStyle = C.brand; ctx.fillRect(Math.max(xp, xe - 2), y, 2, bh);
+          ctx.fillStyle = C.dec; rr(xp, y, Math.max(1, xe - xp), bh, rad); ctx.fill();
+          ctx.fillStyle = C.brand2; ctx.fillRect(Math.max(xp, xe - 2), y, 2, bh);
         }
-        if (q.hit) { ctx.globalAlpha = fade; ctx.fillStyle = '#0d9488'; ctx.fillRect(x0, y, 3, bh); }
+        if (q.hit) { ctx.globalAlpha = fade; ctx.fillStyle = C.hit; ctx.fillRect(x0, y, 3, bh); }
         // static batch: slot held after the request finished
         if (fin !== null && (q.rel === null || q.rel > fin)) {
           var xr = X(q.rel !== null && q.rel <= clock ? q.rel : clock);
@@ -631,7 +638,7 @@
       if (hidden) {
         ctx.font = '500 10.5px ' + C.mono; ctx.textAlign = 'right'; ctx.fillStyle = C.ink3;
         var lbl = '+' + hidden + ' more running, not drawn', tw = ctx.measureText(lbl).width;
-        ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillRect(R - tw - 10, H - axis - 16, tw + 8, 14);
+        ctx.fillStyle = C.white; ctx.globalAlpha = .9; ctx.fillRect(R - tw - 10, H - axis - 16, tw + 8, 14); ctx.globalAlpha = 1;
         ctx.fillStyle = C.ink3; ctx.fillText(lbl, R - 6, H - axis - 5); ctx.textAlign = 'left';
       }
       // queue
@@ -640,7 +647,7 @@
       var cap2 = cols * rows, shown = Math.min(waiting.length, waiting.length > cap2 ? cap2 - cols : cap2);
       for (var w = 0; w < shown; w++) {
         var cx = (w % cols) * (cs + gap), cy = top + Math.floor(w / cols) * (cs + gap);
-        ctx.fillStyle = clock - waiting[w].arr > 2000 ? '#d97706' : C.brand200; rr(cx, cy, cs, cs, 1.5); ctx.fill();
+        ctx.fillStyle = clock - waiting[w].arr > 2000 ? C.wait : C.brand200; rr(cx, cy, cs, cs, 1.5); ctx.fill();
       }
       ctx.fillStyle = C.ink; ctx.font = '500 11px ' + C.mono;
       var qy = top + Math.ceil(Math.max(shown, 1) / cols) * (cs + gap) + 12;
@@ -684,6 +691,7 @@
     }
 
     readColours(); rederive(); reset(); setPlay(st.playing);
+    if (shell) LAB.subscribe(function (msg) { if (msg.kind !== 'gpu' || msg.gpu === st.gpu || !HW.gpus[msg.gpu]) return; st.gpu = msg.gpu; rederive(); reset(); setPlay(st.playing || !reduce); resize(); });
     if ('ResizeObserver' in window) { var ro = new ResizeObserver(resize); ro.observe(canvas); ro.observe(hwBox); } else window.addEventListener('resize', resize);
     resize();
     if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; last = 0; }, { threshold: 0.05 }).observe(el);

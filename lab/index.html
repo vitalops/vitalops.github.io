@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/vo.css?v=26229a5a1b"><link rel="stylesheet" href="../assets/css/pages.css?v=b8d02b27e5">
+<link rel="stylesheet" href="../assets/css/vo.css?v=26229a5a1b"><link rel="stylesheet" href="../assets/css/pages.css?v=43bc71c70e">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -49,25 +49,7 @@
   </div>
 </div></header>
 <main id="main" tabindex="-1">
-<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. For real numbers on your own model and hardware, you would use the products.</p><nav class="lsub" aria-label="Demos"><a href="#planner"><svg class="ic"><use href="#i-gauge"/></svg>Capacity planner</a><a href="#batching"><svg class="ic"><use href="#i-layers"/></svg>Batching simulator</a><a href="#kernel"><svg class="ic"><use href="#i-cpu"/></svg>Kernel lab</a><a href="#quant"><svg class="ic"><use href="#i-boxes"/></svg>Quantisation lab</a><a href="#specdec"><svg class="ic"><use href="#i-zap"/></svg>Speculative decoding</a><a href="#edgefit"><svg class="ic"><use href="#i-smartphone"/></svg>Edge fit</a></nav></div></section><section class="labsec" id="planner"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Capacity planner</span><h2>How many GPUs do you need?</h2><p class="lede">Estimates how many GPUs you need and the cost per million tokens. It assumes decode is limited by memory bandwidth and prefill by compute, which is where Plan starts before running a full simulation.</p></div></div>
-  <div class="lab" data-lab="planner"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
-</div></section><section class="labsec" id="batching"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Batching simulator</span><h2>How batching affects latency</h2><p class="lede">Simulates a model server using static batching, continuous batching, chunked prefill and prefix caching on chat, RAG and agent traffic.</p></div></div>
-  <div class="lab" data-lab="batching"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
-</div></section><section class="labsec" id="kernel"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Kernel lab</span><h2>Register pressure and occupancy, per GPU</h2><p class="lede">Occupancy from the CUDA occupancy-calculator rules for each architecture, the register file and shared memory drawn to scale, spills under a register cap, achievable bandwidth from Little's law and a roofline for the chosen kernel.</p></div></div>
-  <div class="lab" data-lab="kernel"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
-</div></section><section class="labsec" id="quant"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Quantisation lab</span><h2>Quantisation, up close</h2><p class="lede">Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights. You can see the effect of group size and outlier protection.</p></div></div>
-  <div class="lab" data-lab="quant"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
-</div></section><section class="labsec" id="specdec"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Speculative decoding</span><h2>Speculative decoding</h2><p class="lede">A draft model proposes several tokens and the main model checks them in one pass. Adjust the acceptance rate and draft length to find the best setting.</p></div></div>
-  <div class="lab" data-lab="specdec"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
-</div></section><section class="labsec" id="edgefit"><div class="wrap">
-  <div class="labsec-head"><div><span class="k"><svg class="ic"><use href="#i-play"/></svg>Edge fit</span><h2>Will it fit on the device?</h2><p class="lede">Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi. You can also check whether on-device fine-tuning would fit.</p></div></div>
-  <div class="lab" data-lab="edgefit"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
-</div></section><section class="cta2" id="contact"><div class="wrap cta2-in">
+<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. For real numbers on your own model and hardware, you would use the products.</p><nav class="lsub" aria-label="Demos"><a href="#planner" data-tab="planner"><svg class="ic"><use href="#i-gauge"/></svg>Capacity planner</a><a href="#batching" data-tab="batching"><svg class="ic"><use href="#i-layers"/></svg>Batching simulator</a><a href="#kernel" data-tab="kernel"><svg class="ic"><use href="#i-cpu"/></svg>Kernel lab</a><a href="#quant" data-tab="quant"><svg class="ic"><use href="#i-boxes"/></svg>Quantisation lab</a><a href="#specdec" data-tab="specdec"><svg class="ic"><use href="#i-zap"/></svg>Speculative decoding</a><a href="#edgefit" data-tab="edgefit"><svg class="ic"><use href="#i-smartphone"/></svg>Edge fit</a></nav></div></section><section class="labsec" id="demos"><div class="wrap"><div class="lab" data-lab-shell data-tabs="planner,batching,kernel,quant,specdec,edgefit" data-gpu="h100"><noscript><p class="lab-ns">These demos need JavaScript.</p></noscript></div><ul class="lab-list"><li><a href="#planner"><svg class="ic"><use href="#i-gauge"/></svg><b>Capacity planner</b></a><p>Estimates how many GPUs you need and the cost per million tokens. It assumes decode is limited by memory bandwidth and prefill by compute, which is where Plan starts before running a full simulation.</p></li><li><a href="#batching"><svg class="ic"><use href="#i-layers"/></svg><b>Batching simulator</b></a><p>Simulates a model server using static batching, continuous batching, chunked prefill and prefix caching on chat, RAG and agent traffic.</p></li><li><a href="#kernel"><svg class="ic"><use href="#i-cpu"/></svg><b>Kernel lab</b></a><p>Occupancy from the CUDA occupancy-calculator rules for each architecture, the register file and shared memory drawn to scale, spills under a register cap, achievable bandwidth from Little's law and a roofline for the chosen kernel.</p></li><li><a href="#quant"><svg class="ic"><use href="#i-boxes"/></svg><b>Quantisation lab</b></a><p>Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights. You can see the effect of group size and outlier protection.</p></li><li><a href="#specdec"><svg class="ic"><use href="#i-zap"/></svg><b>Speculative decoding</b></a><p>A draft model proposes several tokens and the main model checks them in one pass. Adjust the acceptance rate and draft length to find the best setting.</p></li><li><a href="#edgefit"><svg class="ic"><use href="#i-smartphone"/></svg><b>Edge fit</b></a><p>Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi. You can also check whether on-device fine-tuning would fit.</p></li></ul></div></section><section class="cta2" id="contact"><div class="wrap cta2-in">
   <div class="cta2-copy"><span class="k">Get started</span><h2>Want real numbers?</h2><p class="lede">These demos give rough estimates. On a review call we'll look at your actual model and hardware and tell you what's realistic.</p>
     <div class="hero-cta"><a class="btn btn-p" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener"><svg class="ic"><use href="#i-calendar"/></svg>Book an inference review</a><a class="btn btn-s" href="mailto:hello@vitalops.ai"><svg class="ic"><use href="#i-send"/></svg>hello@vitalops.ai</a></div></div>
   <ol class="cta2-steps">
@@ -91,12 +73,13 @@
 </div></footer>
 <script src="../assets/js/site.js?v=3267f0f221"></script>
 <script src="../assets/js/play.js?v=e82dc5384d"></script>
-<script src="../assets/js/hw.js?v=3257897f13" defer></script>
-<script src="../assets/js/lab-planner.js?v=3e50c0820d" defer></script>
-<script src="../assets/js/lab-batching.js?v=b62e7451a4" defer></script>
-<script src="../assets/js/lab-kernel.js?v=586e6c6192" defer></script>
-<script src="../assets/js/lab-quant.js?v=656b2a6b2d" defer></script>
-<script src="../assets/js/lab-specdec.js?v=853d0d55ad" defer></script>
-<script src="../assets/js/lab-edgefit.js?v=645e043baa" defer></script>
+<script src="../assets/js/hw.js?v=06ddd90bba" defer></script>
+<script src="../assets/js/lab-shell.js?v=c8cd17980e" defer></script>
+<script src="../assets/js/lab-planner.js?v=331f2455cf" defer></script>
+<script src="../assets/js/lab-batching.js?v=a3579f81a4" defer></script>
+<script src="../assets/js/lab-kernel.js?v=020f71f0bf" defer></script>
+<script src="../assets/js/lab-quant.js?v=98a73a5ae5" defer></script>
+<script src="../assets/js/lab-specdec.js?v=49b38db348" defer></script>
+<script src="../assets/js/lab-edgefit.js?v=69a91f2aff" defer></script>
 </body>
 </html>

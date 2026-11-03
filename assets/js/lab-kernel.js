@@ -182,19 +182,19 @@
     var cells = Math.round(total / unit), cols = A.amd ? 32 : 16, rows = Math.ceil(cells / cols);
     var cw = 100 / cols, ch = cw * (A.amd ? 1.6 : 1);
     var H = rows * ch, out = ['<svg class="lk-rf" viewBox="0 0 100 ' + H.toFixed(2) + '" preserveAspectRatio="none" role="img" aria-label="Register file: ' + fmt(o.regsUsed) + ' of ' + fmt(total) + ' registers allocated by ' + o.warps + ' resident ' + o.unit + 's">'];
-    out.push('<defs><pattern id="lk-h" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="4" stroke="#cbd5e1" stroke-width="1.2"/></pattern></defs>');
+    out.push('<defs><pattern id="lk-h" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="4" style="stroke:var(--line)" stroke-width="1.2"/></pattern></defs>');
     var perWarp = (A.amd ? o.regsAlloc * A.warpSize : o.regsPerWarpAlloc), usedPerWarp = (A.amd ? E.regs * A.warpSize : E.regs * A.warpSize);
     var cellsPerWarp = perWarp / unit, c = 0;
     for (var wi = 0; wi < o.warps; wi++) {
-      var fill = wi % 2 ? '#637fff' : '#3f5cf6';
+      var fill = wi % 2 ? 'var(--brand2)' : 'var(--brand)';
       for (var j = 0; j < cellsPerWarp; j++, c++) {
         var x = (c % cols) * cw, y = Math.floor(c / cols) * ch;
-        out.push('<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + (cw - 0.35).toFixed(2) + '" height="' + (ch - 0.35).toFixed(2) + '" fill="' + fill + '"/>');
+        out.push('<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + (cw - 0.35).toFixed(2) + '" height="' + (ch - 0.35).toFixed(2) + '" style="fill:' + fill + '"/>');
       }
       var waste = perWarp - usedPerWarp;
       if (waste > 0) { // the tail of this warp's allocation that holds nothing
         var wc = waste / unit, k = c - 1, px = (k % cols) * cw, py = Math.floor(k / cols) * ch, fw = Math.min(1, wc) * (cw - 0.35);
-        out.push('<rect x="' + (px + (cw - 0.35) - fw).toFixed(2) + '" y="' + py.toFixed(2) + '" width="' + fw.toFixed(2) + '" height="' + (ch - 0.35).toFixed(2) + '" fill="#c7d2fe"/>');
+        out.push('<rect x="' + (px + (cw - 0.35) - fw).toFixed(2) + '" y="' + py.toFixed(2) + '" width="' + fw.toFixed(2) + '" height="' + (ch - 0.35).toFixed(2) + '" style="fill:var(--brand200)"/>');
       }
     }
     for (; c < cells; c++) {
@@ -210,11 +210,11 @@
     var x = 0, resv = E.A.amd ? 0 : E.A.smemReservedPerBlock;
     for (var b = 0; b < o.blocks; b++) {
       var w = o.smemAlloc / total * 100, rw = resv / total * 100;
-      out.push('<rect x="' + x.toFixed(2) + '" y="0" width="' + Math.max(0, w - 0.3).toFixed(2) + '" height="6" fill="' + (b % 2 ? '#637fff' : '#3f5cf6') + '"/>');
-      if (rw > 0) out.push('<rect x="' + x.toFixed(2) + '" y="0" width="' + rw.toFixed(2) + '" height="6" fill="#1e293b" opacity=".55"/>');
+      out.push('<rect x="' + x.toFixed(2) + '" y="0" width="' + Math.max(0, w - 0.3).toFixed(2) + '" height="6" style="fill:' + (b % 2 ? 'var(--brand2)' : 'var(--brand)') + '"/>');
+      if (rw > 0) out.push('<rect x="' + x.toFixed(2) + '" y="0" width="' + rw.toFixed(2) + '" height="6" style="fill:var(--ink3)" opacity=".55"/>');
       x += w;
     }
-    out.push('<rect x="' + x.toFixed(2) + '" y="0" width="' + Math.max(0, 100 - x).toFixed(2) + '" height="6" fill="#eef2f7"/></svg>');
+    out.push('<rect x="' + x.toFixed(2) + '" y="0" width="' + Math.max(0, 100 - x).toFixed(2) + '" height="6" style="fill:var(--line2)"/></svg>');
     return out.join('');
   }
 
@@ -238,7 +238,7 @@
       return d + 'L' + X(maxX).toFixed(1) + ' ' + Y(prev).toFixed(1);
     }
     archs.forEach(function (k) { if (HW.arch[k] !== E.A) out.push('<path class="lk-ln ghost" d="' + path(HW.arch[k]) + '"/>'); });
-    if (E.cap < maxX) out.push('<rect x="' + X(E.cap) + '" y="' + T + '" width="' + (X(maxX) - X(E.cap)) + '" height="' + (H - T - B) + '" fill="#fef3c7" opacity=".7"/><line class="lk-cap" x1="' + X(E.cap) + '" x2="' + X(E.cap) + '" y1="' + T + '" y2="' + (H - B) + '"/><text class="lk-ax warn" x="' + (X(E.cap) + 3) + '" y="' + (T + 9) + '">cap ' + E.cap + ' · spills</text>');
+    if (E.cap < maxX) out.push('<rect x="' + X(E.cap) + '" y="' + T + '" width="' + (X(maxX) - X(E.cap)) + '" height="' + (H - T - B) + '" style="fill:var(--warn)" opacity=".14"/><line class="lk-cap" x1="' + X(E.cap) + '" x2="' + X(E.cap) + '" y1="' + T + '" y2="' + (H - B) + '"/><text class="lk-ax warn" x="' + (X(E.cap) + 3) + '" y="' + (T + 9) + '">cap ' + E.cap + ' · spills</text>');
     out.push('<path class="lk-ln" d="' + path(E.A) + '"/>');
     out.push('<circle class="lk-pt" cx="' + X(Math.min(st.regs, maxX)) + '" cy="' + Y(E.occ.occ) + '" r="4"/>');
     out.push('<text class="lk-ax" x="' + (W - R) + '" y="' + (H - 8) + '" text-anchor="end" style="display:none">regs</text></svg>');
@@ -282,10 +282,11 @@
     if (document.getElementById('lab-kernel-css')) return;
     var s = document.createElement('style'); s.id = 'lab-kernel-css';
     s.textContent = [
-      '.lk-root{font-family:var(--font);color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);display:grid;grid-template-columns:300px minmax(0,1fr);overflow:hidden;font-size:13px;line-height:1.45}',
+      '.lk-root{font-family:var(--font);color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);display:grid;grid-template-columns:280px minmax(0,1fr);overflow:hidden;font-size:13px;line-height:1.45}',
+      '.vlab .lk-root{--ok:#34d399;--warn:#fbbf24;--bad:#f87171;box-shadow:none}',
       '.lk-root *{box-sizing:border-box}',
-      '.lk-ctl{padding:16px 16px 18px;border-right:1px solid var(--line);background:var(--bg);display:grid;gap:12px;align-content:start}',
-      '.lk-res{padding:16px 18px 18px;min-width:0;display:grid;gap:16px;align-content:start}.lk-res>*,.lk-charts>*,.lk-hw>*{min-width:0}',
+      '.lk-ctl{padding:12px 14px 14px;border-right:1px solid var(--line);background:var(--bg);display:grid;gap:9px;align-content:start}',
+      '.lk-res{padding:12px 14px 14px;min-width:0;display:grid;gap:12px;align-content:start}.lk-res>*,.lk-charts>*,.lk-hw>*{min-width:0}',
       '.lk-h{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}',
       '.lk-h::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brand)}',
       '.lk-f{display:grid;gap:5px}.lk-f>label,.lk-lab{font-size:12px;font-weight:600;color:var(--ink2);display:flex;justify-content:space-between;gap:8px}',
@@ -301,23 +302,24 @@
       '.lk-est{font-size:11.5px;color:var(--ink3)}.lk-est button{font:inherit;font-size:11.5px;color:var(--brand);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}',
       '.lk-root :focus-visible{outline:2px solid var(--brand);outline-offset:2px}',
       '.lk-stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}',
-      '.lk-st{padding:10px 12px;border-left:1px solid var(--line);min-width:0}.lk-st:first-child{border-left:0}',
+      '.lk-st{padding:8px 10px;border-left:1px solid var(--line);min-width:0}.lk-st:first-child{border-left:0}',
       '.lk-st small{display:block;font-size:11px;color:var(--ink3);line-height:1.3}',
-      '.lk-st b{display:block;font-family:var(--mono);font-weight:500;font-size:17px;margin-top:2px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}',
+      '.lk-st b{display:block;font-family:var(--mono);font-weight:500;font-size:16px;margin-top:2px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}',
       '.lk-st span{display:block;font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.3}',
       '.lk-st.ok b{color:var(--ok)}.lk-st.warn b{color:var(--warn)}.lk-st.bad b{color:var(--bad)}',
-      '.lk-hw{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}',
+      '.lk-hw{display:grid;grid-template-columns:272px minmax(0,1fr);gap:12px;align-items:start}',
       '.lk-hw .hwc{border-radius:10px}',
       '.lk-sub{font-size:11.5px;font-weight:600;color:var(--ink2);margin:0 0 4px;display:flex;justify-content:space-between;gap:8px}.lk-sub i{font-style:normal;font-family:var(--mono);font-weight:500;color:var(--ink3)}',
-      '.lk-rf{display:block;width:100%;height:auto;max-height:150px;border:1px solid var(--line);border-radius:4px;background:#fff}',
+      '.lk-rf{display:block;width:100%;height:auto;max-height:120px;border:1px solid var(--line);border-radius:4px;background:var(--white)}',
       '.lk-sm{display:block;width:100%;height:14px;border:1px solid var(--line);border-radius:4px;margin-top:2px}',
       '.lk-lg{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:10.5px;color:var(--ink3);margin-top:5px}.lk-lg span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:-1px;background:var(--c)}',
-      '.lk-charts{display:grid;gap:14px}',
-      '.lk-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px 8px;background:#fff}',
-      '.lk-ch{display:block;width:100%;max-width:560px;height:auto}',
+      '.lk-charts{display:grid;gap:8px;align-content:start}',
+      '.lk-ctabs{display:flex;gap:4px}.lk-ctabs button{font:inherit;font-size:12px;font-weight:600;padding:5px 10px;border:1px solid var(--line);border-radius:7px;background:var(--white);color:var(--ink2);cursor:pointer}.lk-ctabs button[aria-pressed=true]{background:var(--brand50);border-color:var(--brand200);color:var(--ink)}',
+      '.lk-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px 8px;background:var(--bg)}',
+      '.lk-ch{display:block;width:100%;max-width:620px;height:auto}',
       '.lk-grid{stroke:var(--line2);stroke-width:1}.lk-ax{fill:var(--ink3);font-size:8.5px;font-family:var(--mono)}.lk-ax.warn{fill:var(--warn)}.lk-ax.pt{fill:var(--ink);font-weight:500}',
-      '.lk-ln{fill:none;stroke:var(--brand);stroke-width:1.8;stroke-linejoin:round}.lk-ln.ghost{stroke:#cbd5e1;stroke-width:1}.lk-ln.warn{stroke:var(--warn);stroke-dasharray:4 3}',
-      '.lk-cap{stroke:var(--warn);stroke-width:1;stroke-dasharray:3 3}.lk-pt{fill:#fff;stroke:var(--brand);stroke-width:2.2}',
+      '.lk-ln{fill:none;stroke:var(--brand);stroke-width:1.8;stroke-linejoin:round}.lk-ln.ghost{stroke:var(--line);stroke-width:1.2}.lk-ln.warn{stroke:var(--warn);stroke-dasharray:4 3}',
+      '.lk-cap{stroke:var(--warn);stroke-width:1;stroke-dasharray:3 3}.lk-pt{fill:var(--white);stroke:var(--brand);stroke-width:2.2}',
       '.lk-tbl{width:100%;border-collapse:collapse;font-size:12px}.lk-tbl th{text-align:left;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}',
       '.lk-tbl td{padding:7px 8px;border-bottom:1px solid var(--line2);font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}.lk-tbl td:first-child{font-family:var(--font);font-weight:600;color:var(--ink)}',
       '.lk-tbl tr.on td{background:var(--brand50)}.lk-tbl tr[tabindex]{cursor:pointer}.lk-tbl tr[tabindex]:hover td{background:var(--bg)}.lk-tbl .n{text-align:right}',
@@ -338,8 +340,8 @@
   var uid = 0;
   function mount(root) {
     css();
-    var id = 'lk' + (++uid);
-    var st = { gpu: 'h100', kernel: 'rmsnorm', threads: 256, regs: 32, smem: 0, ilp: 2, bpl: 16, lb: false, minBlocks: 2, latency: null, k: {}, over: {} };
+    var id = 'lk' + (++uid), L = window.VO_LAB;   // the demo shell, when there is one: it owns the GPU choice
+    var st = { chart: 'occ', gpu: L ? L.gpu : 'h100', kernel: 'rmsnorm', threads: 256, regs: 32, smem: 0, ilp: 2, bpl: 16, lb: false, minBlocks: 2, latency: null, k: {}, over: {} };
     function applyPreset() {
       var K = KERNELS[st.kernel]; st.k = {}; K.params.forEach(function (p) { st.k[p[0]] = p[2]; });
       st.threads = K.defaults.threads; st.ilp = K.defaults.ilp; st.bpl = K.defaults.bpl; st.over = {};
@@ -365,7 +367,7 @@
       var e = K.est(st.k, st);
       ctl.innerHTML =
         '<div class="lk-h">Kernel lab</div>' +
-        '<div class="lk-f"><label for="' + id + '-gpu">GPU</label><select id="' + id + '-gpu" name="gpu">' + GPU_ORDER.map(function (k) { return '<option value="' + k + '"' + (k === st.gpu ? ' selected' : '') + '>' + esc(HW.gpus[k].name) + '</option>'; }).join('') + '</select></div>' +
+        (L ? '' : '<div class="lk-f"><label for="' + id + '-gpu">GPU</label><select id="' + id + '-gpu" name="gpu">' + GPU_ORDER.map(function (k) { return '<option value="' + k + '"' + (k === st.gpu ? ' selected' : '') + '>' + esc(HW.gpus[k].name) + '</option>'; }).join('') + '</select></div>') +
         '<div class="lk-f"><span class="lk-lab">Kernel</span><div class="lk-seg" role="group" aria-label="Kernel">' + Object.keys(KERNELS).map(function (k) { return '<button type="button" data-kernel="' + k + '" aria-pressed="' + (k === st.kernel) + '">' + esc(KERNELS[k].name) + '</button>'; }).join('') + '</div></div>' +
         '<div class="lk-f"><span class="lk-lab">Problem</span><div class="lk-kp">' + K.params.map(function (p) { return '<label>' + esc(p[1]) + '<input type="number" name="k:' + p[0] + '" value="' + st.k[p[0]] + '" min="' + p[3] + '" max="' + p[4] + '" step="1"></label>'; }).join('') + '</div></div>' +
         '<div class="lk-f"><span class="lk-lab">Threads per block</span>' + seg('threads', [64, 128, 256, 512, 1024], st.threads) + '</div>' +
@@ -420,6 +422,7 @@
         '</div>';
 
       var card = HW.card(G, {
+        photo: !L,
         sub: A.name + ' · ' + E.units + ' ' + unitName + 's',
         rows: A.amd ? [
           ['VGPR file per CU', fmt(A.vgprPerSIMD * A.simdsPerCU) + ' × 64 lanes'],
@@ -446,14 +449,16 @@
       var regsFile = A.amd ? A.vgprPerSIMD * A.simdsPerCU * A.warpSize : A.regsPerSM;
       slot.innerHTML =
         '<p class="lk-sub">Register file <i>' + fmt(o.regsUsed * (A.amd ? A.warpSize : 1)) + ' / ' + fmt(regsFile) + '</i></p>' + regFileSVG(E) +
-        '<div class="lk-lg"><span style="--c:#3f5cf6">' + o.warps + ' ' + U + 's × ' + fmt(A.amd ? o.regsAlloc : o.regsPerWarpAlloc) + (A.amd ? ' VGPRs' : ' regs') + '</span><span style="--c:#c7d2fe">rounding waste ' + fmt(o.regsWaste * (A.amd ? A.warpSize : 1)) + '</span><span style="--c:#e2e8f0">idle ' + fmt(regsFile - o.regsUsed * (A.amd ? A.warpSize : 1)) + (o.limiter === 'registers' ? ' (too few for another ' + U + ')' : /full$/.test(o.limiter) ? '' : ' (' + o.limiter + ' limit)') + '</span></div>' +
+        '<div class="lk-lg"><span style="--c:var(--brand)">' + o.warps + ' ' + U + 's × ' + fmt(A.amd ? o.regsAlloc : o.regsPerWarpAlloc) + (A.amd ? ' VGPRs' : ' regs') + '</span><span style="--c:var(--brand200)">rounding waste ' + fmt(o.regsWaste * (A.amd ? A.warpSize : 1)) + '</span><span style="--c:var(--line2)">idle ' + fmt(regsFile - o.regsUsed * (A.amd ? A.warpSize : 1)) + (o.limiter === 'registers' ? ' (too few for another ' + U + ')' : /full$/.test(o.limiter) ? '' : ' (' + o.limiter + ' limit)') + '</span></div>' +
         '<p class="lk-sub" style="margin-top:10px">' + (A.amd ? 'LDS per CU' : 'Shared memory per SM') + ' <i>' + o.blocks + ' × ' + kb(o.smemAlloc) + ' / ' + kb(o.smemTotal) + '</i></p>' + smemSVG(E) +
-        '<div class="lk-lg"><span style="--c:#3f5cf6">block allocation</span>' + (A.amd ? '' : '<span style="--c:#1e293b">1 KB reserved per block</span>') + '<span style="--c:#eef2f7">free</span></div>';
+        '<div class="lk-lg"><span style="--c:var(--brand)">block allocation</span>' + (A.amd ? '' : '<span style="--c:var(--ink3)">1 KB reserved per block</span>') + '<span style="--c:var(--line2)">free</span></div>';
 
       var charts =
         '<div class="lk-charts">' +
-        '<div class="lk-card"><p class="lk-sub">Occupancy against registers per thread <i>' + esc(A.name) + ' · ' + st.threads + ' threads · ' + kb(st.smem) + ' smem</i></p>' + occCurveSVG(E, st) + '<div class="lk-lg"><span style="--c:#3f5cf6">this architecture</span><span style="--c:#cbd5e1">the others</span>' + (E.cap < 255 ? '<span style="--c:#fde68a">above the cap: spilled</span>' : '') + '</div></div>' +
-        '<div class="lk-card"><p class="lk-sub">Roofline <i>' + esc(K.name) + ' on ' + esc(G.name) + '</i></p>' + rooflineSVG(E) + '<div class="lk-lg"><span style="--c:#cbd5e1">peak bandwidth roof</span><span style="--c:#b45309">achievable (Little\'s law)</span><span style="--c:#3f5cf6">this kernel</span></div></div>' +
+        '<div class="lk-ctabs" role="group" aria-label="Chart"><button type="button" data-chart="occ" aria-pressed="' + (st.chart === 'occ') + '">Occupancy against registers</button><button type="button" data-chart="roof" aria-pressed="' + (st.chart === 'roof') + '">Roofline</button></div>' +
+        (st.chart === 'occ'
+          ? '<div class="lk-card"><p class="lk-sub">Occupancy against registers per thread <i>' + esc(A.name) + ' · ' + st.threads + ' threads · ' + kb(st.smem) + ' smem</i></p>' + occCurveSVG(E, st) + '<div class="lk-lg"><span style="--c:var(--brand)">this architecture</span><span style="--c:var(--line)">the others</span>' + (E.cap < 255 ? '<span style="--c:var(--warn)">above the cap: spilled</span>' : '') + '</div></div>'
+          : '<div class="lk-card"><p class="lk-sub">Roofline <i>' + esc(K.name) + ' on ' + esc(G.name) + '</i></p>' + rooflineSVG(E) + '<div class="lk-lg"><span style="--c:var(--line)">peak bandwidth roof</span><span style="--c:var(--warn)">achievable (Little\'s law)</span><span style="--c:var(--brand)">this kernel</span></div></div>') +
         '</div>';
 
       var rows = GPU_ORDER.map(function (k) {
@@ -477,9 +482,11 @@
         '<p class="lk-foot">Sim measures the real stall breakdown by interpreting the kernel\'s SASS instruction by instruction, which this estimate does not do.</p>';
       res.querySelector('.lk-hwcard').appendChild(card);
     }
-    res.addEventListener('click', function (ev) { var tr = ev.target.closest('tr[data-gpu]'); if (tr) pickGpu(tr.dataset.gpu); });
-    res.addEventListener('keydown', function (ev) { var tr = ev.target.closest('tr[data-gpu]'); if (tr && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); pickGpu(tr.dataset.gpu); } });
-    function pickGpu(k) { st.gpu = k; st.latency = null; buildControls(); render(); }
+    res.addEventListener('click', function (ev) { var cb = ev.target.closest('[data-chart]'); if (cb) { st.chart = cb.dataset.chart; render(); return; } var tr = ev.target.closest('tr[data-gpu]'); if (tr) choose(tr.dataset.gpu); });
+    res.addEventListener('keydown', function (ev) { var tr = ev.target.closest('tr[data-gpu]'); if (tr && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); choose(tr.dataset.gpu); } });
+    function choose(k) { if (L) L.select('gpu', k); else pickGpu(k); }   // through the shell, so the carousel follows
+    function pickGpu(k) { if (!HW.gpus[k]) return; st.gpu = k; st.latency = null; buildControls(); render(); }
+    if (L) L.subscribe(function (m) { if (m.kind === 'gpu' && m.gpu !== st.gpu) pickGpu(m.gpu); });
     function tile(label, value, sub, cls) { return '<div class="lk-st ' + cls + '"><small>' + esc(label) + '</small><b>' + esc(value) + '</b><span>' + esc(sub) + '</span></div>'; }
     render();
   }

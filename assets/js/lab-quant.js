@@ -16,6 +16,21 @@
   var FMTS = ['bf16', 'fp8', 'int8', 'int4c', 'int4g', 'nvfp4'];
   var GROUPS = [32, 64, 128, 256];
   var FP4 = [0, 0.5, 1, 1.5, 2, 3, 4, 6];
+  var HW = window.VO_HW || null;
+  var BW_EFF = 0.75;                                        // share of peak bandwidth a decode step reaches (assumption, as in the planner)
+
+  /* what the selected GPU does with a format: from the catalogue's tensor-core rates only, no guesses */
+  function support(fmt, g) {
+    if (!g) return null;
+    var f = g.flops || {};
+    switch (fmt) {
+      case 'bf16': return { native: true, rate: 'bf16', how: 'BF16 tensor cores' };
+      case 'fp8': return f.fp8 ? { native: true, rate: 'fp8', how: 'FP8 tensor cores' } : { native: false, rate: 'bf16', how: 'no FP8 tensor cores: weights dequantised to BF16 at matmul time' };
+      case 'int8': return { native: !!f.int8, rate: 'bf16', how: (f.int8 ? 'INT8 tensor cores exist (W8A8); ' : '') + 'weight-only INT8 as shown here is dequantised to BF16 at matmul time' };
+      case 'int4c': case 'int4g': return { native: false, rate: f.fp8 ? 'fp8' : 'bf16', how: 'weight-only: dequantised at matmul time on every GPU, to ' + (f.fp8 ? 'FP8' : 'BF16') };
+      case 'nvfp4': return f.fp4 ? { native: true, rate: 'fp4', how: 'FP4 tensor cores' } : { native: false, rate: f.fp8 ? 'fp8' : 'bf16', how: 'no FP4 tensor cores: dequantised to ' + (f.fp8 ? 'FP8' : 'BF16') + ' at matmul time' };
+    }
+  }
 
   /* ───────── numerics ───────── */
   function mulberry32(a) {
@@ -283,7 +298,8 @@
   /* ───────── formatting ───────── */
   function pct(x) { x *= 100; return (x < 0.1 ? x.toFixed(3) : x < 1 ? x.toFixed(2) : x < 10 ? x.toFixed(1) : x.toFixed(0)) + '%'; }
   function gb(b) { return b >= 100 ? b.toFixed(0) : b.toFixed(1); }
-  function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function css(v, el) { return getComputedStyle(el || document.documentElement).getPropertyValue(v).trim(); }
+  function lum(c) { var m = (c || '').match(/\d+(\.\d+)?/g); if (!m || m.length < 3) return 1; return (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255; }
   function hex(c) {
     c = (c || '').replace('#', '');
     if (c.length === 3) c = c.split('').map(function (x) { return x + x; }).join('');
@@ -295,7 +311,7 @@
   var CSS = [
     '.lq{--lq-r:12px;font-family:var(--font,Inter,system-ui,sans-serif);color:var(--ink2,#334155);background:var(--white,#fff);border:1px solid var(--line,#e2e8f0);border-radius:var(--lq-r);box-shadow:0 1px 2px rgba(16,24,40,.05);overflow:hidden;font-size:14px;line-height:1.5;text-align:left;max-width:100%;box-sizing:border-box}',
     '.lq *,.lq *::before,.lq *::after{box-sizing:border-box}',
-    '.lq-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line,#e2e8f0);background:var(--bg,#f5f6fa)}',
+    '.lq-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;border-bottom:1px solid var(--line,#e2e8f0);background:var(--bg,#f5f6fa)}',
     '.lq-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;min-width:0}',
     '.lq-title b{color:var(--ink,#0f172a);font-size:14px;font-weight:600}',
     '.lq-title span{font-family:var(--mono,monospace);font-size:12px;color:var(--ink3,#5b687c)}',
@@ -303,7 +319,7 @@
     '.lq-status i{width:7px;height:7px;border-radius:50%;background:var(--ok,#059669);display:inline-block}',
     '.lq-status.busy i{background:var(--brand,#3f5cf6);animation:lq-pulse 1s ease-in-out infinite}',
     '@keyframes lq-pulse{50%{opacity:.3}}',
-    '.lq-ctrls{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;padding:14px 16px 0}',
+    '.lq-ctrls{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:flex-end;padding:12px 16px 0}',
     '.lq-ctl{display:flex;flex-direction:column;gap:6px;min-width:0;max-width:100%}',
     '.lq-lab{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3,#5b687c)}',
     '.lq-seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line,#e2e8f0);border-radius:8px;background:var(--white,#fff);padding:2px;gap:2px;max-width:100%}',
@@ -311,6 +327,14 @@
     '.lq-seg button:hover{background:var(--line2,#eef2f7);color:var(--ink,#0f172a)}',
     '.lq-seg button[aria-checked="true"]{background:var(--brand,#3f5cf6);color:#fff}',
     '.lq-seg button:disabled{color:var(--ink4,#94a3b8);cursor:default;background:transparent}',
+    '.lq-seg button em{font-style:normal;font-family:var(--mono,monospace);font-size:9px;letter-spacing:.04em;text-transform:uppercase;margin-left:5px;opacity:.7}',
+    '.lq select{font:inherit;font-size:13px;color:var(--ink,#0f172a);background:var(--white,#fff);border:1px solid var(--line,#e2e8f0);border-radius:7px;padding:5px 8px;max-width:100%}',
+    '.lq-gpu dl.lq-on{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 8px;margin:2px 0 0;font-size:11.5px}',
+    '.lq-gpu dl.lq-on dt{color:var(--ink3,#5b687c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lq-gpu dl.lq-on dd{margin:0;font-family:var(--mono,monospace);font-variant-numeric:tabular-nums;color:var(--ink,#0f172a);text-align:right;white-space:nowrap}',
+    '.lq-gpu dd.ok{color:var(--ok,#059669)}.lq-gpu dd.dq,.lq-gpu .dq{color:var(--warn,#b45309)}',
+    '.lq-gpu .lq-how{font-size:11px;color:var(--ink3,#5b687c);margin:5px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lq-cap{margin:4px 0 0;font-size:11px;color:var(--ink3,#5b687c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lq-gsub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}',
     '.lq-seg.sm button{font-size:12px;padding:3px 8px}',
     '.lq-seg button[aria-checked="true"]:disabled{background:var(--line2,#eef2f7);color:var(--ink3,#5b687c)}',
     '.lq button:focus-visible,.lq input:focus-visible+.lq-sw-t,.lq summary:focus-visible,.lq-row:focus-visible{outline:2px solid var(--brand,#3f5cf6);outline-offset:2px}',
@@ -320,14 +344,16 @@
     '.lq-sw-t::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}',
     '.lq-sw input:checked+.lq-sw-t{background:var(--brand,#3f5cf6)}',
     '.lq-sw input:checked+.lq-sw-t::after{left:16px}',
-    '.lq-desc{margin:10px 16px 0;font-size:13px;color:var(--ink3,#5b687c);max-width:96ch}',
+    '.lq-desc{margin:8px 16px 0;font-size:12.5px;color:var(--ink3,#5b687c);max-width:110ch}',
     '.lq-desc b{color:var(--ink2,#334155);font-weight:600}',
-    '.lq-body{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding:14px 16px 16px}',
-    '.lq.lq-wide .lq-body{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}',
-    '.lq-vis,.lq-side{display:flex;flex-direction:column;gap:14px;min-width:0}',
-    '.lq-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}',
-    '.lq-panel{border:1px solid var(--line,#e2e8f0);border-radius:10px;padding:10px 12px 12px;min-width:0;background:var(--white,#fff)}',
-    '.lq-ph{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;min-height:24px}',
+    '.lq-body{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:12px 16px 14px}',
+    '.lq-cols{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}',
+    '.lq.lq-mid .lq-cols{grid-template-columns:repeat(2,minmax(0,1fr))}',
+    '.lq.lq-wide .lq-cols{grid-template-columns:repeat(4,minmax(0,1fr))}',
+    '.lq-col{display:flex;flex-direction:column;gap:12px;min-width:0}',
+    '.lq-panel{border:1px solid var(--line,#e2e8f0);border-radius:10px;padding:8px 12px 10px;min-width:0;background:var(--white,#fff)}',
+    '.lq-ph{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;min-height:24px}',
+    '.lq.lq-wide .lq-ph{flex-wrap:nowrap}.lq.lq-wide .lq-ph>b{white-space:nowrap}.lq.lq-wide .lq-ph>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}',
     '.lq-ph b{font-size:13px;font-weight:600;color:var(--ink,#0f172a)}',
     '.lq-ph span{font-size:12px;color:var(--ink3,#5b687c)}',
     '.lq-ph .lq-sp{flex:1}',
@@ -352,14 +378,16 @@
     '.lq-k-g{width:10px;height:1px;background:var(--brand200,#bdcdff)}',
     '.lq-k-s{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--brandD,#2737bd)}',
     '.lq-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line,#e2e8f0);border:1px solid var(--line,#e2e8f0);border-radius:10px;overflow:hidden}',
-    '.lq-m{background:var(--white,#fff);padding:10px 12px;min-width:0}',
-    '.lq-m small{display:block;font-size:11.5px;color:var(--ink3,#5b687c);line-height:1.35}',
-    '.lq-m b{display:block;font-family:var(--mono,monospace);font-variant-numeric:tabular-nums;font-size:19px;font-weight:500;color:var(--ink,#0f172a);margin-top:3px;letter-spacing:-.01em;white-space:nowrap}',
+    '.lq.lq-mid .lq-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}',
+    '.lq.lq-wide .lq-metrics{grid-template-columns:repeat(6,minmax(0,1fr))}',
+    '.lq-m{background:var(--white,#fff);padding:7px 10px;min-width:0}',
+    '.lq-m small{display:block;font-size:11px;color:var(--ink3,#5b687c);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lq-m b{display:block;font-family:var(--mono,monospace);font-variant-numeric:tabular-nums;font-size:17px;font-weight:500;color:var(--ink,#0f172a);margin-top:2px;letter-spacing:-.01em;white-space:nowrap}',
     '.lq-m em{display:block;font-style:normal;font-size:11.5px;color:var(--ink3,#5b687c);font-family:var(--mono,monospace);font-variant-numeric:tabular-nums}',
     '.lq-m em.ok{color:var(--ok,#059669)}',
     '.lq-cmp-h,.lq-row{display:grid;grid-template-columns:84px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center}',
     '.lq-cmp-h{font-size:11px;color:var(--ink3,#5b687c);padding:0 6px 4px;border-bottom:1px solid var(--line2,#eef2f7)}',
-    '.lq-row{padding:6px;border-radius:6px;cursor:pointer;font-size:12px}',
+    '.lq-row{padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12px}',
     '.lq-row:hover{background:var(--line2,#eef2f7)}',
     '.lq-row.on{background:var(--brand50,#eff4ff)}',
     '.lq-row.on .lq-fn{color:var(--brandD,#2737bd);font-weight:600}',
@@ -369,7 +397,7 @@
     '.lq-row.on .lq-bar i{background:var(--brand,#3f5cf6)}',
     '.lq-bar span{font-family:var(--mono,monospace);font-variant-numeric:tabular-nums;font-size:11px;color:var(--ink2,#334155);white-space:nowrap}',
     '.lq-bar span.pend{color:var(--ink4,#94a3b8)}',
-    '.lq-note{font-size:11.5px;color:var(--ink3,#5b687c);margin-top:8px}',
+    '.lq-note{font-size:11.5px;color:var(--ink3,#5b687c);margin-top:6px}',
     '.lq-more{border-top:1px solid var(--line,#e2e8f0);padding:0 16px}',
     '.lq-more summary{cursor:pointer;padding:11px 0;font-size:13px;font-weight:600;color:var(--ink,#0f172a);list-style:none;display:flex;align-items:center;gap:8px}',
     '.lq-more summary::-webkit-details-marker{display:none}',
@@ -395,7 +423,8 @@
   function mount(root) {
     if (root.__lq) return; root.__lq = true;
     var id = 'lq' + (++uid);
-    var S = { fmt: 'int4g', G: 128, prot: false, log: true, heat: 'act' };
+    var LAB = window.VO_LAB || null;
+    var S = { fmt: 'int4g', G: 128, prot: false, log: true, heat: 'act', gpu: LAB ? LAB.gpu : 'h100' };
     var segBtn = function (val, label, attr) { return '<button type="button" role="radio" aria-checked="false" data-' + attr + '="' + val + '">' + label + '</button>'; };
     root.innerHTML =
       '<div class="lq" role="group" aria-label="Quantisation lab">' +
@@ -406,6 +435,7 @@
         '<div class="lq-ctl"><span class="lq-lab" id="' + id + '-g">INT4 group size</span><div class="lq-seg lq-grp" role="radiogroup" aria-labelledby="' + id + '-g">' +
           GROUPS.map(function (g) { return segBtn(g, g, 'g'); }).join('') + '</div></div>' +
         '<label class="lq-sw"><input type="checkbox" class="lq-prot"><span class="lq-sw-t" aria-hidden="true"></span><span>Protect outlier channels</span></label>' +
+        (!LAB && HW ? '<div class="lq-ctl"><label class="lq-lab" for="' + id + '-gpu">GPU</label><select id="' + id + '-gpu" class="lq-gsel">' + Object.keys(HW.gpus).map(function (k) { return '<option value="' + k + '">' + esc(HW.gpus[k].name) + '</option>'; }).join('') + '</select></div>' : '') +
       '</div>' +
       '<p class="lq-desc"></p>' +
       '<div class="lq-body"><div class="lq-load">Generating the layer…</div></div>' +
@@ -419,13 +449,14 @@
           '<dt>NVFP4</dt><dd>Sixteen floating-point levels per block of 16, with an FP8 scale for each block.</dd>' +
           '<dt>Protection</dt><dd>Activation-aware scaling as in AWQ: channels that see large activations are scaled up before quantisation, and the inverse is folded into the previous operation, so they land on finer steps at no memory cost. The exponent is grid-searched on the calibration sample.</dd>' +
         '</dl>' +
+        (HW ? '<p>The "On this GPU" panel uses the catalogue\'s tensor-core rates only: a format is native when the GPU lists a rate for it; otherwise the weights are dequantised to the widest supported type at matmul time, which keeps the memory saving but not a compute speed-up. The per-token time is the 32B model\'s weights divided by ' + BW_EFF + ' of peak bandwidth, the same first-order, memory-bound model as the capacity planner.</p>' : '') +
         '<p>Weight error and SQNR measure the weights alone. Output error is what the next layer receives, which is why the heatmap can weight each error by its channel\'s activation. Neither is the real test: that is accuracy on your own eval set, which is what Optimize holds every candidate to with an accuracy floor.</p>' +
       '</div></details></div>';
     var $ = function (sel) { return root.querySelector(sel); };
     var lq = $('.lq'), body = $('.lq-body'), statusEl = $('.lq-status');
     var built = false, els = {};
 
-    function fit() { lq.classList.toggle('lq-wide', lq.clientWidth >= 860); }
+    function fit() { var w = lq.clientWidth; lq.classList.toggle('lq-wide', w >= 1000); lq.classList.toggle('lq-mid', w >= 560 && w < 1000); }
     fit();
     if (window.ResizeObserver) new ResizeObserver(function () { fit(); redraw(); }).observe(lq);
     else window.addEventListener('resize', function () { fit(); redraw(); });
@@ -434,31 +465,36 @@
 
     function build() {
       body.innerHTML =
-        '<div class="lq-vis">' +
-          '<div class="lq-panel"><div class="lq-ph"><b>Weight distribution</b><span class="lq-hsub"></span><label class="lq-chk"><input type="checkbox" class="lq-log" checked>Log counts</label></div><svg class="lq-hist" viewBox="0 0 600 190" role="img" aria-label="Histogram of the layer\'s weights with the quantisation grid"></svg></div>' +
-          '<div class="lq-two">' +
-            '<div class="lq-panel"><div class="lq-ph"><b>One group, as quantised</b><span class="lq-isub"></span></div><svg class="lq-inset" viewBox="0 0 300 200" role="img" aria-label="Weights of one group against the quantisation levels"></svg>' +
+        '<div class="lq-metrics">' +
+          '<div class="lq-m"><small>Bits per weight, incl. scales</small><b data-m="bits"></b><em data-m="bitsx"></em></div>' +
+          '<div class="lq-m"><small>This layer</small><b data-m="layer"></b><em data-m="layerx"></em></div>' +
+          '<div class="lq-m"><small>32B model, weights</small><b data-m="m32"></b><em data-m="m32x"></em></div>' +
+          '<div class="lq-m"><small>70B model, weights</small><b data-m="m70"></b><em data-m="m70x"></em></div>' +
+          '<div class="lq-m"><small>Weight error, RMSE / RMS</small><b data-m="werr"></b><em data-m="sqnr"></em></div>' +
+          '<div class="lq-m"><small>Output error, ‖xW − xŴ‖ / ‖xW‖</small><b data-m="yerr"></b><em data-m="prot"></em></div>' +
+        '</div>' +
+        '<div class="lq-cols">' +
+          '<div class="lq-col">' +
+            '<div class="lq-panel"><div class="lq-ph"><b>Weight distribution</b><label class="lq-chk"><input type="checkbox" class="lq-log" checked>Log counts</label></div><svg class="lq-hist" viewBox="0 0 600 150" role="img" aria-label="Histogram of the layer\'s weights with the quantisation grid"></svg><p class="lq-cap lq-hsub"></p></div>' +
+            (HW ? '<div class="lq-panel lq-gpu"><div class="lq-ph"><b class="lq-gname">On this GPU</b><span class="lq-gsub">from the datasheet</span></div><div class="lq-gbody"></div></div>' : '') +
+          '</div>' +
+          '<div class="lq-col">' +
+            '<div class="lq-panel"><div class="lq-ph"><b>One group, as quantised</b><span class="lq-isub"></span></div><svg class="lq-inset" viewBox="0 0 300 150" role="img" aria-label="Weights of one group against the quantisation levels"></svg>' +
               '<div class="lq-key"><span><i class="lq-k-o"></i>weight</span><span><i class="lq-k-q"></i>quantised</span><span><i class="lq-k-g"></i>levels</span><span><i class="lq-k-s"></i>ch 291, 300</span></div></div>' +
+          '</div>' +
+          '<div class="lq-col">' +
             '<div class="lq-panel"><div class="lq-ph"><b>Error map</b><span class="lq-sp"></span><div class="lq-seg sm lq-hm" role="radiogroup" aria-label="Error map scale">' + segBtn('act', '× activation', 'hm') + segBtn('raw', 'Raw', 'hm') + '</div></div>' +
               '<div class="lq-heat"><div class="lq-marks"><i style="left:' + ((262 - TK0 + .5) / 64 * 100) + '%">262</i><i style="left:' + ((291 - TK0 + .5) / 64 * 100) + '%">291</i><i class="w" style="left:' + ((300 - TK0 + .5) / 64 * 100) + '%">300</i></div><canvas aria-hidden="true"></canvas></div>' +
               '<div class="lq-axes"><span>in 256 → 319</span><span>out 0 ↓ 63</span></div><div class="lq-legend"><span class="lq-lo"></span><i></i><span class="lq-hi"></span></div></div>' +
           '</div>' +
-        '</div>' +
-        '<div class="lq-side">' +
-          '<div class="lq-metrics">' +
-            '<div class="lq-m"><small>Bits per weight, incl. scales</small><b data-m="bits"></b><em data-m="bitsx"></em></div>' +
-            '<div class="lq-m"><small>This layer</small><b data-m="layer"></b><em data-m="layerx"></em></div>' +
-            '<div class="lq-m"><small>32B model, weights</small><b data-m="m32"></b><em data-m="m32x"></em></div>' +
-            '<div class="lq-m"><small>70B model, weights</small><b data-m="m70"></b><em data-m="m70x"></em></div>' +
-            '<div class="lq-m"><small>Weight error, RMSE / RMS</small><b data-m="werr"></b><em data-m="sqnr"></em></div>' +
-            '<div class="lq-m"><small>Output error, ‖xW − xŴ‖ / ‖xW‖</small><b data-m="yerr"></b><em data-m="prot"></em></div>' +
+          '<div class="lq-col">' +
+            '<div class="lq-panel"><div class="lq-ph"><b>All formats</b><span>this layer, current settings</span></div>' +
+              '<div class="lq-cmp-h"><span>Format</span><span>Bits per weight</span><span>Output error, log</span></div><div class="lq-rows"></div>' +
+              '<p class="lq-note">Pick a row to inspect it. Shorter bars are better.</p></div>' +
           '</div>' +
-          '<div class="lq-panel"><div class="lq-ph"><b>All formats</b><span>this layer, current settings</span></div>' +
-            '<div class="lq-cmp-h"><span>Format</span><span>Bits per weight</span><span>Output error, log</span></div><div class="lq-rows"></div>' +
-            '<p class="lq-note">Pick a row to inspect it. Shorter bars are better.</p></div>' +
         '</div>';
       els.hist = $('.lq-hist'); els.inset = $('.lq-inset'); els.canvas = $('.lq-heat canvas'); els.rows = $('.lq-rows');
-      els.hsub = $('.lq-hsub'); els.isub = $('.lq-isub'); els.lo = $('.lq-lo'); els.hi = $('.lq-hi'); els.leg = $('.lq-legend i');
+      els.hsub = $('.lq-hsub'); els.isub = $('.lq-isub'); els.lo = $('.lq-lo'); els.hi = $('.lq-hi'); els.leg = $('.lq-legend i'); els.gbody = $('.lq-gbody'); els.gname = $('.lq-gname'); els.gsub = $('.lq-gsub');
       $('.lq-log').addEventListener('change', function (e) { S.log = e.target.checked; drawHist(cur); });
       wireSeg($('.lq-hm'), 'hm', function (v) { S.heat = v; drawHeat(); });
       els.rows.addEventListener('click', function (e) { var r = e.target.closest('.lq-row'); if (r) setFmt(r.getAttribute('data-f')); });
@@ -486,18 +522,47 @@
     wireSeg($('.lq-grp'), 'g', function (v) { S.G = +v; update(); });
     $('.lq-prot').addEventListener('change', function (e) { S.prot = e.target.checked; update(); });
     function setFmt(f) { S.fmt = f; update(); }
+    var gsel = $('.lq-gsel');
+    if (gsel) gsel.addEventListener('change', function () { S.gpu = gsel.value; update(); });
+    if (LAB) LAB.subscribe(function (m) { if (m.kind === 'gpu' && m.gpu !== S.gpu) { S.gpu = m.gpu; update(); } });
+    function gpuSpec() { return HW ? HW.gpus[S.gpu] : null; }
+    function tagFormats() {
+      var g = gpuSpec(); if (!g) return;
+      [].forEach.call($('.lq-fmt').querySelectorAll('button'), function (b) {
+        var f = b.getAttribute('data-fmt'), sp = support(f, g);
+        b.innerHTML = esc(short(f, S.G)) + (sp && !sp.native ? '<em>dequant</em>' : '');
+        b.title = sp ? sp.how : '';
+      });
+    }
+    function gpuPanel(r) {
+      var g = gpuSpec(); if (!g || !els.gbody) return;
+      var sp = support(S.fmt, g), f = g.flops || {};
+      var rateT = f[sp.rate] || f.bf16, bytes32 = 32e9 * r.bits / 8, tMs = bytes32 / (g.bw * 1e12 * BW_EFF) * 1e3;
+      els.gname.textContent = 'On ' + g.name;
+      els.gsub.textContent = (HW.arch[g.arch] ? HW.arch[g.arch].name : g.arch) + ' · ' + g.mem + ' GB ' + g.memType + ' · ' + g.bw + ' TB/s';
+      var rate = function (k) { return f[k] ? esc(fmtN(f[k])) : '<span class="dq">none</span>'; };
+      var dl = document.createElement('dl'); dl.className = 'lq-on';
+      dl.innerHTML = '<dt>BF16 · FP8 · FP4, TFLOPS</dt><dd>' + rate('bf16') + ' · ' + rate('fp8') + ' · ' + rate('fp4') + '</dd>' +
+        '<dt>' + esc(short(S.fmt, S.G)) + ' here</dt><dd class="' + (sp.native ? 'ok' : 'dq') + '">' + (sp.native ? 'native' : 'dequantised → ' + sp.rate.toUpperCase()) + '</dd>' +
+        '<dt>Matmul rate used</dt><dd>' + esc(fmtN(rateT) + ' TFLOPS ' + sp.rate) + '</dd>' +
+        '<dt>32B weights to read</dt><dd>' + esc(gb(32 * r.bits / 8) + ' GB') + '</dd>' +
+        '<dt>Per token, one stream</dt><dd>' + esc(tMs.toFixed(2) + ' ms · ≤ ' + Math.round(1000 / tMs) + ' tok/s') + '</dd>';
+      var how = document.createElement('p'); how.className = 'lq-how'; how.textContent = sp.how + '. Read time = bytes ÷ (' + g.bw + ' TB/s × ' + BW_EFF + '); the matmul itself is not counted.'; how.title = how.textContent;
+      els.gbody.innerHTML = ''; els.gbody.appendChild(dl); els.gbody.appendChild(how);
+    }
+    function fmtN(n) { return n == null ? '—' : Number(n).toLocaleString('en-GB'); }
 
     var cur = null;
     function update() {
       syncSeg($('.lq-fmt'), 'fmt', S.fmt);
       syncSeg($('.lq-grp'), 'g', S.G, S.fmt !== 'int4g');
-      var gbtn = $('.lq-fmt [data-fmt="int4g"]'); gbtn.textContent = 'INT4 g' + S.G;
+      var gbtn = $('.lq-fmt [data-fmt="int4g"]'); if (!HW) gbtn.textContent = 'INT4 g' + S.G;
       $('.lq-desc').innerHTML = '<b>' + esc(name(S.fmt, S.G)) + '.</b> ' + esc(desc(S.fmt, S.G));
       if (!D) return;
       if (!built) build();
       syncSeg($('.lq-hm'), 'hm', S.heat);
       cur = result(S.fmt, S.G, S.prot);
-      metrics(cur); drawHist(cur); drawInset(cur); drawHeat(); bars();
+      tagFormats(); metrics(cur); drawHist(cur); drawInset(cur); drawHeat(); bars(); gpuPanel(cur);
       var set = FMTS.map(function (f) { return [f, S.G, S.prot]; });
       enqueue(set, true);
       enqueue(FMTS.map(function (f) { return [f, S.G, !S.prot]; }).concat(GROUPS.map(function (g) { return ['int4g', g, S.prot]; })), false);
@@ -547,7 +612,7 @@
 
     function drawHist(r) {
       if (!r) return;
-      var W = Math.max(300, Math.min(600, Math.round(els.hist.clientWidth || 600))), H = W < 450 ? 170 : 190, L = 34, R = 8, Tp = 8, B = 22, d = D, nb = d.hist.length;
+      var W = Math.max(300, Math.min(600, Math.round(els.hist.clientWidth || 600))), H = W < 450 ? 128 : 150, L = 34, R = 8, Tp = 8, B = 22, d = D, nb = d.hist.length;
       els.hist.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
       var max = 0; for (var i = 0; i < nb; i++) max = Math.max(max, d.hist[i]);
       var fy = function (c) {
@@ -590,7 +655,7 @@
     }
 
     function drawInset(r) {
-      var I = r.inset, W = Math.max(260, Math.min(420, Math.round(els.inset.clientWidth || 300))), H = Math.round(W * 0.8), L = 36, R = 6, Tp = 8, B = 16;
+      var I = r.inset, W = Math.max(260, Math.min(420, Math.round(els.inset.clientWidth || 300))), H = Math.round(W * (lq.classList.contains('lq-wide') ? 0.56 : 0.62)), L = 36, R = 6, Tp = 8, B = 16;
       els.inset.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
       var n = I.r1 - I.r0, m = 0, i;
       for (i = 0; i < n; i++) m = Math.max(m, Math.abs(I.a[i]), Math.abs(I.q[i]));
@@ -620,7 +685,11 @@
 
     var ramp = null;
     function mkRamp() {
-      var stops = [[0, hex(css('--white') || '#fff')], [.5, hex(css('--brand100') || '#dbe5ff')], [.75, hex(css('--brand') || '#3f5cf6')], [.9, hex(css('--brandD') || '#2737bd')], [1, [30, 27, 75]]];
+      var surf = getComputedStyle(lq).backgroundColor, dark = lum(surf) < 0.5, sm = surf.match(/\d+(\.\d+)?/g);
+      var base = sm && sm.length >= 3 ? [+sm[0], +sm[1], +sm[2]] : (dark ? [17, 26, 48] : [255, 255, 255]);
+      var stops = dark
+        ? [[0, base], [.45, hex(css('--brand100', lq) || '#243576')], [.7, hex(css('--brand', lq) || '#3f5cf6')], [.88, [165, 180, 252]], [1, [238, 242, 255]]]
+        : [[0, base], [.5, hex(css('--brand100', lq) || '#dbe5ff')], [.75, hex(css('--brand', lq) || '#3f5cf6')], [.9, hex(css('--brandD', lq) || '#2737bd')], [1, [30, 27, 75]]];
       ramp = new Uint8ClampedArray(256 * 3);
       for (var i = 0; i < 256; i++) {
         var t = i / 255, j = 0; while (j < stops.length - 2 && t > stops[j + 1][0]) j++;

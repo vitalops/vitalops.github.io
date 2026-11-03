@@ -24,12 +24,13 @@
   var TPS = [1, 2, 4, 8];
   var BW_EFF = 0.75, FLOP_EFF = 0.5, PREFILL_EFF = 0.6, MAX_BATCH = 512, GiB = 1073741824;
   var LAT_FAST = 8e-6, LAT_PCIE = 25e-6;                 // all-reduce latency assumptions: NVLink / Infinity Fabric, PCIe
-  var C_W = 'var(--brand)', C_KV = '#0f9d8f', C_ACT = 'var(--ink4)', C_COMM = '#b45309', C_PRE = '#8b5cf6';
+  var C_W = 'var(--brand)', C_KV = '#14a89a', C_ACT = 'var(--ink4)', C_COMM = 'var(--warn)', C_PRE = '#8b5cf6';
 
   var CSS = [
-    '.lp{font-family:var(--font);color:var(--ink2);background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);display:grid;grid-template-columns:320px minmax(0,1fr);overflow:hidden;text-align:left;line-height:1.45;font-size:14px}',
+    '.lp{font-family:var(--font);color:var(--ink2);background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);display:grid;grid-template-columns:280px minmax(0,1fr);overflow:hidden;text-align:left;line-height:1.45;font-size:13.5px}',
+    '.vlab .lp{--ok:#34d399;--warn:#fbbf24;--bad:#f87171;box-shadow:none}',
     '.lp *{box-sizing:border-box}',
-    '.lp-ctl{padding:18px;border-right:1px solid var(--line);background:#fbfcfe;display:flex;flex-direction:column;gap:14px;min-width:0}',
+    '.lp-ctl{padding:14px;border-right:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:10px;min-width:0}',
     '.lp-hd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}',
     '.lp-hd i{width:7px;height:7px;border-radius:50%;background:var(--brand)}',
     '.lp-f{display:flex;flex-direction:column;gap:6px;min-width:0}',
@@ -54,25 +55,25 @@
     '.lp input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--white);border:2px solid var(--brand);margin-top:-6px;box-shadow:0 1px 2px rgba(16,24,40,.15)}',
     '.lp input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--white);border:2px solid var(--brand)}',
     '.lp button:focus-visible,.lp select:focus-visible,.lp input:focus-visible,.lp summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px}',
-    '.lp-out{padding:18px 20px;display:flex;flex-direction:column;gap:16px;min-width:0}',
+    '.lp-out{padding:12px 14px 14px;display:flex;flex-direction:column;gap:12px;min-width:0}',
     '.lp-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}',
-    '.lp-kpi{padding:10px 12px;border-left:1px solid var(--line);min-width:0}',
+    '.lp-kpi{padding:8px 10px;border-left:1px solid var(--line);min-width:0}',
     '.lp-kpi:first-child{border-left:0;background:var(--brand50)}',
     '.lp-kpi small{display:block;font-size:11.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lp-kpi b{display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:20px;font-weight:500;color:var(--ink);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lp-kpi b{display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:18px;font-weight:500;color:var(--ink);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
     '.lp-kpi:first-child b{color:var(--brand)}',
     '.lp-kpi span{display:block;font-size:11.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
     '.lp-kpi span.lp-ok{color:var(--ok)}.lp-kpi span.lp-bad{color:var(--bad)}',
-    '.lp-alert{font-size:13px;border-radius:8px;padding:9px 12px;background:#fff7ed;color:var(--warn);border:1px solid #fed7aa}',
-    '.lp-alert.lp-err{background:#fff1f2;color:var(--bad);border-color:#fecdd3}',
-    '.lp-mid{display:grid;grid-template-columns:276px minmax(0,1fr);gap:16px;align-items:start}',
-    '.lp-r{display:flex;flex-direction:column;gap:16px;min-width:0}',
+    '.lp-alert{font-size:13px;border-radius:8px;padding:9px 12px;color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent)}',
+    '.lp-alert.lp-err{color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent);border-color:color-mix(in srgb,var(--bad) 35%,transparent)}',
+    '.lp-mid{display:grid;grid-template-columns:260px minmax(0,1fr);gap:12px;align-items:start}',
+    '.lp-r{display:flex;flex-direction:column;gap:12px;min-width:0}',
     '.lp-card .hwc-kv{font-size:11.5px}',
     '.lp-sec{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:8px}',
     '.lp-sec span{font-weight:400;color:var(--ink3);font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;text-align:right}',
-    '.lp-stk{display:flex;height:26px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--line2)}',
+    '.lp-stk{display:flex;height:22px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--line2)}',
     '.lp-stk i{display:block;height:100%;transition:width .35s ease;min-width:0}',
-    '.lp-leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:12px;color:var(--ink3)}',
+    '.lp-leg{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:11.5px;color:var(--ink3)}',
     '.lp-leg span{display:inline-flex;align-items:center;gap:6px}',
     '.lp-leg em{font-style:normal;font-family:var(--mono);color:var(--ink);font-variant-numeric:tabular-nums}',
     '.lp-leg i{width:10px;height:10px;border-radius:2px;display:inline-block}',
@@ -87,10 +88,10 @@
     '.lp-chart .lp-dot2{fill:var(--white);stroke:var(--ink3);stroke-width:1.5}',
     '.lp-chart .lp-oplab{fill:var(--brand);font-weight:500}',
     '.lp-tbl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}',
-    '.lp-tbl div{padding:8px 0;border-bottom:1px solid var(--line2);min-width:0;padding-right:10px}',
+    '.lp-tbl div{padding:6px 10px 6px 0;border-bottom:1px solid var(--line2);min-width:0}',
     '.lp-tbl dt{font-size:11.5px;color:var(--ink3)}',
     '.lp-tbl dd{margin:0;font-family:var(--mono);font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lp-how{font-size:13px;color:var(--ink2);border-top:1px solid var(--line);padding-top:12px}',
+    '.lp-how{font-size:13px;color:var(--ink2);border-top:1px solid var(--line);padding-top:10px}',
     '.lp-how summary{cursor:pointer;font-weight:600;color:var(--ink);font-size:13px}',
     '.lp-how ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}',
     '.lp-how code{font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--line2);padding:1px 4px;border-radius:4px;overflow-wrap:anywhere}',
@@ -214,8 +215,8 @@
   function mount(root) {
     if (root.__lp) return; root.__lp = true;
     if (!HW) { root.innerHTML = '<p class="lp-note">The hardware catalogue (hw.js) did not load.</p>'; return; }
-    var u = 'lp' + (++uid) + '-';
-    var st = { model: 'qwen32', w: 'fp8', kv: 'fp8', gpu: 'h100', price: HW.gpus.h100.price, users: 6, inp: 3, out: 2, slo: 2 };
+    var u = 'lp' + (++uid) + '-', L = window.VO_LAB;   // the demo shell, when there is one: it owns the GPU choice
+    var st = { model: 'qwen32', w: 'fp8', kv: 'fp8', gpu: L ? L.gpu : 'h100', price: HW.gpus[L ? L.gpu : 'h100'].price, users: 6, inp: 3, out: 2, slo: 2 };
     root.innerHTML =
       '<div class="lp">' +
       '<div class="lp-ctl">' +
@@ -223,8 +224,8 @@
         '<div class="lp-f"><label for="' + u + 'm">Model</label><select class="lp-sel" id="' + u + 'm" data-k="model">' +
           MODELS.map(function (m) { return '<option value="' + m.id + '"' + (m.id === st.model ? ' selected' : '') + '>' + m.name + '</option>'; }).join('') + '</select></div>' +
         '<div class="lp-row2">' + seg(u + 'w', WPREC, st.w, 'Weights') + seg(u + 'kv', KVPREC, st.kv, 'KV cache') + '</div>' +
-        '<div class="lp-f"><label for="' + u + 'g">GPU</label><select class="lp-sel" id="' + u + 'g" data-k="gpu">' +
-          GPU_ORDER.map(function (k) { var g = HW.gpus[k]; return '<option value="' + k + '"' + (k === st.gpu ? ' selected' : '') + '>' + g.name + ' · ' + g.mem + ' GB</option>'; }).join('') + '</select></div>' +
+        (L ? '' : '<div class="lp-f"><label for="' + u + 'g">GPU</label><select class="lp-sel" id="' + u + 'g" data-k="gpu">' +
+          GPU_ORDER.map(function (k) { var g = HW.gpus[k]; return '<option value="' + k + '"' + (k === st.gpu ? ' selected' : '') + '>' + g.name + ' · ' + g.mem + ' GB</option>'; }).join('') + '</select></div>') +
         '<div class="lp-f lp-inl"><label for="' + u + 'p">Price per GPU-hour</label><span class="lp-usd"><input class="lp-num" id="' + u + 'p" data-k="price" type="number" min="0" step="0.05" value="' + st.price.toFixed(2) + '" inputmode="decimal"></span></div>' +
         range(u + 'users', 'Concurrent requests', USERS, st.users, String) +
         range(u + 'inp', 'Prompt tokens', PROMPT, st.inp, fmtTok) +
@@ -302,7 +303,7 @@
         ['Power', g.tdp + ' W']
       ];
       var note = fallback ? (wname === 'fp8' ? 'No fp8 tensor cores: fp8 weights are dequantised and the matmuls run at the bf16 rate.' : 'int4 weights are dequantised to ' + rt.as + ' for the matmuls.') : (wname === 'int4' && rt.as === 'fp4' ? 'int4 weights run as NVFP4 at the fp4 tensor-core rate.' : '');
-      var c = HW.card(g, { rows: rows, sub: HW.arch[g.arch].name, note: note });
+      var c = HW.card(g, { photo: !L, rows: rows, sub: HW.arch[g.arch].name, note: note });
       X.card.innerHTML = ''; X.card.appendChild(c);
       memBar = null;
     }
@@ -425,6 +426,7 @@
     }
     function short(v) { return v >= 1e4 ? Math.round(v / 1e3) + 'k' : v >= 1e3 ? (v / 1e3).toFixed(1).replace(/\.0$/, '') + 'k' : String(Math.round(v)); }
 
+    if (L) L.subscribe(function (m) { if (m.kind === 'gpu' && m.gpu !== st.gpu) { st.gpu = m.gpu; st.price = HW.gpus[st.gpu].price; $('#' + u + 'p').value = st.price.toFixed(2); update(); } });
     update();
     if ('ResizeObserver' in window) {
       var lastW = 0;

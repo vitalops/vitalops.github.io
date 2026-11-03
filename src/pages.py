@@ -164,7 +164,7 @@ def page(path, title, desc, cur, body, faqs=(), demos=(), cta_args=None, ctaband
     root = "../" * path.count("/") if path else ""
     out = head(title, desc, root, path, jsonld(faqs)) + G["DEFS"] + "__SPRITE__" + nav(root, cur)
     out += '\n<main id="main" tabindex="-1">\n' + body.replace("{R}", root) + (faq(faqs) if faqs else "") + (cta(*(cta_args or ())) if ctaband else "") + "\n</main>\n" + footer(root)
-    js = ["assets/js/site.js", "assets/js/play.js"] + (["assets/js/hw.js"] if demos else []) + [f"assets/js/lab-{d}.js" for d in demos]
+    js = ["assets/js/site.js", "assets/js/play.js"] + (["assets/js/hw.js", "assets/js/lab-shell.js"] if demos else []) + [f"assets/js/lab-{d}.js" for d in demos]
     out += "".join(f'\n<script src="{root}{asset(j)}"{" defer" if "lab-" in j or "hw.js" in j else ""}></script>' for j in js) + "\n</body>\n</html>\n"
     PAGES.append((path, out))
 
@@ -200,11 +200,13 @@ def row(no, title, para, fig, bullets, link=None, flip=None):
   <div class="step-copy"><div class="step-no">{no}</div><h3>{title}</h3><p>{para}</p><ul class="chg">{li}</ul>{a}</div>
   <div class="step-shot">{fig}</div></div></div></article>"""
 
-def lab_block(key, k=None, h2=None, lede=None, id_=None):
-    t, d, i = DEMOS[key]
-    return f"""<section class="labsec" id="{id_ or 'demo-' + key}"><div class="wrap">
+def lab_block(keys, k=None, h2=None, lede=None, id_=None, gpu="h100"):
+    """One demo shell with a tab per key (a string or a list); the hardware carousel is the selector."""
+    keys = [keys] if isinstance(keys, str) else list(keys)
+    t, d, i = DEMOS[keys[0]]
+    return f"""<section class="labsec" id="{id_ or 'demo-' + keys[0]}"><div class="wrap">
   <div class="labsec-head"><div><span class="k">{ic("play")}{k or "Live demo"}</span><h2>{h2 or t}</h2><p class="lede">{lede or d}</p></div></div>
-  <div class="lab" data-lab="{key}"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
+  <div class="lab" data-lab-shell data-tabs="{','.join(keys)}" data-gpu="{gpu}"><noscript><p class="lab-ns">This demo needs JavaScript.</p></noscript></div>
 </div></section>"""
 
 PRODUCT_PHOTO = {"plan": "racks-art", "optimize": "racks-teal", "sim": "racks-dark", "serve": "gpu-cluster", "edge": "jetson-board", "fleet": "aisle-white"}
@@ -442,11 +444,9 @@ def product_pages():
         if d.get("flow"):
             body += f'<section class="flowband"><div class="wrap"><div class="flow-head"><span class="k">How Sim works</span><h2>From Python to SASS, then simulated on a CPU</h2><p class="lede">The kernel is compiled exactly as it would be for the GPU. Sim then runs the SASS on CPU threads and shows how long that took next to the estimated GPU time.</p></div>{g["FLOW"]}</div></section>'
         if d.get("demo"):
-            body += lab_block(d["demo"][0], h2=d["demo"][1], lede=d["demo"][2])
+            body += lab_block([d["demo"][0]] + ([d["demo2"][0]] if d.get("demo2") else []), h2=d["demo"][1], lede=d["demo"][2])
         feats = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{x}</p></div>' for i, t, x in d["feats"])
         body += f'<section class="feats"><div class="wrap">{sec_head("Features", "What's included")}<div class="feat-grid">{feats}</div><div class="works"><h4>Works with</h4><p>{d["works"]}</p></div></div></section>'
-        if d.get("demo2"):
-            body += lab_block(d["demo2"][0], h2=d["demo2"][1], lede=d["demo2"][2])
         rel = {k: PRODUCTS[k] for k in related[key]}
         body += f'<section class="related"><div class="wrap">{sec_head("Related", "Other products")}{cards(rel, "products")}</div></section>'
         demos = [x[0] for x in (d.get("demo"), d.get("demo2")) if x]
@@ -573,7 +573,7 @@ def home():
 # ───────────────────────── other pages ─────────────────────────
 def lab_page():
     order = ["planner", "batching", "kernel", "quant", "specdec", "edgefit"]
-    sub = "".join(f'<a href="#{k}">{ic(DEMOS[k][2])}{DEMOS[k][0]}</a>' for k in order)
+    sub = "".join(f'<a href="#{k}" data-tab="{k}">{ic(DEMOS[k][2])}{DEMOS[k][0]}</a>' for k in order)
     intro = {"planner": "Estimates how many GPUs you need and the cost per million tokens. It assumes decode is limited by memory bandwidth and prefill by compute, which is where Plan starts before running a full simulation.",
              "batching": "Simulates a model server using static batching, continuous batching, chunked prefill and prefix caching on chat, RAG and agent traffic.",
              "quant": "Applies real FP8, INT8, INT4 and NVFP4 rounding to a synthetic layer with outlier channels, similar to real LLM weights. You can see the effect of group size and outlier protection.",
@@ -581,8 +581,9 @@ def lab_page():
              "kernel": "Occupancy from the CUDA occupancy-calculator rules for each architecture, the register file and shared memory drawn to scale, spills under a register cap, achievable bandwidth from Little's law and a roofline for the chosen kernel.",
              "edgefit": "Adds up the weights, KV cache, vision encoder and runtime overhead and compares them with the free memory on a Jetson, a phone or a Raspberry Pi. You can also check whether on-device fine-tuning would fit."}
     body = f"""<section class="lhero"><div class="wrap"><span class="k">Live demos</span><h1>Interactive inference demos</h1><p class="lede">Our engineers use tools like these to estimate how a workload will behave before measuring it. Everything runs in your browser and nothing is sent to a server. For real numbers on your own model and hardware, you would use the products.</p><nav class="lsub" aria-label="Demos">{sub}</nav></div></section>"""
-    for k in order:
-        body += lab_block(k, k=f"{DEMOS[k][0]}", h2={"planner": "How many GPUs do you need?", "batching": "How batching affects latency", "quant": "Quantisation, up close", "specdec": "Speculative decoding", "edgefit": "Will it fit on the device?", "kernel": "Register pressure and occupancy, per GPU"}[k], lede=intro[k], id_=k)
+    items = "".join(f'<li><a href="#{k}">{ic(DEMOS[k][2])}<b>{DEMOS[k][0]}</b></a><p>{intro[k]}</p></li>' for k in order)
+    body += f'<section class="labsec" id="demos"><div class="wrap"><div class="lab" data-lab-shell data-tabs="{",".join(order)}" data-gpu="h100"><noscript><p class="lab-ns">These demos need JavaScript.</p></noscript></div><ul class="lab-list">{items}</ul></div></section>'
+
     page("lab/", "Live demos | VitalOps", "Interactive inference tools that run in your browser: a GPU capacity planner, a batching simulator, a kernel occupancy lab, a quantisation lab, a speculative decoding race and an edge memory fit.", "lab", body, demos=order,
          cta_args=("Want real numbers?", "These demos give rough estimates. On a review call we'll look at your actual model and hardware and tell you what's realistic."))
 

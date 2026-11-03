@@ -3,7 +3,7 @@
    programming guide's compute-capability table, and the notes say where a figure is an assumption.
    Nothing here is a measurement of any VitalOps product.
 
-   window.VO_HW = { gpus, devices, arch, photos, card(key, opts), memoryBar(spec, parts), fmt }
+   window.VO_HW = { gpus, devices, arch, photoURL, card(spec, opts), carousel(kind, key, onSelect), memoryBar(spec, parts), fmt, gb }
 */
 (function () {
   'use strict';
@@ -68,12 +68,26 @@
     if (document.getElementById(CSS_ID)) return;
     var s = document.createElement('style'); s.id = CSS_ID;
     s.textContent = [
-      '.hwc{display:grid;grid-template-columns:minmax(0,1fr);border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;font-family:var(--font)}',
+      '.hwc{display:grid;grid-template-columns:minmax(0,1fr);border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--white);font-family:var(--font)}',
       '.hwc-ph{position:relative;aspect-ratio:3/2;background:#0b1020;overflow:hidden}',
       '.hwc-ph img{width:100%;height:100%;object-fit:cover;display:block}',
       '.hwc-ph.none{display:grid;place-items:center;color:#94a3b8}',
       '.hwc-ph.none svg{width:60%;height:auto;opacity:.8}',
-      '.hwc-ph .hwc-tag{position:absolute;left:8px;bottom:8px;font:500 10.5px/1.35 var(--mono);color:#e2e8f0;background:rgba(7,10,24,.72);padding:3px 7px;border-radius:5px;max-width:calc(100% - 16px);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
+      /* carousel */
+      '.hwcar{position:relative;display:grid;grid-template-columns:32px minmax(0,1fr) 32px;align-items:center;gap:6px}',
+      '.hwcar-track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:6px 4px;scroll-padding:0 40px}',
+      '.hwcar-track::-webkit-scrollbar{display:none}',
+      '.hwcar-it{flex:0 0 172px;scroll-snap-align:center;display:grid;gap:4px;padding:6px 6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);font:inherit;text-align:left;cursor:pointer;opacity:.72;transition:opacity .15s,border-color .15s,transform .15s}',
+      '.hwcar-it:hover{opacity:1;border-color:var(--brand200)}',
+      '.hwcar-it.on{opacity:1;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand100);transform:translateY(-2px)}',
+      '.hwcar-it:focus-visible{outline:2px solid var(--brand);outline-offset:2px}',
+      '.hwcar-it .hwc-ph{border-radius:6px;aspect-ratio:16/10}',
+      '.hwcar-n{font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}',
+      '.hwcar-s{font:11px/1.3 var(--mono);color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.hwcar-ar{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--white);color:var(--ink2);font-size:20px;line-height:1;cursor:pointer;display:grid;place-items:center}',
+      '.hwcar-ar:hover{border-color:var(--brand200);color:var(--brand)}',
+      '@media(max-width:600px){.hwcar{grid-template-columns:minmax(0,1fr)}.hwcar-ar{display:none}.hwcar-it{flex-basis:150px}}',
+      '@media (prefers-reduced-motion:reduce){.hwcar-it{transition:none}}',
       '.hwc-b{padding:10px 12px 12px}',
       '.hwc-b b{display:block;font-size:14px;color:var(--ink);letter-spacing:-.01em}',
       '.hwc-b small{display:block;font-size:11.5px;color:var(--ink3);margin-top:1px}',
@@ -98,12 +112,60 @@
     return '<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14h104v40H8z"/><path d="M18 54v8h60v-8"/><circle cx="36" cy="34" r="12"/><circle cx="74" cy="34" r="12"/><path d="M8 20h-4v28h4"/></svg>';
   }
 
+  function photoHTML(spec) {
+    var url = photoURL(spec.photo);
+    return url ? '<div class="hwc-ph"><img src="' + url + '" alt="" loading="lazy" title="' + esc(spec.photoNote || spec.name) + '"></div>'
+               : '<div class="hwc-ph none" title="' + esc(spec.photoNote || 'No licensed photo') + '">' + silhouette(spec.arch === 'cdna3' ? 'oam' : 'card') + '</div>';
+  }
+
+  /* ── the carousel: a row of hardware cards that is the selector. kind 'gpu' or 'device'. ──
+     carousel(kind, selectedKey, onSelect, opts) -> element with .select(key, silent) and .setKind(kind, selectedKey) */
+  function carousel(kind, selected, onSelect, opts) {
+    css(); opts = opts || {};
+    var el = document.createElement('div'); el.className = 'hwcar';
+    el.innerHTML = '<button class="hwcar-ar l" type="button" aria-label="Previous">&#8249;</button><div class="hwcar-track" role="radiogroup"></div><button class="hwcar-ar r" type="button" aria-label="Next">&#8250;</button>';
+    var track = el.querySelector('.hwcar-track'), cur = selected, curKind = kind;
+    function list() { var src = curKind === 'device' ? DEVICES : GPUS; return Object.keys(src).filter(function (k) { return !(opts.exclude && opts.exclude.indexOf(k) >= 0); }); }
+    function spec(k) { return (curKind === 'device' ? DEVICES : GPUS)[k]; }
+    function specLine(k) {
+      var g = spec(k);
+      if (curKind === 'device') return esc(g.mem + ' GB · ' + g.bw + ' GB/s');
+      return esc(g.mem + ' GB · ' + (g.bw >= 1 ? g.bw.toFixed(g.bw >= 10 ? 0 : 2).replace(/\.?0+$/, '') + ' TB/s' : Math.round(g.bw * 1000) + ' GB/s'));
+    }
+    function build() {
+      track.innerHTML = list().map(function (k) {
+        var g = spec(k);
+        return '<button class="hwcar-it' + (k === cur ? ' on' : '') + '" type="button" role="radio" aria-checked="' + (k === cur) + '" data-key="' + k + '" tabindex="' + (k === cur ? 0 : -1) + '">' +
+          photoHTML(g) + '<span class="hwcar-n">' + esc(g.name) + '</span><span class="hwcar-s">' + specLine(k) + '</span></button>';
+      }).join('');
+    }
+    function reveal(k) { var b = track.querySelector('[data-key="' + k + '"]'); if (b) b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduced() ? 'auto' : 'smooth' }); }
+    function reduced() { return window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    function select(k, silent, focus) {
+      if (!spec(k)) return;
+      cur = k;
+      [].forEach.call(track.children, function (b) { var on = b.getAttribute('data-key') === k; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus({ preventScroll: true }); });
+      reveal(k);
+      if (!silent && onSelect) onSelect(curKind, k, spec(k));
+    }
+    track.addEventListener('click', function (e) { var b = e.target.closest('.hwcar-it'); if (b) select(b.getAttribute('data-key')); });
+    track.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return;
+      e.preventDefault(); var ks = list(), i = ks.indexOf(cur); select(ks[(i + d + ks.length) % ks.length], false, true);
+    });
+    el.querySelector('.hwcar-ar.l').addEventListener('click', function () { var ks = list(), i = ks.indexOf(cur); select(ks[(i - 1 + ks.length) % ks.length]); });
+    el.querySelector('.hwcar-ar.r').addEventListener('click', function () { var ks = list(), i = ks.indexOf(cur); select(ks[(i + 1) % ks.length]); });
+    el.select = select;
+    el.setKind = function (k, sel) { if (k !== curKind) { curKind = k; build(); } if (sel) select(sel, true); else reveal(cur); };
+    el.current = function () { return { kind: curKind, key: cur, spec: spec(cur) }; };
+    build(); setTimeout(function () { reveal(cur); }, 0);
+    return el;
+  }
+
   function card(spec, opts) {
     css(); opts = opts || {};
     var el = document.createElement('div'); el.className = 'hwc' + (opts.cls ? ' ' + opts.cls : '');
-    var url = photoURL(spec.photo);
-    var ph = url ? '<div class="hwc-ph"><img src="' + url + '" alt="" loading="lazy"><span class="hwc-tag">' + esc(spec.photoNote || spec.name) + '</span></div>'
-                 : '<div class="hwc-ph none">' + silhouette(spec.arch === 'cdna3' ? 'oam' : 'card') + '<span class="hwc-tag">' + esc(spec.photoNote || 'No licensed photo') + '</span></div>';
+    var ph = opts.photo === false ? '' : photoHTML(spec);
     var rows = (opts.rows || []).map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + r[1] + '</dd>'; }).join('');
     el.innerHTML = ph + '<div class="hwc-b"><b>' + esc(spec.name) + '</b>' + (opts.sub ? '<small>' + esc(opts.sub) + '</small>' : '') +
       (rows ? '<dl class="hwc-kv">' + rows + '</dl>' : '') + '<div class="hwc-slot"></div>' + (opts.note ? '<p class="hwc-note">' + esc(opts.note) + '</p>' : '') + '</div>';
@@ -134,5 +196,5 @@
     return wrap;
   }
 
-  window.VO_HW = { gpus: GPUS, devices: DEVICES, arch: ARCH, photoURL: photoURL, card: card, memoryBar: memoryBar, fmt: fmt, gb: gb, esc: esc };
+  window.VO_HW = { gpus: GPUS, devices: DEVICES, arch: ARCH, photoURL: photoURL, photoHTML: photoHTML, card: card, carousel: carousel, memoryBar: memoryBar, fmt: fmt, gb: gb, esc: esc };
 })();
