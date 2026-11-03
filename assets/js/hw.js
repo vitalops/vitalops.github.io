@@ -76,7 +76,7 @@
       /* carousel */
       '.hwcar{position:relative;display:grid;grid-template-columns:32px minmax(0,1fr) 32px;align-items:center;gap:6px}',
       '.hwcar-track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:6px 4px;scroll-padding:0 40px;cursor:grab;user-select:none;-webkit-user-select:none}',
-      '.hwcar-track.dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto}.hwcar-track.dragging .hwcar-it{pointer-events:none}',
+      '.hwcar-track.dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto}',
       '.hwcar-track::-webkit-scrollbar{display:none}',
       '.hwcar-it{flex:0 0 172px;scroll-snap-align:center;display:grid;gap:4px;padding:6px 6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);font:inherit;text-align:left;cursor:pointer;opacity:.72;transition:opacity .15s,border-color .15s,transform .15s}',
       '.hwcar-it:hover{opacity:1;border-color:var(--brand200)}',
@@ -166,12 +166,17 @@
 
   /* mouse drag on a horizontally scrolling row; touch already scrolls natively. A drag suppresses the click that follows it. */
   function dragScroll(el) {
-    var x0 = 0, s0 = 0, moved = false, down = false;
-    el.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button) return; down = true; moved = false; x0 = e.clientX; s0 = el.scrollLeft; el.classList.add('dragging'); });
-    el.addEventListener('pointermove', function (e) { if (!down) return; var dx = e.clientX - x0; if (Math.abs(dx) > 4) { moved = true; try { el.setPointerCapture(e.pointerId); } catch (x) {} } if (moved) { el.scrollLeft = s0 - dx; e.preventDefault(); } });
-    function up(e) { if (!down) return; down = false; el.classList.remove('dragging'); }
+    var x0 = 0, s0 = 0, moved = false, down = false, swallow = false;
+    el.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button) return; down = true; moved = false; x0 = e.clientX; s0 = el.scrollLeft; });
+    el.addEventListener('pointermove', function (e) {
+      if (!down) return; var dx = e.clientX - x0;
+      if (!moved && Math.abs(dx) > 4) { moved = true; el.classList.add('dragging'); try { el.setPointerCapture(e.pointerId); } catch (x) {} }
+      if (moved) { el.scrollLeft = s0 - dx; e.preventDefault(); }
+    });
+    /* the click that ends a drag is swallowed; the flag clears right after it, so the next plain click works */
+    function up(e) { if (!down) return; down = false; el.classList.remove('dragging'); if (moved) { swallow = true; setTimeout(function () { swallow = false; }, 0); } moved = false; }
     el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); el.addEventListener('pointerleave', up);
-    el.addEventListener('click', function (e) { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+    el.addEventListener('click', function (e) { if (swallow) { e.stopPropagation(); e.preventDefault(); } }, true);
     el.addEventListener('dragstart', function (e) { e.preventDefault(); });
     return el;
   }

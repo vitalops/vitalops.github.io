@@ -103,7 +103,7 @@
     '.vlab-note{padding:4px 12px 6px;font-size:11px;color:#5f6b85;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid #1f2a44}',
     '.vlab-note b{font-weight:500;color:#8e9ab3}',
     '.vlab .hwc{background:#111a30}',
-    '.vlab-tip{position:absolute;z-index:200;max-width:300px;padding:8px 10px;border-radius:8px;background:#1b2440;color:#e8ecf5;border:1px solid #34436b;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);font:400 12px/1.45 var(--font);pointer-events:none;display:none}',
+    '.vlab-tip{position:fixed;z-index:200;max-width:300px;padding:8px 10px;border-radius:8px;background:#1b2440;color:#e8ecf5;border:1px solid #34436b;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);font:400 12px/1.45 var(--font);pointer-events:none;display:none}',
     '.vlab [data-tip]{cursor:help}.vlab button[data-tip],.vlab input[data-tip],.vlab select[data-tip],.vlab label[data-tip]{cursor:pointer}',
     /* a dotted underline marks inline text that carries a tip; tiles, rows and controls show the tip without it */
     '.vlab :is(span,small,dt,dd,h3,h4,b,em,i,p)[data-tip]{text-decoration:underline dotted var(--ink4);text-underline-offset:3px}',
@@ -117,11 +117,14 @@
   var tip = null, tipFor = null, tipTimer = null;
   function showTip(el) {
     var text = el.getAttribute('data-tip'); if (!text) return;
-    if (!tip) { tip = document.createElement('div'); tip.className = 'vlab-tip'; tip.setAttribute('role', 'tooltip'); document.body.appendChild(tip); }
+    if (!tip) { tip = document.createElement('div'); tip.className = 'vlab-tip'; tip.setAttribute('role', 'tooltip'); }
+    /* in the browser's full-screen mode only the full-screen element is drawn, so the tip has to live inside it */
+    var host = document.fullscreenElement || document.webkitFullscreenElement || document.body;
+    if (tip.parentNode !== host) host.appendChild(tip);
     tip.textContent = text; tipFor = el; tip.style.display = 'block';
     var r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
     var x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), above = r.top - h - 8 >= 8;
-    tip.style.left = x + 'px'; tip.style.top = (above ? r.top - h - 8 : r.bottom + 8) + scrollY + 'px';
+    tip.style.left = x + 'px'; tip.style.top = (above ? r.top - h - 8 : r.bottom + 8) + 'px';
     tip.classList.toggle('below', !above);
   }
   function hideTip() { if (tip) tip.style.display = 'none'; tipFor = null; }
