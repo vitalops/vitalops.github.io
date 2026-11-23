@@ -160,10 +160,10 @@ def faq(items, title="Questions", h2="What engineering teams ask us"):
     return f'<section class="faq"><div class="wrap"><span class="k">{title}</span><h2 style="margin:12px 0 20px">{h2}</h2>{qs}</div></section>'
 
 PAGES = []
-def page(path, title, desc, cur, body, faqs=(), demos=(), cta_args=None, ctaband=True):
+def page(path, title, desc, cur, body, faqs=(), demos=(), cta_args=None, ctaband=True, navfn=None, footfn=None):
     root = "../" * path.count("/") if path else ""
-    out = head(title, desc, root, path, jsonld(faqs)) + G["DEFS"] + "__SPRITE__" + nav(root, cur)
-    out += '\n<main id="main" tabindex="-1">\n' + body.replace("{R}", root) + (faq(faqs) if faqs else "") + (cta(*(cta_args or ())) if ctaband else "") + "\n</main>\n" + footer(root)
+    out = head(title, desc, root, path, jsonld(faqs)) + G["DEFS"] + "__SPRITE__" + (navfn or nav)(root, cur)
+    out += '\n<main id="main" tabindex="-1">\n' + body.replace("{R}", root) + (faq(faqs) if faqs else "") + (cta(*(cta_args or ())) if ctaband else "") + "\n</main>\n" + (footfn or footer)(root)
     js = ["assets/js/site.js", "assets/js/play.js"] + (["assets/js/hw.js", "assets/js/lab-shell.js"] if demos else []) + [f"assets/js/lab-{d}.js" for d in demos]
     out += "".join(f'\n<script src="{root}{asset(j)}"{" defer" if "lab-" in j or "hw.js" in j else ""}></script>' for j in js) + "\n</body>\n</html>\n"
     PAGES.append((path, out))
@@ -738,6 +738,171 @@ def e2e_page():
     path, out = PAGES[-1]
     PAGES[-1] = (path, out.replace("<head>\n", '<head>\n<meta name="robots" content="noindex">\n', 1))
 
+# ───────────────────────── /new (proposal: three services) ─────────────────────────
+# Everything under new/ is a draft: noindex, left out of the sitemap, not linked from the live pages.
+# Use only icons the live pages already use, so the shared sprite (and every live page) stays unchanged.
+OFFERS = {
+ "inference":  dict(name="Inference and model deployment", icon="zap", short="Run open-weight models faster and cheaper, on GPUs or devices you choose."),
+ "automation": dict(name="Operations automation", icon="workflow", short="Take over document-heavy back-office work, including the systems that have no API."),
+ "data":       dict(name="Data engineering", icon="database", short="Pipelines and warehouses that finance and operations teams can rely on."),
+}
+
+def new_nav(root, cur):
+    def link(href, text, key):
+        on = ' class="is-current" aria-current="page"' if cur == key else ""
+        return f'<a class="nav-a" href="{root}{href}"{on}>{text}</a>'
+    return f"""<header class="vnav" id="top"><a class="skip" href="#main">Skip to content</a><div class="wrap vnav-in">
+  <a class="logo" href="{root}new/" aria-label="VitalOps home"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps</a>
+  <nav class="nav-links" id="navLinks" aria-label="Main">
+    {link("new/inference/", "Inference", "new/inference")}
+    {link("new/automation/", "Operations automation", "new/automation")}
+    {link("new/data/", "Data engineering", "new/data")}
+    {link("security/", "Security", "security")}
+    {link("company/", "Company", "company")}
+  </nav>
+  <div class="nav-act">
+    <button class="nav-burger" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <a class="btn btn-p btn-sm" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}<span>Book a call</span></a>
+  </div>
+</div></header>"""
+
+def new_footer(root):
+    return f"""<footer class="vfoot"><div class="wrap">
+  <div class="foot-grid">
+    <div class="foot-brand"><a class="logo" href="{root}new/"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps</a>
+      <p>We build and run AI systems in production, on infrastructure you control.</p>
+      <p class="foot-soc"><a href="https://github.com/vitalops" target="_blank" rel="noopener" aria-label="GitHub">{lg("github")}</a><a href="https://x.com/vitalopsai" target="_blank" rel="noopener" aria-label="X">X</a><a href="mailto:{MAIL}">{MAIL}</a></p></div>
+    <div><h4>Services</h4><a href="{root}new/inference/">Inference</a><a href="{root}new/automation/">Operations automation</a><a href="{root}new/data/">Data engineering</a></div>
+    <div><h4>Inference</h4>{"".join(f'<a href="{root}products/{k}/">{v["name"]}</a>' for k, v in PRODUCTS.items())}</div>
+    <div><h4>Resources</h4><a href="{root}lab/">Live demos</a><a href="{root}oss/">vitalops CLI (open source)</a><a href="{root}security/">Security</a></div>
+    <div><h4>Company</h4><a href="{root}company/">About</a><a href="{BOOK}" target="_blank" rel="noopener">Book a call</a><a href="mailto:{MAIL}">Contact</a><a href="{root}credits/">Photo credits</a></div>
+  </div>
+  <p class="foot-legal">© <span id="yr">2026</span> VitalOps Inc · vitalops.ai</p>
+</div></footer>"""
+
+def new_cta(h2, lede, steps, label="Book a call"):
+    st = "".join(f'<li><b>{ic(i)}{t}</b><span>{d}</span></li>' for i, t, d in steps)
+    return f"""<section class="cta2" id="contact"><div class="wrap cta2-in">
+  <div class="cta2-copy"><span class="k">Get started</span><h2>{h2}</h2><p class="lede">{lede}</p>
+    <div class="hero-cta"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}{label}</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div>
+  <ol class="cta2-steps">{st}</ol>
+</div></section>"""
+
+def feat_grid(items, cls=""):
+    return f'<div class="feat-grid{(" " + cls) if cls else ""}">' + "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in items) + "</div>"
+
+def new_clients():
+    h = G["HTML"]; i = h.index('<section class="clients"'); j = h.index("</section>", i) + 10
+    return h[i:j].replace('src="assets/', 'src="{R}assets/')
+
+def new_page(path, title, desc, cur, body, faqs=()):
+    page(path, title, desc, cur, body, faqs=faqs, ctaband=False, navfn=new_nav, footfn=new_footer)
+    p, out = PAGES[-1]
+    PAGES[-1] = (p, out.replace("<head>\n", '<head>\n<meta name="robots" content="noindex">\n', 1))
+
+def new_home():
+    hero = phero("racks-teal", "AI engineering services",
+                 "We build and run AI systems in production, on infrastructure you control",
+                 "We have three lines of work: getting open-weight models to run fast and cheap, automating back-office operations from start to finish, and the data engineering both depend on. The same engineers do all three.",
+                 [], [("btn-w", BOOK, "Book a call", "calendar", True), ("btn-g", "#services", "Services", "layers", False)])
+    body = hero
+    body += f'<section class="prods" id="services"><div class="wrap">{sec_head("Services", "What we do", "Most clients start with one of these. Some use all three.")}{cards(OFFERS, "new")}</div></section>'
+    body += f'<section class="feats alt"><div class="wrap">{sec_head("Approach", "How we work")}' + feat_grid([
+        ("server", "We run what we build", "We don't hand over a prototype and leave. We operate the system in production and fix it when something upstream changes."),
+        ("lock", "Your data stays put", "Models run on our servers, in your cloud account or in your data centre. We don't send your documents or prompts to outside model providers."),
+        ("badge-check", "Tested on your cases", "We measure each system on your own data before go-live, against targets agreed with you in advance."),
+        ("cpu", "We go deep when needed", "When the bottleneck is a GPU kernel, a 20-year-old ERP or a supplier portal with no API, that's where we work."),
+    ], "four") + '</div></section>'
+    body += new_clients()
+    body += new_cta("Tell us what you're working on", "A model that is too slow or too expensive, a team buried in documents, or data nobody trusts. In a 30-minute call we'll tell you whether we can help and what it would take.",
+                    [("calendar", "Call", "Thirty minutes, free. We ask about volumes, systems and what a good result looks like."),
+                     ("flask-conical", "Pilot or sprint", "A fixed fee and a fixed scope, measured against targets we agree up front."),
+                     ("server", "Run", "We operate it under an agreed service level, or hand it to your team with documentation.")])
+    new_page("new/", "VitalOps · AI engineering services", "VitalOps builds and runs AI systems in production: inference and model deployment, operations automation, and data engineering.", "new", body)
+
+def new_inference():
+    hero = phero("gpu-cluster", "Inference and model deployment",
+                 "Open-weight models that run faster and cost less",
+                 "We plan, tune and run open-weight models on your hardware, from GPU clusters to Jetson boards. Every change is checked against your evals before it ships.",
+                 [], [("btn-w", BOOK, "Book an inference review", "calendar", True), ("btn-g", "{R}lab/", "Try the live demos", "play", False)])
+    body = hero
+    body += f'<section class="feats"><div class="wrap">{sec_head("Services", "What we take on")}' + feat_grid([
+        ("zap", "Tuning sprints", "Two weeks at a fixed fee on one model. We change engine settings, quantisation, batching and kernels, and keep only what holds your accuracy threshold."),
+        ("cpu", "Custom kernels", "Triton or CUDA kernels for the operations where the stock ones leave speed on the table, checked numerically against the reference."),
+        ("gauge", "Capacity planning", "How many GPUs, which ones, and the cost per million tokens at your traffic, before you sign a hardware contract."),
+        ("smartphone", "Edge deployment", "Models compressed to fit Jetson, Apple, Qualcomm and Raspberry Pi devices, and measured on the device."),
+        ("server", "Hosting", "We run the model for you on our GPUs or in your cloud account, with monitoring and on-call."),
+        ("terminal", "Open-source planner", "The vitalops CLI estimates GPUs, latency and cost for any Hugging Face model. Free to use."),
+    ]) + '</div></section>'
+    body += f'<section class="related"><div class="wrap">{sec_head("Products", "Tools we use on these projects", "Built from our client work. Some are early; ask us which are ready for your setup.")}{cards(PRODUCTS, "products")}</div></section>'
+    body += new_cta("Tell us what the model needs to do", "The model, the hardware and the number you need, whether that's tokens per second, latency, memory or cost per million tokens. In 30 minutes we'll tell you whether it's reachable.",
+                    [("calendar", "Review", "A free call about your model, hardware and target."),
+                     ("flask-conical", "Sprint", "Two weeks at a fixed fee. If we can't beat your current setup, you don't pay."),
+                     ("server", "Run", "Optionally, we host and monitor it under an agreed service level.")], "Book an inference review")
+    new_page("new/inference/", "Inference and model deployment | VitalOps", "VitalOps makes open-weight models run faster and cheaper: tuning sprints, custom kernels, capacity planning, edge deployment and hosting.", "new/inference", body, faqs=FAQ_HOME[:3])
+
+FAQ_AUTO = [
+ ("Our main system is old and has no API. Can you still work with it?", "Usually. We use whatever it offers: database access, file exports, EDI, SFTP drops, email, or as a last resort driving its screens in a browser or remote desktop session. We tell you in the first call if something looks impractical."),
+ ("Isn't this just RPA?", "We do use screen automation where there is no other way in, but it's one tool among several. RPA bots break when a screen moves or a document doesn't match the template. We read documents with models that handle new layouts, and we monitor every integration so a break is caught the same day."),
+ ("How do you handle scanned and handwritten documents?", "We test on a sample of your real documents before quoting, including the bad ones: faxes, phone photos, stamps over text, handwriting and mixed languages. You get an accuracy figure per field and per document type."),
+ ("What happens when it gets something wrong?", "Items below an agreed confidence level go to a review queue with the source document and the reason they were flagged. How people resolve them is fed back to improve the system. Every decision is logged."),
+ ("Where does our data go?", "It stays where we agree: our servers, your cloud account or your data centre. We host the models ourselves and don't send documents to outside model providers."),
+ ("How do we pay?", "The pilot is a fixed fee. After that we charge per item processed, with a monthly minimum."),
+]
+
+def new_automation():
+    hero = phero("technician", "Operations automation",
+                 "Automation that survives your real systems and documents",
+                 "Most automation projects stall on the same few things: systems with no API, documents nobody could template, and the cases that don't fit. That's the part we're good at. We build the whole workflow, run it, and keep it working as things change.",
+                 [], [("btn-w", BOOK, "Book a process review", "calendar", True), ("btn-g", "#hard-parts", "The hard parts", "list-checks", False)])
+    hard = [("network", "Systems with no API", "Old ERPs and accounting packages, EDI, SFTP drops, shared inboxes, and supplier, carrier and customs portals you have to log into. We connect through whatever each system offers, and drive the screens only when there is nothing else."),
+            ("scan", "Documents as they arrive", "Scans, faxes, phone photos, stamps over text, handwriting, multi-page bundles and several languages in one file. We read them with models tuned on your documents, not fixed templates, and report accuracy per field."),
+            ("triangle-alert", "The cases that don't fit", "Typically 10 to 20 percent of volume. Each one goes to a person with the documents and the reason it was flagged, and how they resolve it is used to improve the system."),
+            ("refresh-cw", "Things that change", "A supplier changes its invoice layout, a portal changes its login, a rule changes at quarter end. We monitor every integration and fix breaks the same day."),
+            ("badge-check", "Proof it works", "We measure accuracy on your past cases before go-live, report weekly afterwards, and keep an audit trail that links each output to its source documents."),
+            ("lock", "Where it runs", "On our servers, in your cloud account, or in your data centre with no internet access. The models are open-weight and hosted by us, so your documents stay where we agreed.")]
+    body = hero
+    body += f'<section class="pains" id="hard-parts"><div class="wrap">{sec_head("The hard parts", "Where automation projects stall", "Installing an AI tool is the easy step. Getting it to work on your systems and documents is most of the effort.")}<div class="pain-grid">' + "".join(f'<div class="pain"><span class="pn">{n:02d}</span><h3>{t}</h3><p>{d}</p></div>' for n, (_, t, d) in enumerate(hard, 1)) + '</div></div></section>'
+    body += f'<section class="feats alt"><div class="wrap">{sec_head("What we take over", "Work we have automated", "We have built each of these for at least one client.")}' + feat_grid([
+        ("file-text", "Trade documents", "Bills of lading, commercial invoices, packing lists and certificates of origin, checked against each other and the order."),
+        ("arrow-right-left", "Reconciliation", "Import and export records, bank lines and ledger entries matched, with a likely cause for each break."),
+        ("boxes", "Procurement", "Purchase requests, quotes and reverse auctions, supplier onboarding, and three-way matching."),
+        ("database", "Finance data", "Pipelines for month-end close and reporting, and answers to ad hoc questions from the data."),
+    ], "four") + '</div></section>'
+    body += f'<section class="arch"><div class="wrap"><div class="arch-grid"><div>{sec_head("What we run", "One team for every layer", "We build and operate the workflow, the models and the servers they run on. When something breaks, there is one team to call.")}</div><ol class="arch-l">' + "".join(f'<li><span class="pc-i">{ic(i)}</span><div><b>{t}</b><p>{d}</p></div></li>' for i, t, d in [
+        ("workflow", "Workflow", "The steps, the rules and the review queue."),
+        ("network", "Integrations", "Connections to your ERP, inboxes, portals and file drops, each monitored."),
+        ("scan", "Document reading", "Models that read your documents, tuned and tested on your samples."),
+        ("zap", "Inference", "Self-hosted models, tuned by our inference team so the cost per item stays low."),
+        ("server", "Hosting", "Our servers, your cloud account or your data centre.")]) + '</ol></div></div></section>'
+    body += new_clients()
+    body += faq(FAQ_AUTO, h2="Common questions")
+    body += new_cta("Tell us about one workflow", "Roughly how many items a month, which systems it touches and what a mistake costs. Send a few sample documents if you can, including bad ones.",
+                    [("calendar", "Process review", "A free call. We go through one workflow and tell you whether we can take it on."),
+                     ("flask-conical", "Pilot", "Four to six weeks on your real documents, for a fixed fee, against accuracy and turnaround targets agreed up front."),
+                     ("server", "Run", "We run the workflow day to day and bill per item, with a monthly minimum."),
+                     ("layers", "Expand", "The next workflow reuses the same integrations and models.")], "Book a process review")
+    new_page("new/automation/", "Operations automation | VitalOps", "VitalOps automates document-heavy back-office work end to end, including legacy systems with no API, scanned documents and exception handling.", "new/automation", body)
+
+def new_data():
+    hero = phero("racks-dark", "Data engineering",
+                 "Data that finance and operations teams can rely on",
+                 "We build and maintain the pipelines, warehouses and checks behind reporting, month-end close and automation. Clean data is also what every AI project depends on.",
+                 [], [("btn-w", BOOK, "Book a call", "calendar", True)])
+    body = hero
+    body += f'<section class="feats"><div class="wrap">{sec_head("Services", "What we take on")}' + feat_grid([
+        ("git-branch", "Pipelines", "Loading data from ERPs, banks, portals and spreadsheets on a schedule, with retries and alerts when a source changes."),
+        ("database", "Warehouses and models", "A warehouse your analysts can query, with tables and definitions that finance agrees with."),
+        ("list-checks", "Data quality checks", "Tests on every load for missing rows, duplicates and totals that don't tie out, so problems surface before a report goes out."),
+        ("message-square", "Questions in plain English", "An assistant that answers questions from your warehouse and shows the query it ran, hosted on your infrastructure."),
+    ], "four") + '</div></section>'
+    body += new_clients()
+    body += new_cta("Tell us where the numbers come from", "The systems involved, who uses the data and what goes wrong today. In 30 minutes we'll tell you what we'd change first.",
+                    [("calendar", "Call", "Thirty minutes, free."),
+                     ("flask-conical", "Project", "A fixed scope and fee, usually a few weeks."),
+                     ("server", "Support", "Optionally, we monitor and maintain the pipelines afterwards.")])
+    new_page("new/data/", "Data engineering | VitalOps", "VitalOps builds and maintains data pipelines, warehouses and quality checks for finance and operations teams.", "new/data", body)
+
 # ───────────────────────── assets ─────────────────────────
 def write_assets():
     g = G
@@ -759,7 +924,8 @@ def build(g):
     write_assets()
     SCREEN_PLAN_CACHE = screen_plan().replace('id="fig-plan"', 'id="fig-plan-s"')
     home(); product_pages(); solution_pages(); lab_page(); platform_page(); services_page(); security_page(); company_page(); credits_page(); e2e_page()
+    new_home(); new_inference(); new_automation(); new_data()
     write_all()
-    urls = [p for p, _ in PAGES if p != "e2e/"]
+    urls = [p for p, _ in PAGES if p != "e2e/" and not p.startswith("new/")]
     sm = "".join(f"<url><loc>https://vitalops.ai/{u}</loc></url>" for u in urls)
     open(os.path.join(ROOT, "sitemap.xml"), "w").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{sm}</urlset>\n')
