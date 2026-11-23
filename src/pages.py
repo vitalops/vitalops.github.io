@@ -160,10 +160,10 @@ def faq(items, title="Questions", h2="What engineering teams ask us"):
     return f'<section class="faq"><div class="wrap"><span class="k">{title}</span><h2 style="margin:12px 0 20px">{h2}</h2>{qs}</div></section>'
 
 PAGES = []
-def page(path, title, desc, cur, body, faqs=(), demos=(), cta_args=None, ctaband=True, navfn=None, footfn=None):
+def page(path, title, desc, cur, body, faqs=(), demos=(), cta_args=None, ctaband=True):
     root = "../" * path.count("/") if path else ""
-    out = head(title, desc, root, path, jsonld(faqs)) + G["DEFS"] + "__SPRITE__" + (navfn or nav)(root, cur)
-    out += '\n<main id="main" tabindex="-1">\n' + body.replace("{R}", root) + (faq(faqs) if faqs else "") + (cta(*(cta_args or ())) if ctaband else "") + "\n</main>\n" + (footfn or footer)(root)
+    out = head(title, desc, root, path, jsonld(faqs)) + G["DEFS"] + "__SPRITE__" + nav(root, cur)
+    out += '\n<main id="main" tabindex="-1">\n' + body.replace("{R}", root) + (faq(faqs) if faqs else "") + (cta(*(cta_args or ())) if ctaband else "") + "\n</main>\n" + footer(root)
     js = ["assets/js/site.js", "assets/js/play.js"] + (["assets/js/hw.js", "assets/js/lab-shell.js"] if demos else []) + [f"assets/js/lab-{d}.js" for d in demos]
     out += "".join(f'\n<script src="{root}{asset(j)}"{" defer" if "lab-" in j or "hw.js" in j else ""}></script>' for j in js) + "\n</body>\n</html>\n"
     PAGES.append((path, out))
@@ -668,7 +668,7 @@ def company_page():
     body = phero("racks-art", "Company", "About VitalOps",
                  "VitalOps works on inference: making open-weight models run faster and cheaper. We spent several years doing this for clients one project at a time, and built the products from what we learned.",
                  [], None)
-    body += f'<section class="feats"><div class="wrap">{sec_head("Approach", "How we work")}<div class="feat-grid four">{vs}</div></div></section>'
+    body += f'<section class="feats"><div class="wrap">{sec_head("How we work", "How we work")}<div class="feat-grid four">{vs}</div></div></section>'
     body += f'<section class="feats alt"><div class="wrap"><div class="split2"><div>{sec_head("Contact", "Get in touch", "Book a 30-minute call or email us. We usually reply within a working day.")}<div class="hero-cta" style="margin-top:20px"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}Book a review</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div><div class="co-ph" style="background-image:url(\'{{R}}assets/stock/pair-review.jpg\')"></div></div></div></section>'
     page("company/", "Company | VitalOps", "VitalOps makes open-weight models run faster and cheaper, with software and engineering services.", "company", body, ctaband=False)
 
@@ -677,231 +677,6 @@ def credits_page():
     rows = "".join(f'<li><img src="{{R}}assets/photos/{c["file"]}" alt="" loading="lazy"><div><b>{H.escape(c["title"])}</b><span>{H.escape(c["author"])} · {c["license"]} · <a href="{c["page"]}" target="_blank" rel="noopener">source</a></span></div></li>' for c in cr)
     body = f'<section class="lhero"><div class="wrap"><span class="k">Credits</span><h1>Photo credits</h1><p class="lede">Photographs from Wikimedia Commons, used under the licences listed, cropped and resized for the web. The office photographs are from Pexels under the Pexels licence. Product screens are illustrations; numbers on them are examples. The hardware photographs in the live demos are listed here too; where no licensed photo of a part exists, the demo shows a labelled outline instead.</p><ul class="credits">{rows}</ul></div></section>'
     page("credits/", "Photo credits | VitalOps", "Photo credits for vitalops.ai.", "credits", body, ctaband=False)
-
-# ───────────────────────── e2e (proposal) ─────────────────────────
-FAQ_E2E = [
- ("Where does our data go?", "It stays on the machines we agree on: ours, your cloud account, or your own servers. We use open-weight models that we host ourselves, so documents and prompts are not sent to an outside model provider."),
- ("Do we have to replace our ERP or other software?", "No. We read from and write to the systems you already have, usually an ERP, a few shared inboxes, a drive and some supplier or carrier portals."),
- ("What happens when the AI is wrong or unsure?", "Before go-live we run each step over a few hundred of your past cases and agree an accuracy threshold with you. In production, items the system is unsure about go to a review queue that your team or ours works through. Every decision is logged with the documents it was based on."),
- ("How do we pay?", "The pilot is a fixed fee. After that we charge per item, for example per document processed, line matched or order placed, with a monthly minimum."),
- ("Why open-weight models?", "Mainly cost and control. We know where your data is, the model only changes when we change it, and running our own inference is cheap enough that per-item pricing works for both of us."),
-]
-
-def e2e_page():
-    hero = phero("racks-teal", "AI operations",
-                 "We run back-office work for trade, procurement and finance teams",
-                 "We set up the workflows, host the models and process the work each day, either on our servers or on yours. After a fixed-fee pilot you pay per document, match or order.",
-                 [],
-                 [("btn-w", BOOK, "Book a process review", "calendar", True), ("btn-g", "#stack", "How it's built", "layers", False)])
-    depts = [("file-text", "Trade documents", "We read bills of lading, commercial invoices, packing lists and certificates of origin, check them against each other and the order, and send mismatches to whoever handles them."),
-             ("arrow-right-left", "Reconciliation", "We match import and export records, bank lines and ledger entries. Each break comes with the likely cause, and routine ones are cleared automatically."),
-             ("boxes", "Procurement", "Purchase requests, quotes and reverse auctions, supplier onboarding, and three-way matching of orders, receipts and invoices."),
-             ("database", "Finance data", "We build and maintain the pipelines that feed month-end close and reporting, and answer ad hoc questions from the data.")]
-    dg = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in depts)
-    layers = [("The work", "The workflow itself, plus a review queue for items that need a person.", "workflow"),
-              ("Testing", "Each step is scored on your past cases before release, and again whenever we change it.", "badge-check"),
-              ("Models", "Open-weight models such as Qwen and Llama. We fine-tune on your documents when it measurably helps.", "brain"),
-              ("Inference", "We tune serving ourselves, down to GPU kernels when needed. That is what keeps the cost per document low.", "zap"),
-              ("Hosting", "GPUs in our cloud, your cloud account or your data centre.", "server")]
-    ls = "".join(f'<li><span class="pc-i">{ic(i)}</span><div><b>{t}</b><p>{d}</p></div></li>' for t, d, i in layers)
-    why = [("workflow", "We handle the integration work", "Most of the effort in automating a back office goes into connecting systems and handling unusual cases. We do that work, and keep adjusting as suppliers, formats and rules change."),
-           ("users", "Your team approves", "Your staff sign off on anything that matters and handle exceptions. We report how many items needed a person each week."),
-           ("history", "An audit trail", "Each output records its source documents, the model version and the checks it passed. Logs can be exported."),
-           ("trending-down", "Lower cost over time", "As accuracy allows, we move steps to smaller models. We pass part of the saving on at each contract review.")]
-    wg = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in why)
-    deploy = [("cloud", "Our cloud", "Quickest to set up. Each customer gets separate GPUs and storage."),
-              ("cloud-upload", "Your cloud account", "AWS, Google Cloud, Azure or Kubernetes. We work under your access policies and you keep the keys."),
-              ("lock", "Your servers", "In your data centre, air-gapped if needed. Your IT team looks after the hardware and we look after everything running on it.")]
-    dp = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in deploy)
-    steps = [("calendar", "Process review", "A free call where we go through one workflow, its volume and what errors cost you, and say whether we can take it on."),
-             ("flask-conical", "Pilot", "Four to six weeks on your real documents, for a fixed fee. We agree targets for accuracy and turnaround before starting."),
-             ("server", "Run", "We run the workflow day to day and bill per item, with a monthly minimum."),
-             ("layers", "Expand", "Later workflows reuse the same integrations and models, so they take less time to set up.")]
-    st = "".join(f'<li><b>{ic(i)}{t}</b><span>{d}</span></li>' for i, t, d in steps)
-    clients = G["HTML"]
-    i = clients.index('<section class="clients"'); j = clients.index("</section>", i) + 10
-    clients = clients[i:j].replace('src="assets/', 'src="{R}assets/')
-    body = hero
-    body += f'<section class="feats"><div class="wrap">{sec_head("What we do", "Work we take on", "We have built each of these for at least one client.")}<div class="feat-grid four">{dg}</div></div></section>'
-    body += f'<section class="arch" id="stack"><div class="wrap"><div class="arch-grid"><div>{sec_head("How it's built", "What we run", "We operate every layer below, from the workflow down to the GPUs. Because we control the costs, we can charge per item.")}</div><ol class="arch-l">{ls}</ol></div></div></section>'
-    body += f'<section class="feats alt"><div class="wrap">{sec_head("Approach", "How we work")}<div class="feat-grid four">{wg}</div></div></section>'
-    body += f'<section class="feats"><div class="wrap">{sec_head("Deployment", "Where it runs", "The workflows and the team are the same in each case.")}<div class="feat-grid">{dp}</div></div></section>'
-    body += clients
-    body += f'<section class="feats alt"><div class="wrap"><div class="split2"><div>{sec_head("Inference engineering", "Inference work for other teams", "We also take on fixed-fee projects to make open-weight models run faster on a team's own hardware. Our capacity planner is open source.")}<div class="hero-cta" style="margin-top:20px"><a class="btn btn-s" href="{{R}}services/">{ic("zap")}Optimisation sprints</a><a class="btn btn-s" href="{{R}}oss/">{ic("terminal")}vitalops CLI</a></div></div><div class="co-ph" style="background-image:url(\'{{R}}assets/photos/racks-dark.webp\')"></div></div></div></section>'
-    body += faq(FAQ_E2E, h2="Common questions")
-    body += f"""<section class="cta2" id="contact"><div class="wrap cta2-in">
-  <div class="cta2-copy"><span class="k">Get started</span><h2>Tell us about one workflow</h2><p class="lede">Roughly how many items a month, which systems it touches and what a mistake costs. In a 30-minute call we'll say whether we can run it and what a pilot would involve.</p>
-    <div class="hero-cta"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}Book a process review</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div>
-  <ol class="cta2-steps">{st}</ol>
-</div></section>"""
-    page("e2e/", "VitalOps · AI operations on private models", "VitalOps runs back-office work for trade, procurement and finance teams on self-hosted models, billed per item processed.", "e2e", body, ctaband=False)
-    path, out = PAGES[-1]
-    PAGES[-1] = (path, out.replace("<head>\n", '<head>\n<meta name="robots" content="noindex">\n', 1))
-
-# ───────────────────────── /new (proposal: three services) ─────────────────────────
-# Everything under new/ is a draft: noindex, left out of the sitemap, not linked from the live pages.
-# Use only icons the live pages already use, so the shared sprite (and every live page) stays unchanged.
-OFFERS = {
- "inference":  dict(name="Inference and model deployment", icon="zap", short="Make open-weight models faster and cheaper to run, on GPUs or on devices."),
- "automation": dict(name="Operations automation", icon="workflow", short="Automate back-office work that runs on documents and old software."),
- "data":       dict(name="Data engineering", icon="database", short="Pipelines, warehouses and reporting for finance and operations."),
-}
-
-def new_nav(root, cur):
-    def link(href, text, key):
-        on = ' class="is-current" aria-current="page"' if cur == key else ""
-        return f'<a class="nav-a" href="{root}{href}"{on}>{text}</a>'
-    return f"""<header class="vnav" id="top"><a class="skip" href="#main">Skip to content</a><div class="wrap vnav-in">
-  <a class="logo" href="{root}new/" aria-label="VitalOps home"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps</a>
-  <nav class="nav-links" id="navLinks" aria-label="Main">
-    {link("new/inference/", "Inference", "new/inference")}
-    {link("new/automation/", "Operations automation", "new/automation")}
-    {link("new/data/", "Data engineering", "new/data")}
-    {link("security/", "Security", "security")}
-    {link("company/", "Company", "company")}
-  </nav>
-  <div class="nav-act">
-    <button class="nav-burger" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-    <a class="btn btn-p btn-sm" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}<span>Book a call</span></a>
-  </div>
-</div></header>"""
-
-def new_footer(root):
-    return f"""<footer class="vfoot"><div class="wrap">
-  <div class="foot-grid">
-    <div class="foot-brand"><a class="logo" href="{root}new/"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps</a>
-      <p>We build AI systems and run them for you.</p>
-      <p class="foot-soc"><a href="https://github.com/vitalops" target="_blank" rel="noopener" aria-label="GitHub">{lg("github")}</a><a href="https://x.com/vitalopsai" target="_blank" rel="noopener" aria-label="X">X</a><a href="mailto:{MAIL}">{MAIL}</a></p></div>
-    <div><h4>Services</h4><a href="{root}new/inference/">Inference</a><a href="{root}new/automation/">Operations automation</a><a href="{root}new/data/">Data engineering</a></div>
-    <div><h4>Inference</h4>{"".join(f'<a href="{root}products/{k}/">{v["name"]}</a>' for k, v in PRODUCTS.items())}</div>
-    <div><h4>Resources</h4><a href="{root}lab/">Live demos</a><a href="{root}oss/">vitalops CLI (open source)</a><a href="{root}security/">Security</a></div>
-    <div><h4>Company</h4><a href="{root}company/">About</a><a href="{BOOK}" target="_blank" rel="noopener">Book a call</a><a href="mailto:{MAIL}">Contact</a><a href="{root}credits/">Photo credits</a></div>
-  </div>
-  <p class="foot-legal">© <span id="yr">2026</span> VitalOps Inc · vitalops.ai</p>
-</div></footer>"""
-
-def new_cta(h2, lede, steps, label="Book a call"):
-    st = "".join(f'<li><b>{ic(i)}{t}</b><span>{d}</span></li>' for i, t, d in steps)
-    return f"""<section class="cta2" id="contact"><div class="wrap cta2-in">
-  <div class="cta2-copy"><span class="k">Get started</span><h2>{h2}</h2><p class="lede">{lede}</p>
-    <div class="hero-cta"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}{label}</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div>
-  <ol class="cta2-steps">{st}</ol>
-</div></section>"""
-
-def feat_grid(items, cls=""):
-    return f'<div class="feat-grid{(" " + cls) if cls else ""}">' + "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in items) + "</div>"
-
-def new_clients():
-    h = G["HTML"]; i = h.index('<section class="clients"'); j = h.index("</section>", i) + 10
-    return h[i:j].replace('src="assets/', 'src="{R}assets/')
-
-def new_page(path, title, desc, cur, body, faqs=()):
-    page(path, title, desc, cur, body, faqs=faqs, ctaband=False, navfn=new_nav, footfn=new_footer)
-    p, out = PAGES[-1]
-    PAGES[-1] = (p, out.replace("<head>\n", '<head>\n<meta name="robots" content="noindex">\n', 1))
-
-def new_home():
-    hero = phero("racks-teal", "AI engineering",
-                 "We build AI systems and run them for you",
-                 "We tune and host open-weight models, automate back-office work, and build the data pipelines underneath. On our servers or yours.",
-                 [], [("btn-w", BOOK, "Book a call", "calendar", True), ("btn-g", "#services", "Services", "layers", False)])
-    body = hero
-    body += f'<section class="prods" id="services"><div class="wrap">{sec_head("Services", "What we do", "")}{cards(OFFERS, "new")}</div></section>'
-    body += f'<section class="feats alt"><div class="wrap">{sec_head("Approach", "How we work")}' + feat_grid([
-        ("server", "We run it after launch", "We operate what we build and fix it when a source system or document format changes."),
-        ("lock", "Self-hosted models", "Models run on our servers, in your cloud account or in your data centre. Your documents are not sent to outside model providers."),
-        ("badge-check", "Measured on your data", "Before go-live we test on your own past cases, against targets we agree with you first."),
-        ("cpu", "Low-level work", "We write GPU kernels and integrate with old ERPs and portals that have no API."),
-    ], "four") + '</div></section>'
-    body += new_clients()
-    body += new_cta("Book a call", "Tell us what you want to build or fix. We'll say whether we can help and roughly what it would cost.",
-                    [("calendar", "Call", "30 minutes, free."),
-                     ("flask-conical", "Pilot or sprint", "Fixed scope and fee, with targets agreed before we start."),
-                     ("server", "Run", "We operate it under a service-level agreement, or hand it over to your team.")])
-    new_page("new/", "VitalOps · AI engineering services", "VitalOps builds AI systems and runs them: model deployment and inference, operations automation, and data engineering.", "new", body)
-
-def new_inference():
-    hero = phero("gpu-cluster", "Inference and model deployment",
-                 "Faster, cheaper open-weight models",
-                 "We size, tune and host open-weight models, from GPU clusters to Jetson boards. Each change is checked against your evals before it ships.",
-                 [], [("btn-w", BOOK, "Book an inference review", "calendar", True), ("btn-g", "{R}lab/", "Try the live demos", "play", False)])
-    body = hero
-    body += f'<section class="feats"><div class="wrap">{sec_head("Services", "What we take on")}' + feat_grid([
-        ("zap", "Tuning sprints", "Two weeks, fixed fee, one model. We try engine settings, quantisation, batching and kernels, and keep what passes your accuracy threshold."),
-        ("cpu", "Custom kernels", "Triton or CUDA kernels where the stock ones are slow, checked numerically against the reference."),
-        ("gauge", "Capacity planning", "GPU count, GPU type and cost per million tokens for your traffic, worked out before you buy."),
-        ("smartphone", "Edge deployment", "Models compressed for Jetson, Apple, Qualcomm and Raspberry Pi, and measured on the device."),
-        ("server", "Hosting", "On our GPUs or in your cloud account, with monitoring and on-call."),
-        ("terminal", "Open-source planner", "The vitalops CLI estimates GPUs, latency and cost for any Hugging Face model."),
-    ]) + '</div></section>'
-    body += f'<section class="related"><div class="wrap">{sec_head("Products", "Tools we use on these projects", "Some are early. Ask us which ones fit your setup.")}{cards(PRODUCTS, "products")}</div></section>'
-    body += new_cta("Book an inference review", "Send the model, the hardware and your target for speed, latency, memory or cost. We'll tell you if it's doable.",
-                    [("calendar", "Review", "30 minutes, free."),
-                     ("flask-conical", "Sprint", "Two weeks at a fixed fee. If we can't beat your current setup, you don't pay."),
-                     ("server", "Run", "If you want, we host and monitor it.")], "Book an inference review")
-    new_page("new/inference/", "Inference and model deployment | VitalOps", "Tuning sprints, custom kernels, capacity planning, edge deployment and hosting for open-weight models.", "new/inference", body, faqs=FAQ_HOME[:3])
-
-FAQ_AUTO = [
- ("Our main system is old and has no API. Can you still work with it?", "Usually. We use what it has: database access, file exports, EDI, SFTP or email. If none of those work, we drive its screens. We'll tell you on the first call if it looks impractical."),
- ("Isn't this just RPA?", "Partly. We use screen automation when a system has no other way in. The difference is in the documents: RPA needs a template per layout, and we use models that read new layouts. We also monitor each integration and fix breaks ourselves."),
- ("How do you handle scanned and handwritten documents?", "Before quoting, we test on a sample of your real documents, including faxes, phone photos and handwriting. You get accuracy per field and per document type."),
- ("What happens when it gets something wrong?", "Low-confidence items go to a review queue with the source document and the reason they were flagged. We use the corrections to improve the system, and every decision is logged."),
- ("Where does our data go?", "On our servers, in your cloud account or in your data centre. We host the models ourselves."),
- ("How do we pay?", "The pilot is a fixed fee. After that we charge per item processed, with a monthly minimum."),
-]
-
-def new_automation():
-    hero = phero("technician", "Operations automation",
-                 "Back-office automation for old systems and messy documents",
-                 "We automate document-heavy work such as trade paperwork, reconciliation and procurement. That includes systems with no API, scanned documents and the exceptions. We build the workflow and then run it.",
-                 [], [("btn-w", BOOK, "Book a process review", "calendar", True), ("btn-g", "#hard-parts", "Common problems", "list-checks", False)])
-    hard = [("network", "Systems with no API", "Old ERPs, EDI, SFTP, shared inboxes, and supplier, carrier and customs portals. We use each system's database, files or email where possible, and its screens when not."),
-            ("scan", "Scanned and messy documents", "Faxes, phone photos, stamps, handwriting, multi-page bundles and mixed languages. We tune the models on your documents and report accuracy per field."),
-            ("triangle-alert", "Exceptions", "Items the system can't handle go to a person with the documents and the reason. We use their corrections to reduce the number over time."),
-            ("refresh-cw", "Changes upstream", "Suppliers change invoice layouts and portals change their logins. We monitor each integration and fix it when it breaks."),
-            ("badge-check", "Measurement", "We test on your past cases before go-live and report accuracy weekly after. Each output links back to its source documents."),
-            ("lock", "Where it runs", "Our servers, your cloud account, or your data centre, air-gapped if needed. We host open-weight models, so documents don't go to outside providers.")]
-    body = hero
-    body += f'<section class="pains" id="hard-parts"><div class="wrap">{sec_head("Common problems", "Where automation projects get stuck", "These take most of the time on a real project.")}<div class="pain-grid">' + "".join(f'<div class="pain"><span class="pn">{n:02d}</span><h3>{t}</h3><p>{d}</p></div>' for n, (_, t, d) in enumerate(hard, 1)) + '</div></div></section>'
-    body += f'<section class="feats alt"><div class="wrap">{sec_head("Examples", "Work we have automated", "We have built each of these for at least one client.")}' + feat_grid([
-        ("file-text", "Trade documents", "Bills of lading, commercial invoices, packing lists and certificates of origin, checked against each other and the order."),
-        ("arrow-right-left", "Reconciliation", "Import and export records, bank lines and ledger entries matched, with a likely cause for each break."),
-        ("boxes", "Procurement", "Purchase requests, quotes and reverse auctions, supplier onboarding, and three-way matching."),
-        ("database", "Finance data", "Pipelines for month-end close and reporting."),
-    ], "four") + '</div></section>'
-    body += f'<section class="arch"><div class="wrap"><div class="arch-grid"><div>{sec_head("What we run", "What we operate", "We run all of it, from the workflow down to the servers.")}</div><ol class="arch-l">' + "".join(f'<li><span class="pc-i">{ic(i)}</span><div><b>{t}</b><p>{d}</p></div></li>' for i, t, d in [
-        ("workflow", "Workflow", "The steps, the rules and the review queue."),
-        ("network", "Integrations", "Connections to your ERP, inboxes, portals and file drops."),
-        ("scan", "Document reading", "Models tuned and tested on your documents."),
-        ("zap", "Inference", "Self-hosted models, tuned by our inference team to keep costs down."),
-        ("server", "Hosting", "Our servers, your cloud account or your data centre.")]) + '</ol></div></div></section>'
-    body += new_clients()
-    body += faq(FAQ_AUTO, h2="Common questions")
-    body += new_cta("Book a process review", "Tell us about one workflow: monthly volume, the systems involved and what errors cost. Sample documents help.",
-                    [("calendar", "Process review", "30 minutes, free."),
-                     ("flask-conical", "Pilot", "Four to six weeks on your documents, for a fixed fee, with agreed targets."),
-                     ("server", "Run", "We run it and bill per item, with a monthly minimum."),
-                     ("layers", "Expand", "Later workflows reuse the integrations and models.")], "Book a process review")
-    new_page("new/automation/", "Operations automation | VitalOps", "Back-office automation for trade, procurement and finance, including old systems with no API and scanned documents.", "new/automation", body)
-
-def new_data():
-    hero = phero("racks-dark", "Data engineering",
-                 "Data engineering for finance and operations",
-                 "We build and maintain pipelines, warehouses and data checks for reporting and month-end close.",
-                 [], [("btn-w", BOOK, "Book a call", "calendar", True)])
-    body = hero
-    body += f'<section class="feats"><div class="wrap">{sec_head("Services", "What we take on")}' + feat_grid([
-        ("git-branch", "Pipelines", "Scheduled loads from ERPs, banks, portals and spreadsheets, with alerts when a source changes."),
-        ("database", "Warehouses and models", "A warehouse your analysts can query, with definitions finance has signed off."),
-        ("list-checks", "Data quality checks", "Checks on every load for missing rows, duplicates and totals that don't match."),
-        ("message-square", "Questions in plain English", "Ask questions of the warehouse in plain English and see the SQL it ran."),
-    ], "four") + '</div></section>'
-    body += new_clients()
-    body += new_cta("Book a call", "Tell us which systems are involved and what goes wrong today.",
-                    [("calendar", "Call", "30 minutes, free."),
-                     ("flask-conical", "Project", "Fixed scope and fee, usually a few weeks."),
-                     ("server", "Support", "If you want, we maintain the pipelines afterwards.")])
-    new_page("new/data/", "Data engineering | VitalOps", "Data pipelines, warehouses and data checks for finance and operations teams.", "new/data", body)
 
 # ───────────────────────── assets ─────────────────────────
 def write_assets():
@@ -923,9 +698,8 @@ def build(g):
     G.update(g)
     write_assets()
     SCREEN_PLAN_CACHE = screen_plan().replace('id="fig-plan"', 'id="fig-plan-s"')
-    home(); product_pages(); solution_pages(); lab_page(); platform_page(); services_page(); security_page(); company_page(); credits_page(); e2e_page()
-    new_home(); new_inference(); new_automation(); new_data()
+    home(); product_pages(); solution_pages(); lab_page(); platform_page(); services_page(); security_page(); company_page(); credits_page()
     write_all()
-    urls = [p for p, _ in PAGES if p != "e2e/" and not p.startswith("new/")]
+    urls = [p for p, _ in PAGES]
     sm = "".join(f"<url><loc>https://vitalops.ai/{u}</loc></url>" for u in urls)
     open(os.path.join(ROOT, "sitemap.xml"), "w").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{sm}</urlset>\n')
