@@ -742,9 +742,9 @@ def e2e_page():
 # Everything under new/ is a draft: noindex, left out of the sitemap, not linked from the live pages.
 # Use only icons the live pages already use, so the shared sprite (and every live page) stays unchanged.
 OFFERS = {
- "inference":  dict(name="Inference and model deployment", icon="zap", short="Run open-weight models faster and cheaper, on GPUs or devices you choose."),
- "automation": dict(name="Operations automation", icon="workflow", short="Take over document-heavy back-office work, including the systems that have no API."),
- "data":       dict(name="Data engineering", icon="database", short="Pipelines and warehouses that finance and operations teams can rely on."),
+ "inference":  dict(name="Inference and model deployment", icon="zap", short="Make open-weight models faster and cheaper to run, on GPUs or on devices."),
+ "automation": dict(name="Operations automation", icon="workflow", short="Automate back-office work that runs on documents and old software."),
+ "data":       dict(name="Data engineering", icon="database", short="Pipelines, warehouses and reporting for finance and operations."),
 }
 
 def new_nav(root, cur):
@@ -770,7 +770,7 @@ def new_footer(root):
     return f"""<footer class="vfoot"><div class="wrap">
   <div class="foot-grid">
     <div class="foot-brand"><a class="logo" href="{root}new/"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps</a>
-      <p>We build and run AI systems in production, on infrastructure you control.</p>
+      <p>We build AI systems and run them for you.</p>
       <p class="foot-soc"><a href="https://github.com/vitalops" target="_blank" rel="noopener" aria-label="GitHub">{lg("github")}</a><a href="https://x.com/vitalopsai" target="_blank" rel="noopener" aria-label="X">X</a><a href="mailto:{MAIL}">{MAIL}</a></p></div>
     <div><h4>Services</h4><a href="{root}new/inference/">Inference</a><a href="{root}new/automation/">Operations automation</a><a href="{root}new/data/">Data engineering</a></div>
     <div><h4>Inference</h4>{"".join(f'<a href="{root}products/{k}/">{v["name"]}</a>' for k, v in PRODUCTS.items())}</div>
@@ -801,107 +801,107 @@ def new_page(path, title, desc, cur, body, faqs=()):
     PAGES[-1] = (p, out.replace("<head>\n", '<head>\n<meta name="robots" content="noindex">\n', 1))
 
 def new_home():
-    hero = phero("racks-teal", "AI engineering services",
-                 "We build and run AI systems in production, on infrastructure you control",
-                 "We have three lines of work: getting open-weight models to run fast and cheap, automating back-office operations from start to finish, and the data engineering both depend on. The same engineers do all three.",
+    hero = phero("racks-teal", "AI engineering",
+                 "We build AI systems and run them for you",
+                 "We tune and host open-weight models, automate back-office work, and build the data pipelines underneath. On our servers or yours.",
                  [], [("btn-w", BOOK, "Book a call", "calendar", True), ("btn-g", "#services", "Services", "layers", False)])
     body = hero
-    body += f'<section class="prods" id="services"><div class="wrap">{sec_head("Services", "What we do", "Most clients start with one of these. Some use all three.")}{cards(OFFERS, "new")}</div></section>'
+    body += f'<section class="prods" id="services"><div class="wrap">{sec_head("Services", "What we do", "")}{cards(OFFERS, "new")}</div></section>'
     body += f'<section class="feats alt"><div class="wrap">{sec_head("Approach", "How we work")}' + feat_grid([
-        ("server", "We run what we build", "We don't hand over a prototype and leave. We operate the system in production and fix it when something upstream changes."),
-        ("lock", "Your data stays put", "Models run on our servers, in your cloud account or in your data centre. We don't send your documents or prompts to outside model providers."),
-        ("badge-check", "Tested on your cases", "We measure each system on your own data before go-live, against targets agreed with you in advance."),
-        ("cpu", "We go deep when needed", "When the bottleneck is a GPU kernel, a 20-year-old ERP or a supplier portal with no API, that's where we work."),
+        ("server", "We run it after launch", "We operate what we build and fix it when a source system or document format changes."),
+        ("lock", "Self-hosted models", "Models run on our servers, in your cloud account or in your data centre. Your documents are not sent to outside model providers."),
+        ("badge-check", "Measured on your data", "Before go-live we test on your own past cases, against targets we agree with you first."),
+        ("cpu", "Low-level work", "We write GPU kernels and integrate with old ERPs and portals that have no API."),
     ], "four") + '</div></section>'
     body += new_clients()
-    body += new_cta("Tell us what you're working on", "A model that is too slow or too expensive, a team buried in documents, or data nobody trusts. In a 30-minute call we'll tell you whether we can help and what it would take.",
-                    [("calendar", "Call", "Thirty minutes, free. We ask about volumes, systems and what a good result looks like."),
-                     ("flask-conical", "Pilot or sprint", "A fixed fee and a fixed scope, measured against targets we agree up front."),
-                     ("server", "Run", "We operate it under an agreed service level, or hand it to your team with documentation.")])
-    new_page("new/", "VitalOps · AI engineering services", "VitalOps builds and runs AI systems in production: inference and model deployment, operations automation, and data engineering.", "new", body)
+    body += new_cta("Book a call", "Tell us what you want to build or fix. We'll say whether we can help and roughly what it would cost.",
+                    [("calendar", "Call", "30 minutes, free."),
+                     ("flask-conical", "Pilot or sprint", "Fixed scope and fee, with targets agreed before we start."),
+                     ("server", "Run", "We operate it under a service-level agreement, or hand it over to your team.")])
+    new_page("new/", "VitalOps · AI engineering services", "VitalOps builds AI systems and runs them: model deployment and inference, operations automation, and data engineering.", "new", body)
 
 def new_inference():
     hero = phero("gpu-cluster", "Inference and model deployment",
-                 "Open-weight models that run faster and cost less",
-                 "We plan, tune and run open-weight models on your hardware, from GPU clusters to Jetson boards. Every change is checked against your evals before it ships.",
+                 "Faster, cheaper open-weight models",
+                 "We size, tune and host open-weight models, from GPU clusters to Jetson boards. Each change is checked against your evals before it ships.",
                  [], [("btn-w", BOOK, "Book an inference review", "calendar", True), ("btn-g", "{R}lab/", "Try the live demos", "play", False)])
     body = hero
     body += f'<section class="feats"><div class="wrap">{sec_head("Services", "What we take on")}' + feat_grid([
-        ("zap", "Tuning sprints", "Two weeks at a fixed fee on one model. We change engine settings, quantisation, batching and kernels, and keep only what holds your accuracy threshold."),
-        ("cpu", "Custom kernels", "Triton or CUDA kernels for the operations where the stock ones leave speed on the table, checked numerically against the reference."),
-        ("gauge", "Capacity planning", "How many GPUs, which ones, and the cost per million tokens at your traffic, before you sign a hardware contract."),
-        ("smartphone", "Edge deployment", "Models compressed to fit Jetson, Apple, Qualcomm and Raspberry Pi devices, and measured on the device."),
-        ("server", "Hosting", "We run the model for you on our GPUs or in your cloud account, with monitoring and on-call."),
-        ("terminal", "Open-source planner", "The vitalops CLI estimates GPUs, latency and cost for any Hugging Face model. Free to use."),
+        ("zap", "Tuning sprints", "Two weeks, fixed fee, one model. We try engine settings, quantisation, batching and kernels, and keep what passes your accuracy threshold."),
+        ("cpu", "Custom kernels", "Triton or CUDA kernels where the stock ones are slow, checked numerically against the reference."),
+        ("gauge", "Capacity planning", "GPU count, GPU type and cost per million tokens for your traffic, worked out before you buy."),
+        ("smartphone", "Edge deployment", "Models compressed for Jetson, Apple, Qualcomm and Raspberry Pi, and measured on the device."),
+        ("server", "Hosting", "On our GPUs or in your cloud account, with monitoring and on-call."),
+        ("terminal", "Open-source planner", "The vitalops CLI estimates GPUs, latency and cost for any Hugging Face model."),
     ]) + '</div></section>'
-    body += f'<section class="related"><div class="wrap">{sec_head("Products", "Tools we use on these projects", "Built from our client work. Some are early; ask us which are ready for your setup.")}{cards(PRODUCTS, "products")}</div></section>'
-    body += new_cta("Tell us what the model needs to do", "The model, the hardware and the number you need, whether that's tokens per second, latency, memory or cost per million tokens. In 30 minutes we'll tell you whether it's reachable.",
-                    [("calendar", "Review", "A free call about your model, hardware and target."),
+    body += f'<section class="related"><div class="wrap">{sec_head("Products", "Tools we use on these projects", "Some are early. Ask us which ones fit your setup.")}{cards(PRODUCTS, "products")}</div></section>'
+    body += new_cta("Book an inference review", "Send the model, the hardware and your target for speed, latency, memory or cost. We'll tell you if it's doable.",
+                    [("calendar", "Review", "30 minutes, free."),
                      ("flask-conical", "Sprint", "Two weeks at a fixed fee. If we can't beat your current setup, you don't pay."),
-                     ("server", "Run", "Optionally, we host and monitor it under an agreed service level.")], "Book an inference review")
-    new_page("new/inference/", "Inference and model deployment | VitalOps", "VitalOps makes open-weight models run faster and cheaper: tuning sprints, custom kernels, capacity planning, edge deployment and hosting.", "new/inference", body, faqs=FAQ_HOME[:3])
+                     ("server", "Run", "If you want, we host and monitor it.")], "Book an inference review")
+    new_page("new/inference/", "Inference and model deployment | VitalOps", "Tuning sprints, custom kernels, capacity planning, edge deployment and hosting for open-weight models.", "new/inference", body, faqs=FAQ_HOME[:3])
 
 FAQ_AUTO = [
- ("Our main system is old and has no API. Can you still work with it?", "Usually. We use whatever it offers: database access, file exports, EDI, SFTP drops, email, or as a last resort driving its screens in a browser or remote desktop session. We tell you in the first call if something looks impractical."),
- ("Isn't this just RPA?", "We do use screen automation where there is no other way in, but it's one tool among several. RPA bots break when a screen moves or a document doesn't match the template. We read documents with models that handle new layouts, and we monitor every integration so a break is caught the same day."),
- ("How do you handle scanned and handwritten documents?", "We test on a sample of your real documents before quoting, including the bad ones: faxes, phone photos, stamps over text, handwriting and mixed languages. You get an accuracy figure per field and per document type."),
- ("What happens when it gets something wrong?", "Items below an agreed confidence level go to a review queue with the source document and the reason they were flagged. How people resolve them is fed back to improve the system. Every decision is logged."),
- ("Where does our data go?", "It stays where we agree: our servers, your cloud account or your data centre. We host the models ourselves and don't send documents to outside model providers."),
+ ("Our main system is old and has no API. Can you still work with it?", "Usually. We use what it has: database access, file exports, EDI, SFTP or email. If none of those work, we drive its screens. We'll tell you on the first call if it looks impractical."),
+ ("Isn't this just RPA?", "Partly. We use screen automation when a system has no other way in. The difference is in the documents: RPA needs a template per layout, and we use models that read new layouts. We also monitor each integration and fix breaks ourselves."),
+ ("How do you handle scanned and handwritten documents?", "Before quoting, we test on a sample of your real documents, including faxes, phone photos and handwriting. You get accuracy per field and per document type."),
+ ("What happens when it gets something wrong?", "Low-confidence items go to a review queue with the source document and the reason they were flagged. We use the corrections to improve the system, and every decision is logged."),
+ ("Where does our data go?", "On our servers, in your cloud account or in your data centre. We host the models ourselves."),
  ("How do we pay?", "The pilot is a fixed fee. After that we charge per item processed, with a monthly minimum."),
 ]
 
 def new_automation():
     hero = phero("technician", "Operations automation",
-                 "Automation that survives your real systems and documents",
-                 "Most automation projects stall on the same few things: systems with no API, documents nobody could template, and the cases that don't fit. That's the part we're good at. We build the whole workflow, run it, and keep it working as things change.",
-                 [], [("btn-w", BOOK, "Book a process review", "calendar", True), ("btn-g", "#hard-parts", "The hard parts", "list-checks", False)])
-    hard = [("network", "Systems with no API", "Old ERPs and accounting packages, EDI, SFTP drops, shared inboxes, and supplier, carrier and customs portals you have to log into. We connect through whatever each system offers, and drive the screens only when there is nothing else."),
-            ("scan", "Documents as they arrive", "Scans, faxes, phone photos, stamps over text, handwriting, multi-page bundles and several languages in one file. We read them with models tuned on your documents, not fixed templates, and report accuracy per field."),
-            ("triangle-alert", "The cases that don't fit", "Typically 10 to 20 percent of volume. Each one goes to a person with the documents and the reason it was flagged, and how they resolve it is used to improve the system."),
-            ("refresh-cw", "Things that change", "A supplier changes its invoice layout, a portal changes its login, a rule changes at quarter end. We monitor every integration and fix breaks the same day."),
-            ("badge-check", "Proof it works", "We measure accuracy on your past cases before go-live, report weekly afterwards, and keep an audit trail that links each output to its source documents."),
-            ("lock", "Where it runs", "On our servers, in your cloud account, or in your data centre with no internet access. The models are open-weight and hosted by us, so your documents stay where we agreed.")]
+                 "Back-office automation for old systems and messy documents",
+                 "We automate document-heavy work such as trade paperwork, reconciliation and procurement. That includes systems with no API, scanned documents and the exceptions. We build the workflow and then run it.",
+                 [], [("btn-w", BOOK, "Book a process review", "calendar", True), ("btn-g", "#hard-parts", "Common problems", "list-checks", False)])
+    hard = [("network", "Systems with no API", "Old ERPs, EDI, SFTP, shared inboxes, and supplier, carrier and customs portals. We use each system's database, files or email where possible, and its screens when not."),
+            ("scan", "Scanned and messy documents", "Faxes, phone photos, stamps, handwriting, multi-page bundles and mixed languages. We tune the models on your documents and report accuracy per field."),
+            ("triangle-alert", "Exceptions", "Items the system can't handle go to a person with the documents and the reason. We use their corrections to reduce the number over time."),
+            ("refresh-cw", "Changes upstream", "Suppliers change invoice layouts and portals change their logins. We monitor each integration and fix it when it breaks."),
+            ("badge-check", "Measurement", "We test on your past cases before go-live and report accuracy weekly after. Each output links back to its source documents."),
+            ("lock", "Where it runs", "Our servers, your cloud account, or your data centre, air-gapped if needed. We host open-weight models, so documents don't go to outside providers.")]
     body = hero
-    body += f'<section class="pains" id="hard-parts"><div class="wrap">{sec_head("The hard parts", "Where automation projects stall", "Installing an AI tool is the easy step. Getting it to work on your systems and documents is most of the effort.")}<div class="pain-grid">' + "".join(f'<div class="pain"><span class="pn">{n:02d}</span><h3>{t}</h3><p>{d}</p></div>' for n, (_, t, d) in enumerate(hard, 1)) + '</div></div></section>'
-    body += f'<section class="feats alt"><div class="wrap">{sec_head("What we take over", "Work we have automated", "We have built each of these for at least one client.")}' + feat_grid([
+    body += f'<section class="pains" id="hard-parts"><div class="wrap">{sec_head("Common problems", "Where automation projects get stuck", "These take most of the time on a real project.")}<div class="pain-grid">' + "".join(f'<div class="pain"><span class="pn">{n:02d}</span><h3>{t}</h3><p>{d}</p></div>' for n, (_, t, d) in enumerate(hard, 1)) + '</div></div></section>'
+    body += f'<section class="feats alt"><div class="wrap">{sec_head("Examples", "Work we have automated", "We have built each of these for at least one client.")}' + feat_grid([
         ("file-text", "Trade documents", "Bills of lading, commercial invoices, packing lists and certificates of origin, checked against each other and the order."),
         ("arrow-right-left", "Reconciliation", "Import and export records, bank lines and ledger entries matched, with a likely cause for each break."),
         ("boxes", "Procurement", "Purchase requests, quotes and reverse auctions, supplier onboarding, and three-way matching."),
-        ("database", "Finance data", "Pipelines for month-end close and reporting, and answers to ad hoc questions from the data."),
+        ("database", "Finance data", "Pipelines for month-end close and reporting."),
     ], "four") + '</div></section>'
-    body += f'<section class="arch"><div class="wrap"><div class="arch-grid"><div>{sec_head("What we run", "One team for every layer", "We build and operate the workflow, the models and the servers they run on. When something breaks, there is one team to call.")}</div><ol class="arch-l">' + "".join(f'<li><span class="pc-i">{ic(i)}</span><div><b>{t}</b><p>{d}</p></div></li>' for i, t, d in [
+    body += f'<section class="arch"><div class="wrap"><div class="arch-grid"><div>{sec_head("What we run", "What we operate", "We run all of it, from the workflow down to the servers.")}</div><ol class="arch-l">' + "".join(f'<li><span class="pc-i">{ic(i)}</span><div><b>{t}</b><p>{d}</p></div></li>' for i, t, d in [
         ("workflow", "Workflow", "The steps, the rules and the review queue."),
-        ("network", "Integrations", "Connections to your ERP, inboxes, portals and file drops, each monitored."),
-        ("scan", "Document reading", "Models that read your documents, tuned and tested on your samples."),
-        ("zap", "Inference", "Self-hosted models, tuned by our inference team so the cost per item stays low."),
+        ("network", "Integrations", "Connections to your ERP, inboxes, portals and file drops."),
+        ("scan", "Document reading", "Models tuned and tested on your documents."),
+        ("zap", "Inference", "Self-hosted models, tuned by our inference team to keep costs down."),
         ("server", "Hosting", "Our servers, your cloud account or your data centre.")]) + '</ol></div></div></section>'
     body += new_clients()
     body += faq(FAQ_AUTO, h2="Common questions")
-    body += new_cta("Tell us about one workflow", "Roughly how many items a month, which systems it touches and what a mistake costs. Send a few sample documents if you can, including bad ones.",
-                    [("calendar", "Process review", "A free call. We go through one workflow and tell you whether we can take it on."),
-                     ("flask-conical", "Pilot", "Four to six weeks on your real documents, for a fixed fee, against accuracy and turnaround targets agreed up front."),
-                     ("server", "Run", "We run the workflow day to day and bill per item, with a monthly minimum."),
-                     ("layers", "Expand", "The next workflow reuses the same integrations and models.")], "Book a process review")
-    new_page("new/automation/", "Operations automation | VitalOps", "VitalOps automates document-heavy back-office work end to end, including legacy systems with no API, scanned documents and exception handling.", "new/automation", body)
+    body += new_cta("Book a process review", "Tell us about one workflow: monthly volume, the systems involved and what errors cost. Sample documents help.",
+                    [("calendar", "Process review", "30 minutes, free."),
+                     ("flask-conical", "Pilot", "Four to six weeks on your documents, for a fixed fee, with agreed targets."),
+                     ("server", "Run", "We run it and bill per item, with a monthly minimum."),
+                     ("layers", "Expand", "Later workflows reuse the integrations and models.")], "Book a process review")
+    new_page("new/automation/", "Operations automation | VitalOps", "Back-office automation for trade, procurement and finance, including old systems with no API and scanned documents.", "new/automation", body)
 
 def new_data():
     hero = phero("racks-dark", "Data engineering",
-                 "Data that finance and operations teams can rely on",
-                 "We build and maintain the pipelines, warehouses and checks behind reporting, month-end close and automation. Clean data is also what every AI project depends on.",
+                 "Data engineering for finance and operations",
+                 "We build and maintain pipelines, warehouses and data checks for reporting and month-end close.",
                  [], [("btn-w", BOOK, "Book a call", "calendar", True)])
     body = hero
     body += f'<section class="feats"><div class="wrap">{sec_head("Services", "What we take on")}' + feat_grid([
-        ("git-branch", "Pipelines", "Loading data from ERPs, banks, portals and spreadsheets on a schedule, with retries and alerts when a source changes."),
-        ("database", "Warehouses and models", "A warehouse your analysts can query, with tables and definitions that finance agrees with."),
-        ("list-checks", "Data quality checks", "Tests on every load for missing rows, duplicates and totals that don't tie out, so problems surface before a report goes out."),
-        ("message-square", "Questions in plain English", "An assistant that answers questions from your warehouse and shows the query it ran, hosted on your infrastructure."),
+        ("git-branch", "Pipelines", "Scheduled loads from ERPs, banks, portals and spreadsheets, with alerts when a source changes."),
+        ("database", "Warehouses and models", "A warehouse your analysts can query, with definitions finance has signed off."),
+        ("list-checks", "Data quality checks", "Checks on every load for missing rows, duplicates and totals that don't match."),
+        ("message-square", "Questions in plain English", "Ask questions of the warehouse in plain English and see the SQL it ran."),
     ], "four") + '</div></section>'
     body += new_clients()
-    body += new_cta("Tell us where the numbers come from", "The systems involved, who uses the data and what goes wrong today. In 30 minutes we'll tell you what we'd change first.",
-                    [("calendar", "Call", "Thirty minutes, free."),
-                     ("flask-conical", "Project", "A fixed scope and fee, usually a few weeks."),
-                     ("server", "Support", "Optionally, we monitor and maintain the pipelines afterwards.")])
-    new_page("new/data/", "Data engineering | VitalOps", "VitalOps builds and maintains data pipelines, warehouses and quality checks for finance and operations teams.", "new/data", body)
+    body += new_cta("Book a call", "Tell us which systems are involved and what goes wrong today.",
+                    [("calendar", "Call", "30 minutes, free."),
+                     ("flask-conical", "Project", "Fixed scope and fee, usually a few weeks."),
+                     ("server", "Support", "If you want, we maintain the pipelines afterwards.")])
+    new_page("new/data/", "Data engineering | VitalOps", "Data pipelines, warehouses and data checks for finance and operations teams.", "new/data", body)
 
 # ───────────────────────── assets ─────────────────────────
 def write_assets():
