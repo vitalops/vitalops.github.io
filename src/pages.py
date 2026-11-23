@@ -678,6 +678,66 @@ def credits_page():
     body = f'<section class="lhero"><div class="wrap"><span class="k">Credits</span><h1>Photo credits</h1><p class="lede">Photographs from Wikimedia Commons, used under the licences listed, cropped and resized for the web. The office photographs are from Pexels under the Pexels licence. Product screens are illustrations; numbers on them are examples. The hardware photographs in the live demos are listed here too; where no licensed photo of a part exists, the demo shows a labelled outline instead.</p><ul class="credits">{rows}</ul></div></section>'
     page("credits/", "Photo credits | VitalOps", "Photo credits for vitalops.ai.", "credits", body, ctaband=False)
 
+# ───────────────────────── e2e (proposal) ─────────────────────────
+FAQ_E2E = [
+ ("Where does our data go?", "Wherever you choose: our cloud, your cloud account or your own servers. The models are open-weight and run on infrastructure we operate for you, so documents and prompts are never sent to a third-party model API."),
+ ("Do we have to replace our ERP or other software?", "No. We connect to what you already use, such as your ERP, email inboxes, shared drives and supplier or carrier portals, and do the work in between."),
+ ("What happens when the AI is wrong or unsure?", "Before anything goes live, each step is tested against your past cases, with an accuracy threshold you agree to. In production, anything below a confidence threshold goes to a review queue for your team or ours, and every decision is logged with its source documents."),
+ ("How do we pay?", "The pilot is a fixed fee. After that we charge per unit of work done, such as a document processed, a line matched or an order placed, with a monthly minimum. You don't pay for seats or tokens."),
+ ("Why open-weight models instead of the big APIs?", "Control and cost. Your data stays in an environment we can point to, the model doesn't change under you, and because we tune our own inference we can price per outcome and still make a margin."),
+]
+
+def e2e_page():
+    hero = phero("racks-teal", "End-to-end AI operations",
+                 "We run your back office on <em>private AI</em>",
+                 "Trade documents, reconciliation, procurement and finance data. We build the workflows, host the models and run the work, on our cloud, in your cloud account or on your own servers. You pay for work done, not for seats or tokens.",
+                 [("1 team", "from GPUs to the finished work"), ("3", "places it runs: our cloud, your cloud, your servers"), ("0", "documents sent to third-party model APIs"), ("Per outcome", "pricing after a fixed-fee pilot")],
+                 [("btn-w", BOOK, "Book a process review", "calendar", True), ("btn-g", "#stack", "See the stack", "layers", False)])
+    depts = [("file-text", "Trade documents", "Bills of lading, commercial invoices, packing lists and certificates of origin are read, checked against each other and against the order, and the exceptions are sent to the right person."),
+             ("arrow-right-left", "Reconciliation", "Import and export records, bank lines and ledgers are matched. Breaks are explained, not just listed, and the easy ones are resolved for you."),
+             ("boxes", "Procurement", "Source-to-pay: requests, quotes and auctions, supplier onboarding, and matching purchase orders, receipts and invoices."),
+             ("database", "Finance data", "Pipelines over your finance databases, so close, reporting and questions from the business run on clean, current numbers.")]
+    dg = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in depts)
+    layers = [("The work", "Workflows that do the department's job, with a review queue for anything the system isn't sure about.", "workflow"),
+              ("Agents and evals", "Each step is tested against your past cases before it goes live, and held above an accuracy threshold you set.", "badge-check"),
+              ("Models", "Open-weight models, fine-tuned on your documents where that improves accuracy.", "brain"),
+              ("Inference", "Tuned by the same engineers who write GPU kernels. This keeps the cost per document low enough to price per outcome.", "zap"),
+              ("Hosting", "Our cloud, your cloud account or your servers. One team is on call for all of it.", "server")]
+    ls = "".join(f'<li><span class="pc-i">{ic(i)}</span><div><b>{t}</b><p>{d}</p></div></li>' for t, d, i in layers)
+    why = [("workflow", "We do the last 30 percent", "Agents don't automate a department straight after install. We build the integrations, handle the edge cases and keep the workflow running as your suppliers, formats and rules change."),
+           ("users", "People stay in the loop", "Your team approves what matters and handles the exceptions. We measure how many items need a person, and work to bring that number down."),
+           ("history", "Every decision is traceable", "Each output links to its source documents, the model version and the check it passed. Audit logs can be exported."),
+           ("trending-down", "The cost per item falls", "Because we own the stack down to the kernels, we move work to smaller and faster models as accuracy allows, and the saving shows up in your price.")]
+    wg = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in why)
+    deploy = [("cloud", "Our cloud", "The fastest way to start. Dedicated GPUs and storage per customer, operated by us."),
+              ("cloud-upload", "Your cloud account", "AWS, Google Cloud, Azure or any Kubernetes cluster. We operate it under your access policies, and you hold the keys."),
+              ("lock", "Your servers", "In your data centre, including air-gapped. Your IT runs the hardware, and we run the models and workflows on top.")]
+    dp = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in deploy)
+    steps = [("calendar", "Process review", "A free working session. We map one workflow, its volumes and its error costs, and tell you whether it's a good fit."),
+             ("flask-conical", "Pilot", "A fixed fee, for four to six weeks, on your real documents. We agree the target before we start, such as accuracy, turnaround or items handled without a person."),
+             ("server", "Run", "We operate the workflow end to end and charge per unit of work, with a monthly minimum."),
+             ("layers", "Expand", "Your next workflow is built on the same platform, models and integrations, so it goes live faster.")]
+    st = "".join(f'<li><b>{ic(i)}{t}</b><span>{d}</span></li>' for i, t, d in steps)
+    clients = G["HTML"]
+    i = clients.index('<section class="clients"'); j = clients.index("</section>", i) + 10
+    clients = clients[i:j].replace('src="assets/', 'src="{R}assets/')
+    body = hero
+    body += f'<section class="feats"><div class="wrap">{sec_head("What we take over", "Back-office work that runs on documents", "Each of these is a workflow we already run, or have built, for a client.")}<div class="feat-grid four">{dg}</div></div></section>'
+    body += f'<section class="arch" id="stack"><div class="wrap"><div class="arch-grid"><div>{sec_head("The stack", "One team, from the GPU to the finished work", "Most AI services firms resell a model API and most inference firms stop at the endpoint. We run every layer, which is why we can stand behind an outcome and price for it.")}</div><ol class="arch-l">{ls}</ol></div></div></section>'
+    body += f'<section class="feats alt"><div class="wrap">{sec_head("Why it works", "Why this works when software alone doesn\'t")}<div class="feat-grid four">{wg}</div></div></section>'
+    body += f'<section class="feats"><div class="wrap">{sec_head("Deployment", "Where it runs", "You choose where it runs. It's the same workflows and the same team either way.")}<div class="feat-grid">{dp}</div></div></section>'
+    body += clients
+    body += f'<section class="feats alt"><div class="wrap"><div class="split2"><div>{sec_head("Inference engineering", "We also make open-weight models fast", "Keeping our own stack cheap is the same work other teams hire us for. We take on fixed-fee optimisation sprints for open-weight models, and our capacity planner is free and open source.")}<div class="hero-cta" style="margin-top:20px"><a class="btn btn-s" href="{{R}}services/">{ic("zap")}Optimisation sprints</a><a class="btn btn-s" href="{{R}}oss/">{ic("terminal")}vitalops CLI</a></div></div><div class="co-ph" style="background-image:url(\'{{R}}assets/photos/racks-dark.webp\')"></div></div></div></section>'
+    body += faq(FAQ_E2E, h2="What operations teams ask us")
+    body += f"""<section class="cta2" id="contact"><div class="wrap cta2-in">
+  <div class="cta2-copy"><span class="k">Get started</span><h2>Which department is drowning in paperwork?</h2><p class="lede">Bring one workflow, with its monthly volume and what an error costs you. In 30 minutes we'll tell you whether we can run it and what a pilot would look like.</p>
+    <div class="hero-cta"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}Book a process review</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div>
+  <ol class="cta2-steps">{st}</ol>
+</div></section>"""
+    page("e2e/", "VitalOps · AI operations on private models", "VitalOps runs back-office work in trade, procurement and finance end to end: workflows, models and hosting, on our cloud, yours or your servers, priced per outcome.", "e2e", body, ctaband=False)
+    path, out = PAGES[-1]
+    PAGES[-1] = (path, out.replace("<head>\n", '<head>\n<meta name="robots" content="noindex">\n', 1))
+
 # ───────────────────────── assets ─────────────────────────
 def write_assets():
     g = G
@@ -698,8 +758,8 @@ def build(g):
     G.update(g)
     write_assets()
     SCREEN_PLAN_CACHE = screen_plan().replace('id="fig-plan"', 'id="fig-plan-s"')
-    home(); product_pages(); solution_pages(); lab_page(); platform_page(); services_page(); security_page(); company_page(); credits_page()
+    home(); product_pages(); solution_pages(); lab_page(); platform_page(); services_page(); security_page(); company_page(); credits_page(); e2e_page()
     write_all()
-    urls = [p for p, _ in PAGES]
+    urls = [p for p, _ in PAGES if p != "e2e/"]
     sm = "".join(f"<url><loc>https://vitalops.ai/{u}</loc></url>" for u in urls)
     open(os.path.join(ROOT, "sitemap.xml"), "w").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{sm}</urlset>\n')
