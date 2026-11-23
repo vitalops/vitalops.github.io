@@ -668,7 +668,7 @@ def company_page():
     body = phero("racks-art", "Company", "About VitalOps",
                  "VitalOps works on inference: making open-weight models run faster and cheaper. We spent several years doing this for clients one project at a time, and built the products from what we learned.",
                  [], None)
-    body += f'<section class="feats"><div class="wrap">{sec_head("How we work", "How we work")}<div class="feat-grid four">{vs}</div></div></section>'
+    body += f'<section class="feats"><div class="wrap">{sec_head("Approach", "How we work")}<div class="feat-grid four">{vs}</div></div></section>'
     body += f'<section class="feats alt"><div class="wrap"><div class="split2"><div>{sec_head("Contact", "Get in touch", "Book a 30-minute call or email us. We usually reply within a working day.")}<div class="hero-cta" style="margin-top:20px"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}Book a review</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div><div class="co-ph" style="background-image:url(\'{{R}}assets/stock/pair-review.jpg\')"></div></div></div></section>'
     page("company/", "Company | VitalOps", "VitalOps makes open-weight models run faster and cheaper, with software and engineering services.", "company", body, ctaband=False)
 
@@ -680,61 +680,61 @@ def credits_page():
 
 # ───────────────────────── e2e (proposal) ─────────────────────────
 FAQ_E2E = [
- ("Where does our data go?", "Wherever you choose: our cloud, your cloud account or your own servers. The models are open-weight and run on infrastructure we operate for you, so documents and prompts are never sent to a third-party model API."),
- ("Do we have to replace our ERP or other software?", "No. We connect to what you already use, such as your ERP, email inboxes, shared drives and supplier or carrier portals, and do the work in between."),
- ("What happens when the AI is wrong or unsure?", "Before anything goes live, each step is tested against your past cases, with an accuracy threshold you agree to. In production, anything below a confidence threshold goes to a review queue for your team or ours, and every decision is logged with its source documents."),
- ("How do we pay?", "The pilot is a fixed fee. After that we charge per unit of work done, such as a document processed, a line matched or an order placed, with a monthly minimum. You don't pay for seats or tokens."),
- ("Why open-weight models instead of the big APIs?", "Control and cost. Your data stays in an environment we can point to, the model doesn't change under you, and because we tune our own inference we can price per outcome and still make a margin."),
+ ("Where does our data go?", "It stays on the machines we agree on: ours, your cloud account, or your own servers. We use open-weight models that we host ourselves, so documents and prompts are not sent to an outside model provider."),
+ ("Do we have to replace our ERP or other software?", "No. We read from and write to the systems you already have, usually an ERP, a few shared inboxes, a drive and some supplier or carrier portals."),
+ ("What happens when the AI is wrong or unsure?", "Before go-live we run each step over a few hundred of your past cases and agree an accuracy threshold with you. In production, items the system is unsure about go to a review queue that your team or ours works through. Every decision is logged with the documents it was based on."),
+ ("How do we pay?", "The pilot is a fixed fee. After that we charge per item, for example per document processed, line matched or order placed, with a monthly minimum."),
+ ("Why open-weight models?", "Mainly cost and control. We know where your data is, the model only changes when we change it, and running our own inference is cheap enough that per-item pricing works for both of us."),
 ]
 
 def e2e_page():
-    hero = phero("racks-teal", "End-to-end AI operations",
-                 "We run your back office on <em>private AI</em>",
-                 "Trade documents, reconciliation, procurement and finance data. We build the workflows, host the models and run the work, on our cloud, in your cloud account or on your own servers. You pay for work done, not for seats or tokens.",
-                 [("1 team", "from GPUs to the finished work"), ("3", "places it runs: our cloud, your cloud, your servers"), ("0", "documents sent to third-party model APIs"), ("Per outcome", "pricing after a fixed-fee pilot")],
-                 [("btn-w", BOOK, "Book a process review", "calendar", True), ("btn-g", "#stack", "See the stack", "layers", False)])
-    depts = [("file-text", "Trade documents", "Bills of lading, commercial invoices, packing lists and certificates of origin are read, checked against each other and against the order, and the exceptions are sent to the right person."),
-             ("arrow-right-left", "Reconciliation", "Import and export records, bank lines and ledgers are matched. Breaks are explained, not just listed, and the easy ones are resolved for you."),
-             ("boxes", "Procurement", "Source-to-pay: requests, quotes and auctions, supplier onboarding, and matching purchase orders, receipts and invoices."),
-             ("database", "Finance data", "Pipelines over your finance databases, so close, reporting and questions from the business run on clean, current numbers.")]
+    hero = phero("racks-teal", "AI operations",
+                 "We run back-office work for trade, procurement and finance teams",
+                 "We set up the workflows, host the models and process the work each day, either on our servers or on yours. After a fixed-fee pilot you pay per document, match or order.",
+                 [],
+                 [("btn-w", BOOK, "Book a process review", "calendar", True), ("btn-g", "#stack", "How it's built", "layers", False)])
+    depts = [("file-text", "Trade documents", "We read bills of lading, commercial invoices, packing lists and certificates of origin, check them against each other and the order, and send mismatches to whoever handles them."),
+             ("arrow-right-left", "Reconciliation", "We match import and export records, bank lines and ledger entries. Each break comes with the likely cause, and routine ones are cleared automatically."),
+             ("boxes", "Procurement", "Purchase requests, quotes and reverse auctions, supplier onboarding, and three-way matching of orders, receipts and invoices."),
+             ("database", "Finance data", "We build and maintain the pipelines that feed month-end close and reporting, and answer ad hoc questions from the data.")]
     dg = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in depts)
-    layers = [("The work", "Workflows that do the department's job, with a review queue for anything the system isn't sure about.", "workflow"),
-              ("Agents and evals", "Each step is tested against your past cases before it goes live, and held above an accuracy threshold you set.", "badge-check"),
-              ("Models", "Open-weight models, fine-tuned on your documents where that improves accuracy.", "brain"),
-              ("Inference", "Tuned by the same engineers who write GPU kernels. This keeps the cost per document low enough to price per outcome.", "zap"),
-              ("Hosting", "Our cloud, your cloud account or your servers. One team is on call for all of it.", "server")]
+    layers = [("The work", "The workflow itself, plus a review queue for items that need a person.", "workflow"),
+              ("Testing", "Each step is scored on your past cases before release, and again whenever we change it.", "badge-check"),
+              ("Models", "Open-weight models such as Qwen and Llama. We fine-tune on your documents when it measurably helps.", "brain"),
+              ("Inference", "We tune serving ourselves, down to GPU kernels when needed. That is what keeps the cost per document low.", "zap"),
+              ("Hosting", "GPUs in our cloud, your cloud account or your data centre.", "server")]
     ls = "".join(f'<li><span class="pc-i">{ic(i)}</span><div><b>{t}</b><p>{d}</p></div></li>' for t, d, i in layers)
-    why = [("workflow", "We do the last 30 percent", "Agents don't automate a department straight after install. We build the integrations, handle the edge cases and keep the workflow running as your suppliers, formats and rules change."),
-           ("users", "People stay in the loop", "Your team approves what matters and handles the exceptions. We measure how many items need a person, and work to bring that number down."),
-           ("history", "Every decision is traceable", "Each output links to its source documents, the model version and the check it passed. Audit logs can be exported."),
-           ("trending-down", "The cost per item falls", "Because we own the stack down to the kernels, we move work to smaller and faster models as accuracy allows, and the saving shows up in your price.")]
+    why = [("workflow", "We handle the integration work", "Most of the effort in automating a back office goes into connecting systems and handling unusual cases. We do that work, and keep adjusting as suppliers, formats and rules change."),
+           ("users", "Your team approves", "Your staff sign off on anything that matters and handle exceptions. We report how many items needed a person each week."),
+           ("history", "An audit trail", "Each output records its source documents, the model version and the checks it passed. Logs can be exported."),
+           ("trending-down", "Lower cost over time", "As accuracy allows, we move steps to smaller models. We pass part of the saving on at each contract review.")]
     wg = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in why)
-    deploy = [("cloud", "Our cloud", "The fastest way to start. Dedicated GPUs and storage per customer, operated by us."),
-              ("cloud-upload", "Your cloud account", "AWS, Google Cloud, Azure or any Kubernetes cluster. We operate it under your access policies, and you hold the keys."),
-              ("lock", "Your servers", "In your data centre, including air-gapped. Your IT runs the hardware, and we run the models and workflows on top.")]
+    deploy = [("cloud", "Our cloud", "Quickest to set up. Each customer gets separate GPUs and storage."),
+              ("cloud-upload", "Your cloud account", "AWS, Google Cloud, Azure or Kubernetes. We work under your access policies and you keep the keys."),
+              ("lock", "Your servers", "In your data centre, air-gapped if needed. Your IT team looks after the hardware and we look after everything running on it.")]
     dp = "".join(f'<div class="feat"><span class="pc-i">{ic(i)}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in deploy)
-    steps = [("calendar", "Process review", "A free working session. We map one workflow, its volumes and its error costs, and tell you whether it's a good fit."),
-             ("flask-conical", "Pilot", "A fixed fee, for four to six weeks, on your real documents. We agree the target before we start, such as accuracy, turnaround or items handled without a person."),
-             ("server", "Run", "We operate the workflow end to end and charge per unit of work, with a monthly minimum."),
-             ("layers", "Expand", "Your next workflow is built on the same platform, models and integrations, so it goes live faster.")]
+    steps = [("calendar", "Process review", "A free call where we go through one workflow, its volume and what errors cost you, and say whether we can take it on."),
+             ("flask-conical", "Pilot", "Four to six weeks on your real documents, for a fixed fee. We agree targets for accuracy and turnaround before starting."),
+             ("server", "Run", "We run the workflow day to day and bill per item, with a monthly minimum."),
+             ("layers", "Expand", "Later workflows reuse the same integrations and models, so they take less time to set up.")]
     st = "".join(f'<li><b>{ic(i)}{t}</b><span>{d}</span></li>' for i, t, d in steps)
     clients = G["HTML"]
     i = clients.index('<section class="clients"'); j = clients.index("</section>", i) + 10
     clients = clients[i:j].replace('src="assets/', 'src="{R}assets/')
     body = hero
-    body += f'<section class="feats"><div class="wrap">{sec_head("What we take over", "Back-office work that runs on documents", "Each of these is a workflow we already run, or have built, for a client.")}<div class="feat-grid four">{dg}</div></div></section>'
-    body += f'<section class="arch" id="stack"><div class="wrap"><div class="arch-grid"><div>{sec_head("The stack", "One team, from the GPU to the finished work", "Most AI services firms resell a model API and most inference firms stop at the endpoint. We run every layer, which is why we can stand behind an outcome and price for it.")}</div><ol class="arch-l">{ls}</ol></div></div></section>'
-    body += f'<section class="feats alt"><div class="wrap">{sec_head("Why it works", "Why this works when software alone doesn\'t")}<div class="feat-grid four">{wg}</div></div></section>'
-    body += f'<section class="feats"><div class="wrap">{sec_head("Deployment", "Where it runs", "You choose where it runs. It's the same workflows and the same team either way.")}<div class="feat-grid">{dp}</div></div></section>'
+    body += f'<section class="feats"><div class="wrap">{sec_head("What we do", "Work we take on", "We have built each of these for at least one client.")}<div class="feat-grid four">{dg}</div></div></section>'
+    body += f'<section class="arch" id="stack"><div class="wrap"><div class="arch-grid"><div>{sec_head("How it's built", "What we run", "We operate every layer below, from the workflow down to the GPUs. Because we control the costs, we can charge per item.")}</div><ol class="arch-l">{ls}</ol></div></div></section>'
+    body += f'<section class="feats alt"><div class="wrap">{sec_head("Approach", "How we work")}<div class="feat-grid four">{wg}</div></div></section>'
+    body += f'<section class="feats"><div class="wrap">{sec_head("Deployment", "Where it runs", "The workflows and the team are the same in each case.")}<div class="feat-grid">{dp}</div></div></section>'
     body += clients
-    body += f'<section class="feats alt"><div class="wrap"><div class="split2"><div>{sec_head("Inference engineering", "We also make open-weight models fast", "Keeping our own stack cheap is the same work other teams hire us for. We take on fixed-fee optimisation sprints for open-weight models, and our capacity planner is free and open source.")}<div class="hero-cta" style="margin-top:20px"><a class="btn btn-s" href="{{R}}services/">{ic("zap")}Optimisation sprints</a><a class="btn btn-s" href="{{R}}oss/">{ic("terminal")}vitalops CLI</a></div></div><div class="co-ph" style="background-image:url(\'{{R}}assets/photos/racks-dark.webp\')"></div></div></div></section>'
-    body += faq(FAQ_E2E, h2="What operations teams ask us")
+    body += f'<section class="feats alt"><div class="wrap"><div class="split2"><div>{sec_head("Inference engineering", "Inference work for other teams", "We also take on fixed-fee projects to make open-weight models run faster on a team's own hardware. Our capacity planner is open source.")}<div class="hero-cta" style="margin-top:20px"><a class="btn btn-s" href="{{R}}services/">{ic("zap")}Optimisation sprints</a><a class="btn btn-s" href="{{R}}oss/">{ic("terminal")}vitalops CLI</a></div></div><div class="co-ph" style="background-image:url(\'{{R}}assets/photos/racks-dark.webp\')"></div></div></div></section>'
+    body += faq(FAQ_E2E, h2="Common questions")
     body += f"""<section class="cta2" id="contact"><div class="wrap cta2-in">
-  <div class="cta2-copy"><span class="k">Get started</span><h2>Which department is drowning in paperwork?</h2><p class="lede">Bring one workflow, with its monthly volume and what an error costs you. In 30 minutes we'll tell you whether we can run it and what a pilot would look like.</p>
+  <div class="cta2-copy"><span class="k">Get started</span><h2>Tell us about one workflow</h2><p class="lede">Roughly how many items a month, which systems it touches and what a mistake costs. In a 30-minute call we'll say whether we can run it and what a pilot would involve.</p>
     <div class="hero-cta"><a class="btn btn-p" href="{BOOK}" target="_blank" rel="noopener">{ic("calendar")}Book a process review</a><a class="btn btn-s" href="mailto:{MAIL}">{ic("send")}{MAIL}</a></div></div>
   <ol class="cta2-steps">{st}</ol>
 </div></section>"""
-    page("e2e/", "VitalOps · AI operations on private models", "VitalOps runs back-office work in trade, procurement and finance end to end: workflows, models and hosting, on our cloud, yours or your servers, priced per outcome.", "e2e", body, ctaband=False)
+    page("e2e/", "VitalOps · AI operations on private models", "VitalOps runs back-office work for trade, procurement and finance teams on self-hosted models, billed per item processed.", "e2e", body, ctaband=False)
     path, out = PAGES[-1]
     PAGES[-1] = (path, out.replace("<head>\n", '<head>\n<meta name="robots" content="noindex">\n', 1))
 
