@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>VitalOps · Operations automation</title>
+<meta name="description" content="VitalOps automates document work for trade, procurement and finance operations teams, and runs it as a service.">
+<link rel="icon" type="image/svg+xml" href="../assets/vo-mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="e2e.css?v=__CSSV__">
+</head>
+<body>
+__SPRITE__
+
+<header class="bar"><div class="wrap">
+  <a class="logo" href="#top"><img src="../assets/vo-mark.svg" alt="">VitalOps</a>
+  <nav aria-label="Sections">
+    <a href="#today">Today</a><a href="#what">What we do</a><a href="#review">Review screen</a><a href="#record">Audit record</a><a href="#project">Project plan</a><a href="#cost">Cost</a>
+  </nav>
+  <a class="btn btn-p btn-sm" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener">Book a call</a>
+</div></header>
+
+<main id="top">
+
+<!-- ───────── cover ───────── -->
+<section class="cover"><div class="wrap cover-grid">
+  <div>
+    <div class="kick">VitalOps · Operations automation</div>
+    <h1>We automate the document work your operations team does by hand</h1>
+    <p class="lede">Shipping paperwork, supplier invoices, purchase orders and reconciliations. We connect to the systems you already use, read the documents as they come in, and run the process every day. Your staff only see the cases that need a decision.</p>
+    <div class="cta">
+      <a class="btn btn-p" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener"><i data-i="calendar"></i>Book a 30-minute call</a>
+      <a class="btn btn-s" href="mailto:hello@vitalops.ai"><i data-i="send"></i>hello@vitalops.ai</a>
+    </div>
+  </div>
+
+  <figure class="hero-vis" aria-label="Illustration: three shipping documents are read and booked as one shipment record">
+    <div class="stack">
+      <div class="paper p1">
+        <div class="ph"><b>COMMERCIAL INVOICE</b><span>No. HT-2291</span></div>
+        <div class="pl"><span>Seller</span><b>Harbor Textiles Ltd</b></div>
+        <div class="pl"><span>PO</span><b class="hl">PO-48213</b></div>
+        <div class="pl"><span>Qty</span><b class="hl">1,200 ctn</b></div>
+        <div class="pl"><span>Gross wt</span><b class="hl">12,400 kg</b></div>
+        <div class="lines"><i></i><i></i><i class="s"></i></div>
+        <div class="scan"></div>
+      </div>
+      <div class="paper p2">
+        <div class="ph"><b>BILL OF LADING</b><span>NLF 77120</span></div>
+        <div class="pl"><span>Container</span><b>MSKU 448120</b></div>
+        <div class="pl"><span>Gross wt</span><b>12,400 kg</b></div>
+        <div class="lines"><i></i><i class="s"></i></div>
+      </div>
+      <div class="paper p3">
+        <div class="ph"><b>CERTIFICATE OF ORIGIN</b></div>
+        <div class="lines"><i></i><i></i><i class="s"></i><i></i></div>
+        <div class="stamp">CHAMBER OF<br>COMMERCE</div>
+      </div>
+    </div>
+    <div class="arrow" aria-hidden="true"><i data-i="chevron-right"></i></div>
+    <div class="record">
+      <div class="rh"><span class="mono">SHP-20931</span><span class="badge ok"><i data-i="circle-check"></i>Booked</span></div>
+      <dl>
+        <dt>Purchase order</dt><dd>PO-48213</dd>
+        <dt>Supplier</dt><dd>Harbor Textiles</dd>
+        <dt>Quantity</dt><dd>1,200 cartons</dd>
+        <dt>Gross weight</dt><dd>12,400 kg</dd>
+        <dt>Documents</dt><dd>4 linked</dd>
+        <dt>Checks</dt><dd>14/14 passed</dd>
+      </dl>
+      <div class="rf"><i data-i="history"></i>Every value links to its source document</div>
+    </div>
+    <figcaption>Illustration. Company names and numbers are made up.</figcaption>
+  </figure>
+</div>
+<div class="wrap"><div class="facts">
+  <div><i data-i="users"></i><b>Who it's for</b><span>Trade, logistics, procurement and finance teams</span></div>
+  <div><i data-i="database"></i><b>What you keep</b><span>Your ERP, inboxes and portals, unchanged</span></div>
+  <div><i data-i="server"></i><b>Where it runs</b><span>Our servers, your cloud account or your data centre</span></div>
+  <div><i data-i="package"></i><b>How you pay</b><span>Fixed-fee pilot, then a monthly fee based on volume</span></div>
+</div></div></section>
+
+<!-- ───────── 01 today ───────── -->
+<section class="slide alt" id="today"><div class="wrap">
+  <div class="no">01 · Today</div>
+  <h2>One import shipment, checked by hand</h2>
+  <p class="lede">Four documents from three senders arrive by email. Someone opens each one, finds the order, types the figures into the ERP and compares them field by field. Here is what they are comparing.</p>
+
+  <div class="docs4">
+    <div class="mini"><div class="mh"><i data-i="file-text"></i>Commercial invoice</div><span class="src">Supplier · PDF</span><div class="lines"><i></i><i class="s"></i><i></i></div></div>
+    <div class="mini scan-doc"><div class="mh"><i data-i="file-text"></i>Packing list</div><span class="src">Supplier · scanned, skewed</span><div class="lines"><i></i><i></i><i class="s"></i></div></div>
+    <div class="mini"><div class="mh"><i data-i="file-text"></i>Bill of lading</div><span class="src">Forwarder · PDF</span><div class="lines"><i class="s"></i><i></i><i></i></div></div>
+    <div class="mini photo-doc"><div class="mh"><i data-i="file-text"></i>Certificate of origin</div><span class="src">Chamber · phone photo, stamped</span><div class="lines"><i></i><i class="s"></i></div><div class="stamp sm">STAMP</div></div>
+  </div>
+
+  <div class="matrix-wrap" role="region" aria-label="Field comparison across the four documents" tabindex="0">
+    <table class="matrix">
+      <thead><tr><th>Field</th><th>Purchase order</th><th>Invoice</th><th>Packing list</th><th>Bill of lading</th><th>Certificate</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>PO number</td><td>PO-48213</td><td>PO-48213</td><td>PO-48213</td><td class="na">not shown</td><td class="na">not shown</td><td><span class="res ok"><i data-i="check"></i>Match</span></td></tr>
+        <tr><td>Quantity</td><td>1,200 ctn</td><td>1,200 ctn</td><td>1,200 ctn</td><td>1,200 pkg</td><td class="na">not shown</td><td><span class="res ok"><i data-i="check"></i>Match</span></td></tr>
+        <tr class="bad"><td>Gross weight</td><td class="na">not shown</td><td>12,400 kg</td><td class="diff">12,040 kg</td><td>12,400 kg</td><td class="na">not shown</td><td><span class="res bad"><i data-i="triangle-alert"></i>Differs</span></td></tr>
+        <tr><td>HS code</td><td>6204.62</td><td>6204.62</td><td class="na">not shown</td><td class="na">not shown</td><td>6204.62</td><td><span class="res ok"><i data-i="check"></i>Match</span></td></tr>
+        <tr><td>Consignee</td><td>Your company</td><td>Your company</td><td>Your company</td><td>Your company</td><td>Your company</td><td><span class="res ok"><i data-i="check"></i>Match</span></td></tr>
+        <tr><td>Incoterms</td><td>FOB Chennai</td><td>FOB Chennai</td><td class="na">not shown</td><td class="na">not shown</td><td class="na">not shown</td><td><span class="res ok"><i data-i="check"></i>Match</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap">Sample shipment. A real one has 20 to 40 fields to compare, and the person doing it has dozens of shipments a day.</p>
+</div></section>
+
+<!-- ───────── 02 why still manual ───────── -->
+<section class="slide" id="why"><div class="wrap">
+  <div class="no">02 · Why it's still manual</div>
+  <h2>Most teams have tried to automate this before</h2>
+  <div class="why">
+    <div class="wcard">
+      <div class="wvis legacy" aria-hidden="true">
+        <div class="term"><span>ORDER ENTRY  SCR 04</span><span>PO NO ..... [48213   ]</span><span>SUPPLIER .. [HARB01  ]</span><span>F3=EXIT  F12=CANCEL</span></div>
+      </div>
+      <h3>The ERP has no usable API</h3><p>Core systems are often 10 to 20 years old and heavily customised. Some can only be reached through their screens or a nightly file export.</p>
+    </div>
+    <div class="wcard">
+      <div class="wvis tmpl" aria-hidden="true">
+        <div class="tdoc"><i class="b"></i><i></i><i></i><i class="box"></i></div>
+        <div class="tdoc alt2"><i class="box"></i><i class="b"></i><i></i><i></i></div>
+        <span class="tx"><i data-i="x"></i></span>
+      </div>
+      <h3>Templates break</h3><p>Template-based OCR and RPA need a rule for each layout. A company with 300 suppliers has hundreds of layouts, and they change without notice.</p>
+    </div>
+    <div class="wcard">
+      <div class="wvis exc" aria-hidden="true">
+        <label>Items</label>
+        <div class="bar2"><span style="width:78%"></span><span class="e" style="width:22%"></span></div>
+        <label>Staff time</label>
+        <div class="bar2"><span style="width:30%"></span><span class="e" style="width:70%"></span></div>
+        <div class="exk"><span><i></i>Clean</span><span><i class="e"></i>Exceptions</span></div>
+      </div>
+      <h3>Exceptions take most of the time</h3><p>Mismatched quantities, missing certificates and partial shipments are a minority of items but most of the hours. A tool that stops at the first exception saves little.</p>
+    </div>
+    <div class="wcard">
+      <div class="wvis maint" aria-hidden="true">
+        <div class="login"><span>Supplier portal</span><i class="f"></i><i class="f"></i><em>Sign in</em></div>
+        <div class="login moved"><span>Supplier portal</span><em>Continue with SSO</em><i class="f"></i></div>
+      </div>
+      <h3>Nobody maintains it</h3><p>Vendors hand over a licence and IT has a backlog. When a portal changes its login page, the bot stops and staff go back to doing it by hand.</p>
+    </div>
+  </div>
+  <p class="cap">The exception bars are illustrative and show the usual pattern.</p>
+</div></section>
+
+<!-- ───────── 03 what we do ───────── -->
+<section class="slide alt" id="what"><div class="wrap">
+  <div class="no">03 · What we do</div>
+  <h2>We build the process and then run it for you</h2>
+  <p class="lede">We connect to where documents arrive and to where the results need to go. Everything in the middle is built, hosted and monitored by us.</p>
+
+  <div class="hub">
+    <div class="col">
+      <span class="ch">Where documents arrive</span>
+      <div class="sys"><i data-i="inbox"></i><b>Shared inboxes</b></div>
+      <div class="sys"><i data-i="globe"></i><b>Supplier and carrier portals</b></div>
+      <div class="sys"><i data-i="folder"></i><b>SFTP folders</b></div>
+      <div class="sys"><i data-i="arrow-right-left"></i><b>EDI messages</b></div>
+    </div>
+    <div class="core">
+      <span class="ch">Run by VitalOps</span>
+      <ol class="pipe">
+        <li><i data-i="scan"></i><div><b>Read</b><span>Classify each file and extract every field</span></div></li>
+        <li><i data-i="search"></i><div><b>Match</b><span>Find the order, shipment and supplier in your ERP</span></div></li>
+        <li><i data-i="list-checks"></i><div><b>Check</b><span>Compare documents and order, using your tolerances</span></div></li>
+        <li><i data-i="git-branch"></i><div><b>Decide</b><span>Post clean items, send the rest for review</span></div></li>
+      </ol>
+    </div>
+    <div class="col">
+      <span class="ch">Where results go</span>
+      <div class="sys ok"><i data-i="database"></i><b>Your ERP</b><span>clean items booked</span></div>
+      <div class="sys warn"><i data-i="eye"></i><b>Review screen</b><span>exceptions for your staff</span></div>
+      <div class="sys"><i data-i="history"></i><b>Audit log</b><span>every value and decision</span></div>
+      <div class="sys"><i data-i="bar-chart-3"></i><b>Weekly report</b><span>volumes, accuracy, issues</span></div>
+    </div>
+  </div>
+
+  <div class="how">
+    <div><i data-i="network"></i><h3>Connections</h3><p>An API where there is one. Otherwise a database view, file exports, EDI or email. If a system has none of these, we operate its screens through a browser, as a person would. Each connection is health-checked every few minutes.</p></div>
+    <div><i data-i="scan"></i><h3>Document reading</h3><p>Models fine-tuned on a sample of your own files, so new layouts, stamps, handwriting, multi-page tables and mixed languages don't need a template. You get accuracy per field before we quote.</p></div>
+    <div><i data-i="refresh-cw"></i><h3>Upkeep</h3><p>When a supplier changes its layout or a portal changes its screens, we see it in the health checks or in a rise in review items, and fix it. This is part of the monthly fee.</p></div>
+  </div>
+</div></section>
+
+<!-- ───────── 04 review screen ───────── -->
+<section class="slide" id="review"><div class="wrap">
+  <div class="no">04 · The review screen</div>
+  <h2>What your staff see when something doesn't match</h2>
+  <p class="lede">Flagged items wait in a queue. Each one opens with the documents side by side, the values read from them, and the reason it was flagged. The correction is used to retrain the models.</p>
+
+  <div class="app" aria-label="Mock of the review screen with sample data">
+    <div class="app-top"><span class="dots"><i></i><i></i><i></i></span><span class="mono">review.vitalops · import documents</span><span class="who">Signed in as Priya, AP team</span></div>
+    <div class="app-body">
+      <aside class="queue">
+        <div class="qh"><b>Review queue</b><span class="cnt">7</span></div>
+        <div class="qi on"><b>SHP-20931</b><span>Harbor Textiles</span><em class="chip w">Weight differs</em></div>
+        <div class="qi"><b>SHP-20928</b><span>Kestrel Foods</span><em class="chip">Certificate missing</em></div>
+        <div class="qi"><b>SHP-20925</b><span>Arden Steel</span><em class="chip">Partial shipment</em></div>
+        <div class="qi"><b>INV-77410</b><span>Moreau Packaging</span><em class="chip">Price above PO</em></div>
+        <div class="qi"><b>SHP-20919</b><span>Harbor Textiles</span><em class="chip">Low read confidence</em></div>
+      </aside>
+      <div class="docview">
+        <div class="tabs"><span>Invoice</span><span class="on">Packing list</span><span>Bill of lading</span><span>Certificate</span></div>
+        <div class="sheet">
+          <div class="sh-h"><b>PACKING LIST</b><span>Harbor Textiles Ltd · Tiruppur</span></div>
+          <div class="sh-r"><span>PO ref</span><b>PO-48213</b></div>
+          <div class="sh-r"><span>Cartons</span><b>1,200</b></div>
+          <div class="sh-r"><span>Net weight</span><b>11,160 kg</b></div>
+          <div class="sh-r focus"><span>Gross weight</span><b>12,040 kg</b></div>
+          <div class="sh-lines"><i></i><i></i><i class="s"></i><i></i><i class="s"></i></div>
+          <div class="hand">checked RK</div>
+        </div>
+      </div>
+      <div class="fields">
+        <div class="flag"><i data-i="triangle-alert"></i><div><b>Gross weight differs</b><span>Packing list reads 12,040 kg. Invoice and bill of lading both read 12,400 kg. Tolerance is 0.5%, difference is 2.9%.</span></div></div>
+        <div class="fl"><span>PO number</span><b>PO-48213</b><em class="conf" style="--c:99%"></em></div>
+        <div class="fl"><span>Cartons</span><b>1,200</b><em class="conf" style="--c:98%"></em></div>
+        <div class="fl"><span>Net weight</span><b>11,160 kg</b><em class="conf" style="--c:96%"></em></div>
+        <div class="fl hot"><span>Gross weight</span><b>12,040 kg</b><em class="conf low" style="--c:71%"></em></div>
+        <div class="acts">
+          <span class="b1">Use 12,400 kg</span><span class="b2">Keep 12,040 kg</span><span class="b2">Ask supplier</span>
+        </div>
+        <p class="note">Likely cause: digits transposed on the scanned page. The decision and the reviewer's name are saved to the audit log.</p>
+      </div>
+    </div>
+  </div>
+  <p class="cap">Mock-up with sample data. Company names are made up.</p>
+</div></section>
+
+<!-- ───────── 05 record (ideas from the openvibe runtime) ───────── -->
+<section class="slide alt" id="record"><div class="wrap">
+  <div class="no">05 · The record</div>
+  <h2>Every item keeps a record of who decided what</h2>
+  <p class="lede">Each step is written to a log that can't be edited afterwards. For every decision it notes whether a rule, a model or a person made it.</p>
+  <div class="audit" aria-label="Sample audit record for one shipment">
+    <div class="au-h"><b>SHP-20931 · Harbor Textiles Ltd</b><span class="mono">sample record</span></div>
+    <ol class="au">
+      <li><time>09:02</time><span class="ev">Received 4 documents from the imports inbox</span><em class="by sys">System</em></li>
+      <li><time>09:02</time><span class="ev">Read 38 fields with document model v3.2</span><em class="by mod">Model</em></li>
+      <li><time>09:03</time><span class="ev">Matched to PO-48213 in the ERP</span><em class="by rule">Rule</em></li>
+      <li class="warn"><time>09:03</time><span class="ev">Gross weight check failed: 12,040 kg against 12,400 kg</span><em class="by rule">Rule</em></li>
+      <li><time>09:03</time><span class="ev">Sent to the review queue and notified the AP team</span><em class="by sys">System</em></li>
+      <li class="ok"><time>11:40</time><span class="ev">Chose 12,400 kg and added a note for the supplier</span><em class="by per">Priya, AP team</em></li>
+      <li class="ok"><time>11:40</time><span class="ev">Booked shipment SHP-20931 in the ERP</span><em class="by sys">System</em></li>
+    </ol>
+  </div>
+  <div class="trio">
+    <div><i data-i="rotate-ccw"></i><h3>Replay any item</h3><p>We can re-run an item months later with the same documents, model version and rules it had on the day, and get the same result. This is how we answer an auditor's question or investigate a mistake.</p></div>
+    <div><i data-i="shield-check"></i><h3>A second check on payments</h3><p>Before anything that moves money or changes a supplier's bank details, a separate check compares the action with your written approval rules. Above limits you set, two people have to approve.</p></div>
+    <div><i data-i="lock"></i><h3>Each document in its own sandbox</h3><p>Documents are processed in an isolated container that has no internet access and is deleted afterwards. A malicious attachment can't reach anything else.</p></div>
+  </div>
+</div></section>
+
+<!-- ───────── 06 examples ───────── -->
+<section class="slide" id="work"><div class="wrap">
+  <div class="no">06 · Examples</div>
+  <h2>Work we have automated for clients</h2>
+  <div class="ex">
+    <div class="exr"><div class="exh"><span class="k">Trade</span><h3>Import and export documents</h3></div>
+      <div class="exf"><span class="in">Invoices, packing lists, bills of lading, certificates</span><i data-i="chevron-right"></i><span class="mid">Cross-check against each other and the order</span><i data-i="chevron-right"></i><span class="out">Booked shipments and a discrepancy list for the forwarder</span></div></div>
+    <div class="exr"><div class="exh"><span class="k">Finance</span><h3>Reconciliation</h3></div>
+      <div class="exf"><span class="in">Trade records, bank statements, ledger entries</span><i data-i="chevron-right"></i><span class="mid">Match lines and find a likely cause for each break</span><i data-i="chevron-right"></i><span class="out">Cleared matches and a short list of breaks</span></div></div>
+    <div class="exr"><div class="exh"><span class="k">Procurement</span><h3>Source to pay</h3></div>
+      <div class="exf"><span class="in">Purchase requests, supplier quotes, invoices</span><i data-i="chevron-right"></i><span class="mid">Compare quotes, run reverse auctions, three-way match</span><i data-i="chevron-right"></i><span class="out">Approved orders and invoices ready to pay</span></div></div>
+    <div class="exr"><div class="exh"><span class="k">Finance</span><h3>Finance data pipelines</h3></div>
+      <div class="exf"><span class="in">ERP exports, bank feeds, spreadsheets</span><i data-i="chevron-right"></i><span class="mid">Check for missing rows, duplicates and totals that don't tie</span><i data-i="chevron-right"></i><span class="out">Clean tables for month-end close and reporting</span></div></div>
+  </div>
+</div></section>
+
+<!-- ───────── 06 project plan ───────── -->
+<section class="slide alt" id="project"><div class="wrap">
+  <div class="no">07 · Project plan</div>
+  <h2>A first project takes about six weeks</h2>
+  <p class="lede">We start with one process. Your team keeps working as usual until our results have been checked against theirs.</p>
+  <div class="gantt" role="img" aria-label="Project plan by week: process review in week 0, connect and measure in weeks 1 to 2, build and test in weeks 3 to 4, parallel run in weeks 5 to 6, live from week 7">
+    <div class="gh"><span></span><span>Wk 0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8+</span></div>
+    <div class="gr"><div class="gl"><b>Process review</b><span>Call and 50 to 200 sample documents</span></div><div class="gb" style="--s:1;--e:2"></div></div>
+    <div class="gr"><div class="gl"><b>Connect and measure</b><span>Read access, model tuning, accuracy per field</span></div><div class="gb" style="--s:2;--e:4"></div></div>
+    <div class="gr"><div class="gl"><b>Build and test</b><span>Checks and review screen, tested on past cases</span></div><div class="gb" style="--s:4;--e:6"></div></div>
+    <div class="gr"><div class="gl"><b>Run in parallel</b><span>Live items, a person approves every output</span></div><div class="gb par" style="--s:6;--e:8"></div></div>
+    <div class="gr"><div class="gl"><b>Live</b><span>Only flagged items need a person</span></div><div class="gb live" style="--s:8;--e:10"></div></div>
+    <div class="gr"><div class="gl"><b>Your team's time</b><span>Roughly, per week</span></div>
+      <div class="gt" style="--s:1;--e:2">2 hrs</div><div class="gt" style="--s:2;--e:6">1 hr</div><div class="gt" style="--s:6;--e:8">as today</div><div class="gt" style="--s:8;--e:10">exceptions</div></div>
+  </div>
+</div></section>
+
+<!-- ───────── 07 data ───────── -->
+<section class="slide" id="data"><div class="wrap">
+  <div class="no">08 · Data and security</div>
+  <h2>Your documents stay where you decide</h2>
+  <p class="lede">We run open-weight models on servers we operate. Your documents are not sent to OpenAI, Google or any other model provider. You pick one of three places for it to run.</p>
+  <div class="dep">
+    <div class="dcol">
+      <div class="dbox"><span class="dl"><i data-i="server"></i>Our servers</span><div class="chips"><em>Documents</em><em>Models</em><em>Workflows</em></div></div>
+      <p>Quickest to start. Storage is kept separate for each client.</p>
+    </div>
+    <div class="dcol">
+      <div class="dbox you"><span class="dl"><i data-i="cloud"></i>Your cloud account</span><div class="chips"><em>Documents</em><em>Models</em><em>Workflows</em></div></div>
+      <p>AWS, Google Cloud or Azure. You hold the keys, we work under your access policies.</p>
+    </div>
+    <div class="dcol">
+      <div class="dbox you"><span class="dl"><i data-i="lock"></i>Your data centre</span><div class="chips"><em>Documents</em><em>Models</em><em>Workflows</em></div></div>
+      <p>On your hardware, with no internet connection if required. Your IT team runs the machines.</p>
+    </div>
+  </div>
+  <div class="never"><i data-i="x"></i><span>In every option, no documents go to an outside model API</span></div>
+  <div class="sec3">
+    <span><i data-i="users"></i>Sign-in through your single sign-on</span>
+    <span><i data-i="history"></i>Full audit log, exportable</span>
+    <span><i data-i="clock"></i>Retention period set by you</span>
+  </div>
+</div></section>
+
+<!-- ───────── 08 cost + report ───────── -->
+<section class="slide alt" id="cost"><div class="wrap">
+  <div class="no">09 · Cost and reporting</div>
+  <h2>A fixed-fee pilot, then a fee per item</h2>
+  <div class="price">
+    <div class="pp">
+      <span class="pk">Weeks 0 to 6</span><h3>Pilot</h3>
+      <p class="big">Fixed fee</p>
+      <p>Agreed before we start, after we have seen your documents and systems.</p>
+    </div>
+    <div class="parr" aria-hidden="true"><i data-i="chevron-right"></i></div>
+    <div class="pp main">
+      <span class="pk">From go-live</span><h3>Monthly</h3>
+      <p class="big">Per item, with a minimum</p>
+      <p>Priced per document, match or order. Includes:</p>
+      <ul class="inc"><li><i data-i="check"></i>Hosting and models</li><li><i data-i="check"></i>Monitoring and fixes</li><li><i data-i="check"></i>Review screen and audit log</li><li><i data-i="check"></i>Weekly report</li></ul>
+    </div>
+  </div>
+
+  <div class="rep" aria-label="Mock of the weekly report with sample data">
+    <div class="rep-h"><b>Weekly report · import documents</b><span class="mono">sample data</span></div>
+    <div class="kpis">
+      <div><span>Documents received</span><b>2,318</b></div>
+      <div><span>Handled without a person</span><b>86%</b></div>
+      <div><span>Median arrival to booking</span><b>41 min</b></div>
+      <div><span>Integration incidents</span><b>1</b><em>fixed in 3 h</em></div>
+    </div>
+    <div class="chart">
+      <div class="ct"><b>Share of items sent for review, by week since go-live</b></div>
+      <div class="bars" role="img" aria-label="Sample data: share sent for review falls from 38 percent in week 1 to 14 percent in week 8">
+        <div class="bc" style="--v:38" title="Week 1: 38%"><span>38%</span></div>
+        <div class="bc" style="--v:31" title="Week 2: 31%"></div>
+        <div class="bc" style="--v:27" title="Week 3: 27%"></div>
+        <div class="bc" style="--v:22" title="Week 4: 22%"></div>
+        <div class="bc" style="--v:19" title="Week 5: 19%"></div>
+        <div class="bc" style="--v:17" title="Week 6: 17%"></div>
+        <div class="bc" style="--v:15" title="Week 7: 15%"></div>
+        <div class="bc" style="--v:14" title="Week 8: 14%"><span>14%</span></div>
+      </div>
+      <div class="bx"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+    </div>
+    <p class="rep-n">Sample figures to show the layout. We give you real targets only after measuring your documents.</p>
+  </div>
+</div></section>
+
+<!-- ───────── 09 clients ───────── -->
+<section class="slide" id="clients"><div class="wrap">
+  <div class="no">10 · Clients</div>
+  <h2>What clients say</h2>
+  <div class="quotes">
+    <figure class="q"><blockquote>“VitalOps helped us optimise our data pipelines for the finance databases, which directly translated into a smoother and more intuitive experience for our users.”</blockquote><footer><img src="../assets/chatfin-logo.png" alt="Chatfin"><span>CEO, Chatfin · AI for finance teams</span></footer></figure>
+    <figure class="q"><blockquote>“The team is highly responsive, pragmatic, and product-minded, and the best part is that they understand what it takes to operationalize data, not just analyze it.”</blockquote><footer><img src="../assets/straightops-logo.jpg" alt="Straightops"><span>CEO, Straightops · Source-to-pay automation</span></footer></figure>
+  </div>
+</div></section>
+
+<!-- ───────── 10 next ───────── -->
+<section class="slide close" id="next"><div class="wrap grid2">
+  <div>
+    <div class="no">11 · Next step</div>
+    <h2>Send us one process to look at</h2>
+    <p class="lede">After a 30-minute call we will tell you whether we can take it on and roughly what a pilot would cost.</p>
+    <div class="cta">
+      <a class="btn btn-p" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener"><i data-i="calendar"></i>Book a call</a>
+      <a class="btn btn-s" href="mailto:hello@vitalops.ai"><i data-i="send"></i>hello@vitalops.ai</a>
+    </div>
+  </div>
+  <div class="ready">
+    <b>Useful to have ready</b>
+    <ul>
+      <li><i data-i="file-text"></i>A short description of the process and who does it today</li>
+      <li><i data-i="bar-chart-3"></i>Monthly volume, and how it changes over the year</li>
+      <li><i data-i="database"></i>The systems involved: ERP, inboxes, portals, spreadsheets</li>
+      <li><i data-i="folder"></i>Twenty or so sample documents, including the bad ones</li>
+      <li><i data-i="triangle-alert"></i>What an error costs you when one gets through</li>
+    </ul>
+  </div>
+</div></section>
+
+</main>
+<footer class="foot"><div class="wrap"><span>VitalOps Inc · vitalops.ai</span><a href="mailto:hello@vitalops.ai">hello@vitalops.ai</a></div></footer>
+</body>
+</html>
