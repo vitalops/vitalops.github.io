@@ -43,10 +43,10 @@ __SPRITE__
     <div class="feed-win">
       <ul class="feed-list">
         <li><time>09:14</time><div><span class="fi"><i data-i="factory"></i>Manufacturing</span><p>Lot 2291 certificate: viscosity 412 cP against a limit of 400</p></div><em class="fo warn">Held for QA</em></li>
-        <li><time>09:14</time><div><span class="fi"><i data-i="truck"></i>Logistics</span><p>Carrier invoice 88120: detention charge not supported by the gate log</p></div><em class="fo bad">Disputed</em></li>
+        <li><time>09:14</time><div><span class="fi"><i data-i="truck"></i>Logistics</span><p>Transporter invoice 88120: halting charge not supported by the gate log</p></div><em class="fo bad">Disputed</em></li>
         <li><time>09:15</time><div><span class="fi"><i data-i="stethoscope"></i>Healthcare</span><p>Cashless pre-auth for IP-8812 sent to Sunrise TPA with the cost estimate</p></div><em class="fo ok">Submitted</em></li>
         <li><time>09:15</time><div><span class="fi"><i data-i="boxes"></i>Supply chain</span><p>PO-48213 acknowledgement: supplier moved the ship date to 10 Dec</p></div><em class="fo warn">To buyer</em></li>
-        <li><time>09:16</time><div><span class="fi"><i data-i="landmark"></i>Finance</span><p>Payment of $12,480 matched to 3 open invoices</p></div><em class="fo ok">Posted</em></li>
+        <li><time>09:16</time><div><span class="fi"><i data-i="landmark"></i>Finance</span><p>NEFT of ₹12,46,737 matched to 3 invoices and TDS</p></div><em class="fo ok">Posted</em></li>
         <li><time>09:16</time><div><span class="fi"><i data-i="boxes"></i>Supply chain</span><p>New supplier Kiran Castings: GST certificate expired, new copy asked for</p></div><em class="fo warn">Chased</em></li>
         <li><time>09:17</time><div><span class="fi"><i data-i="factory"></i>Manufacturing</span><p>Customer PO 7781 entered, 6 lines, prices match the contract</p></div><em class="fo ok">Confirmed</em></li>
         <li><time>09:17</time><div><span class="fi"><i data-i="stethoscope"></i>Healthcare</span><p>Discharge bill for IP-8779 checked: room rent limit, family told ₹31,150</p></div><em class="fo warn">To billing</em></li>
@@ -58,7 +58,7 @@ __SPRITE__
 </div>
 <div class="wrap"><div class="facts">
   <div><i data-i="users"></i><b>Who it's for</b><span>Operations teams in manufacturing, supply chain, logistics, healthcare and finance</span></div>
-  <div><i data-i="database"></i><b>What you keep</b><span>Your ERP, EHR, inboxes and portals, unchanged</span></div>
+  <div><i data-i="database"></i><b>What you keep</b><span>Your ERP, HIS, inboxes and portals, unchanged</span></div>
   <div><i data-i="server"></i><b>Where it runs</b><span>Our servers, your cloud account or your data centre</span></div>
   <div><i data-i="package"></i><b>How you pay</b><span>Fixed-fee pilot, then a monthly fee based on volume</span></div>
 </div></div></section>
@@ -69,21 +69,21 @@ __SPRITE__
   <h2>Each agent does one job your team does by hand today</h2>
   <p class="lede">An agent reads what arrives, looks up the related records, applies your rules and takes the next step in your systems. When it is unsure, or an amount is above a limit you set, it passes the case to a named person with everything they need. We build it, host it and keep it working.</p>
 
-  <div class="screen mt" data-w="1072" role="img" aria-label="Mock of one agent run on a carrier invoice"><div class="screen-in"><div class="vw">
-<div class="vw-bar"><span class="dots"><i></i><i></i><i></i></span><span class="vw-url"><i data-i="lock"></i>app.vitalops.ai/corvel/runs/r-20931</span><span class="vw-sp"></span></div>
-<div class="run-h"><div><span class="a-crumb">Corvel Distribution / Freight audit / Runs</span><b class="a-title">Run r-20931 · carrier invoice 88120</b></div><span class="pl warn">Waiting for approval</span></div>
+  <div class="screen mt" data-w="1072" role="img" aria-label="Mock of one agent run on a transporter invoice"><div class="screen-in"><div class="vw">
+<div class="vw-bar"><span class="dots"><i></i><i></i><i></i></span><span class="vw-url"><i data-i="lock"></i>app.vitalops.ai/tarang/runs/r-20931</span><span class="vw-sp"></span></div>
+<div class="run-h"><div><span class="a-crumb">Tarang Logistics / Freight audit / Runs</span><b class="a-title">Run r-20931 · transporter invoice TI-88120</b></div><span class="pl warn">Waiting for approval</span></div>
 <div class="run">
  <div class="run-in"><span class="d-k">Came in</span>
-  <div class="mailc"><b>Invoice 88120</b><span>billing@redline-freight.example · 09:14</span><p>Please find attached our invoice for load L-30417.</p><div class="attc"><div class="thumb"><i></i><i></i><i class="s"></i><i></i><i class="s"></i></div><div><b>invoice-88120.pdf</b><span>2 pages, scanned</span></div></div></div>
+  <div class="mailc"><b>Invoice TI-88120</b><span>billing@konkanroadlines.example · 09:14</span><p>Please find attached our invoice for LR 30417.</p><div class="attc"><div class="thumb"><i></i><i></i><i class="s"></i><i></i><i class="s"></i></div><div><b>invoice-88120.pdf</b><span>2 pages, scanned</span></div></div></div>
  </div>
- <div class="run-tr"><span class="d-k">Steps</span><ol><li class="st-read"><time>09:14:02</time><span class="rs">Read</span><span class="rt">Classified invoice-88120.pdf as a carrier invoice and read 4 charges, total $2,762</span><em class="by mod">Model</em></li><li class="st-look"><time>09:14:03</time><span class="rs">Look up</span><span class="rt">Found load L-30417 in the TMS and rate confirmation RC-9921</span><em class="by sys">System</em></li><li class="st-look"><time>09:14:03</time><span class="rs">Look up</span><span class="rt">Pulled gate times for DC-4, in 10:05 and out 11:45</span><em class="by sys">System</em></li><li class="st-check"><time>09:14:04</time><span class="rs">Check</span><span class="rt">Linehaul $1,850 and fuel $592 match the contract</span><em class="by rule">Rule</em></li><li class="st-check"><time>09:14:04</time><span class="rs">Check</span><span class="rt">Detention $225 is not owed. On site 1 h 40 min with 2 h free</span><em class="by rule">Rule</em></li><li class="st-check"><time>09:14:04</time><span class="rs">Check</span><span class="rt">Liftgate $95 was not ordered. Delivery was to dock door 12</span><em class="by rule">Rule</em></li><li class="st-act"><time>09:14:05</time><span class="rs">Act</span><span class="rt">Approved $2,442 for payment in the ERP and drafted a dispute for $320</span><em class="by sys">System</em></li><li class="st-hand"><time>09:14:05</time><span class="rs">Hand over</span><span class="rt">Disputes over $250 need approval. Sent to D. Ruiz in AP</span><em class="by rule">Rule</em></li></ol></div>
+ <div class="run-tr"><span class="d-k">Steps</span><ol><li class="st-read"><time>09:14:02</time><span class="rs">Read</span><span class="rt">Classified invoice-88120.pdf as a transporter invoice and read 4 charges, total ₹53,590</span><em class="by mod">Model</em></li><li class="st-look"><time>09:14:03</time><span class="rs">Look up</span><span class="rt">Found LR 30417 in the TMS and rate contract RC-9921</span><em class="by sys">System</em></li><li class="st-look"><time>09:14:03</time><span class="rs">Look up</span><span class="rt">Pulled gate times for the Nagpur DC, in 10:05 and out 16:45</span><em class="by sys">System</em></li><li class="st-check"><time>09:14:04</time><span class="rs">Check</span><span class="rt">Freight ₹46,500 and diesel ₹2,790 match the contract</span><em class="by rule">Rule</em></li><li class="st-check"><time>09:14:04</time><span class="rs">Check</span><span class="rt">Halting ₹2,500 is not owed. On site 6 h 40 min with 24 h free</span><em class="by rule">Rule</em></li><li class="st-check"><time>09:14:04</time><span class="rs">Check</span><span class="rt">Unloading ₹1,800 is not owed. The contract puts it on the consignee</span><em class="by rule">Rule</em></li><li class="st-act"><time>09:14:05</time><span class="rs">Act</span><span class="rt">Approved ₹49,290 for payment in the ERP and drafted a dispute for ₹4,300</span><em class="by sys">System</em></li><li class="st-hand"><time>09:14:05</time><span class="rs">Hand over</span><span class="rt">Disputes over ₹2,500 need approval. Sent to D. Rane in AP</span><em class="by rule">Rule</em></li></ol></div>
  <div class="run-out"><span class="d-k">Result</span>
-  <div class="ro"><i data-i="database"></i><div><b>ERP</b><span>$2,442 approved to pay, $320 on hold</span></div></div>
-  <div class="ro w"><i data-i="user-check"></i><div><b>D. Ruiz, AP</b><span>Dispute draft waiting for approval</span></div></div>
+  <div class="ro"><i data-i="database"></i><div><b>ERP</b><span>₹49,290 approved to pay, ₹4,300 on hold</span></div></div>
+  <div class="ro w"><i data-i="user-check"></i><div><b>D. Rane, AP</b><span>Dispute draft waiting for approval</span></div></div>
   <div class="ro"><i data-i="history"></i><div><b>Audit log</b><span>8 steps with sources attached</span></div></div>
  </div>
 </div>
-<div class="run-f"><span>Took 3 s</span><span>Document model v3.2</span><span>Rules: Corvel freight contract set, rev 14</span></div>
+<div class="run-f"><span>Took 3 s</span><span>Document model v3.2</span><span>Rules: Tarang freight contract set, rev 14</span></div>
 </div></div></div>
   <p class="cap">One run of the freight audit agent.</p>
 
@@ -111,7 +111,7 @@ __SPRITE__
       <div class="wvis legacy" aria-hidden="true">
         <div class="term"><span>ORDER ENTRY  SCR 04</span><span>PO NO ..... [48213   ]</span><span>SUPPLIER .. [HARB01  ]</span><span>F3=EXIT  F12=CANCEL</span></div>
       </div>
-      <h3>The core system has no usable API</h3><p>ERPs, EHRs and policy systems are often 10 to 20 years old and heavily customised. Some can only be reached through their screens or a nightly file export.</p>
+      <h3>The core system has no usable API</h3><p>ERPs and hospital systems are often 10 to 20 years old and heavily customised. Some can only be reached through their screens or a nightly file export.</p>
     </div>
     <div class="wcard">
       <div class="wvis tmpl" aria-hidden="true">
@@ -182,9 +182,9 @@ __SPRITE__
       <aside class="queue">
         <div class="qh"><b>Review queue</b><span class="cnt">7</span></div>
         <div class="qi on"><b>SHP-20931</b><span>Harbor Textiles</span><em class="chip w">Weight differs</em></div>
-        <div class="qi"><b>SHP-20928</b><span>Kestrel Foods</span><em class="chip">Certificate missing</em></div>
-        <div class="qi"><b>SHP-20925</b><span>Arden Steel</span><em class="chip">Partial shipment</em></div>
-        <div class="qi"><b>INV-77410</b><span>Moreau Packaging</span><em class="chip">Price above PO</em></div>
+        <div class="qi"><b>SHP-20928</b><span>Kesar Foods</span><em class="chip">Certificate missing</em></div>
+        <div class="qi"><b>SHP-20925</b><span>Arjun Steel</span><em class="chip">Partial shipment</em></div>
+        <div class="qi"><b>INV-77410</b><span>Mohan Packaging</span><em class="chip">Price above PO</em></div>
         <div class="qi"><b>SHP-20919</b><span>Harbor Textiles</span><em class="chip">Low read confidence</em></div>
       </aside>
       <div class="docview">
@@ -352,7 +352,7 @@ __SPRITE__
     <ul>
       <li><i data-i="file-text"></i>A short description of the process and who does it today</li>
       <li><i data-i="bar-chart-3"></i>Monthly volume, and how it changes over the year</li>
-      <li><i data-i="database"></i>The systems involved: ERP, EHR, TMS, inboxes, portals, spreadsheets</li>
+      <li><i data-i="database"></i>The systems involved: ERP, HIS, TMS, inboxes, portals, spreadsheets</li>
       <li><i data-i="folder"></i>Twenty or so sample cases, including the messy ones</li>
       <li><i data-i="triangle-alert"></i>What an error costs you when one gets through</li>
     </ul>
