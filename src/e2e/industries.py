@@ -123,11 +123,11 @@ INDUSTRIES = [
 
 
 PHOTOS = {  # id: (file in e2e/img, credit, licence, source page)
-    "manufacturing": ("manufacturing.webp", "U.S. Department of Agriculture", "CC BY 2.0", "https://commons.wikimedia.org/wiki/File:201107120-RD-LSC-0117_-_Flickr_-_USDAgov.jpg"),
-    "supply-chain": ("supply-chain.webp", "Axisadman", "CC BY-SA 3.0", "https://commons.wikimedia.org/wiki/File:Modern_warehouse_with_pallet_rack_storage_system.jpg"),
-    "logistics": ("logistics.webp", "H. Zell", "CC BY-SA 3.0", "https://commons.wikimedia.org/wiki/File:Container-Terminal_Bremerhaven_02.jpg"),
-    "healthcare": ("healthcare.webp", "Kgbo", "CC BY-SA 4.0", "https://commons.wikimedia.org/wiki/File:Princess_Alexandra_Hospital_nurse_with_mobile_computer_work_station.jpg"),
-    "insurance": ("insurance.webp", "KatieThebeau", "CC BY 2.0", "https://commons.wikimedia.org/wiki/File:The_tree_fallen_over_the_roof_(11568670925).jpg"),
+    "manufacturing": ("manufacturing.webp", "Jorge Royan", "CC BY-SA 3.0", "https://commons.wikimedia.org/wiki/File:India_-_Varanasi_electric_fan_factory_-_1464.jpg"),
+    "supply-chain": ("supply-chain.webp", "Prabhat1729", "CC BY-SA 4.0", "https://commons.wikimedia.org/wiki/File:CWC_Godown,_Bamanheri_operated_by_Food_Corporation_of_India_for_stocking_foodgrains.jpg"),
+    "logistics": ("logistics.webp", "Andrew Thomas", "CC BY-SA 2.0", "https://commons.wikimedia.org/wiki/File:Truck,_Mumbai_-_India,_April_12_2014._(14101792825).jpg"),
+    "healthcare": ("healthcare.webp", "Barry Pousman", "CC BY 2.0", "https://commons.wikimedia.org/wiki/File:My_nurses_at_the_hospital_in_Pondi_(6290972608).jpg"),
+    "insurance": ("insurance.webp", "Dil Shad Roshan", "CC BY-SA 4.0", "https://commons.wikimedia.org/wiki/File:Flooded-home-companypady-2018-kerala-floods.jpg"),
     "finance": ("finance.webp", "VitalOps", "", ""),
 }
 
