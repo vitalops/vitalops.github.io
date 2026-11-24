@@ -141,11 +141,12 @@ def render():
         sel = "true" if i == 0 else "false"
         tabs.append(f'<button role="tab" id="tab-{ind["id"]}" aria-controls="{ind["id"]}" aria-selected="{sel}"><i data-i="{ind["icon"]}"></i>{e(ind["name"])}</button>')
         jobs = "".join(
-            f'<article class="job"><h4>{e(t)}</h4>'
+            f'<div class="jrow{" flip" if k % 2 else ""}"><div class="jtext"><span class="jn">{k + 1:02d}</span><h4>{e(t)}</h4>'
             f'<div class="jr today"><span class="jl"><i data-i="clock"></i>Today</span><p>{e(a)}</p></div>'
             f'<div class="jr agent"><span class="jl"><i data-i="bot"></i>The agent</span><p>{e(b)}</p></div>'
-            f'<div class="jr person"><span class="jl"><i data-i="user-check"></i>Your team</span><p>{e(c)}</p></div></article>'
-            for t, a, b, c in ind["jobs"]
+            f'<div class="jr person"><span class="jl"><i data-i="user-check"></i>Your team</span><p>{e(c)}</p></div></div>'
+            f'<div class="jshot"><div class="screen" data-w="860" role="img" aria-label="Mock of the VitalOps app: {e(t.lower())}"><div class="screen-in">{SCREENS[ind["id"]][k]()}</div></div></div></div>'
+            for k, (t, a, b, c) in enumerate(ind["jobs"])
         )
         chips = "".join(f"<em>{e(x)}</em>" for x in ind["systems"])
         img, who, lic, src = PHOTOS[ind["id"]]
@@ -158,8 +159,6 @@ def render():
             f'<div class="ind-h{nocls}">{photo}'
             f'<div class="ind-t"><span class="ind-ic"><i data-i="{ind["icon"]}"></i></span><h3>{e(ind["name"])}</h3><p>{e(ind["who"])}</p>'
             f'<div class="ind-sys"><span>Systems we connect to</span><div>{chips}</div></div></div></div>'
-            f'<div class="screen mt" data-w="1072" role="img" aria-label="Mock of the VitalOps app for {e(ind["name"].lower())}"><div class="screen-in">{SCREENS[ind["id"]]()}</div></div>'
-            f'<p class="cap">Names and figures are made up.</p>'
-            f'<div class="jobs">{jobs}</div></div>'
+            f'<div class="jobs">{jobs}</div><p class="cap">Screens are mock-ups. Names and figures are made up.</p></div>'
         )
     return f'<div class="tabs-ind" role="tablist" aria-label="Industries">{"".join(tabs)}</div>' + "".join(panels)

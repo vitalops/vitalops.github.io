@@ -373,7 +373,7 @@ __SPRITE__
   var screens=Array.prototype.slice.call(document.querySelectorAll('.screen'));
   // scale to the container width, but never taller than the window (minus the sticky bar), centred
   function fit(sc){var w=+sc.getAttribute('data-w'),inn=sc.firstElementChild;inn.style.width=w+'px';
-    var h=inn.offsetHeight,cw=sc.clientWidth,maxH=window.innerHeight-58-32,k=Math.min(cw/w,maxH/h);
+    var h=inn.offsetHeight,cw=sc.clientWidth,maxH=window.innerHeight-58-66-24,k=Math.min(cw/w,maxH/h);
     inn.style.transform='translateX('+((cw-w*k)/2)+'px) scale('+k+')';sc.style.height=(h*k)+'px';}
   screens.forEach(fit);
   if(window.ResizeObserver){var ro=new ResizeObserver(function(es){es.forEach(function(en){fit(en.target);});});screens.forEach(function(sc){ro.observe(sc);});}
@@ -384,15 +384,19 @@ __SPRITE__
   function show(id,focus){
     var t=document.getElementById('tab-'+id); if(!t) return false;
     tabs.forEach(function(b){var on=b===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;document.getElementById(b.getAttribute('aria-controls')).hidden=!on;});
-    if(focus) t.focus();
+    if(focus) t.focus({preventScroll:true});
     t.scrollIntoView({block:'nearest',inline:'nearest'});
+    // if the reader is already inside the industries, take them to the top of the new one
+    var bar=document.querySelector('.tabs-ind'),panel=document.getElementById(id);
+    var top=panel.getBoundingClientRect().top+window.scrollY-58-bar.offsetHeight-16;
+    if(window.scrollY>top) window.scrollTo({top:top,behavior:'instant' in document.documentElement.style?'instant':'auto'});
     return true;
   }
   tabs.forEach(function(b,i){
     b.addEventListener('click',function(){var id=b.getAttribute('aria-controls');show(id);history.replaceState(null,'','#'+id);});
     b.addEventListener('keydown',function(e){var k={ArrowRight:1,ArrowLeft:-1}[e.key];if(!k)return;e.preventDefault();show(tabs[(i+k+tabs.length)%tabs.length].getAttribute('aria-controls'),true);});
   });
-  function fromHash(){var id=location.hash.slice(1);if(show(id)){document.getElementById('industries').scrollIntoView();}}
+  function fromHash(){var id=location.hash.slice(1);if(document.getElementById('tab-'+id)){show(id);document.getElementById('industries').scrollIntoView();}}
   window.addEventListener('hashchange',fromHash); fromHash();
 })();
 </script>
