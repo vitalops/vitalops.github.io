@@ -87,7 +87,9 @@ p{color:var(--ink2)}
 .hc-chips button.on{color:#fff}
 .hc-chips button:focus-visible{outline:2px solid #a5b4fc;outline-offset:2px;border-radius:4px}
 .hc-chips .ic{width:15px;height:15px}
-.hc-chips .pg{position:absolute;left:0;top:-1px;height:2px;width:0;background:#a5b4fc}
+/* .pg is only the timer (its animationend moves the carousel); it is not drawn */
+.hc-chips .pg{position:absolute;left:0;top:-1px;height:2px;width:0;visibility:hidden}
+.hc-chips button.on::before{content:"";position:absolute;left:0;right:0;top:-1px;height:2px;background:#a5b4fc}
 .hc-chips button.on .pg{animation:hcpg 7s linear forwards}
 .hc.paused .pg,.hc.away .pg{animation-play-state:paused!important}
 @keyframes hcpg{to{width:100%}}
