@@ -93,7 +93,7 @@ p{color:var(--ink2)}
 .hc-chips button.on::before{content:"";position:absolute;left:0;right:0;top:-1px;height:2px;background:#a5b4fc}
 @media(max-width:600px){.hc-chips span{display:none}.hc-chips .ic{width:18px;height:18px}.hc-chips button{padding-top:12px}}
 @media(prefers-reduced-motion:reduce){.cover-bg img{transition:opacity .3s}.cover-bg img.on{transform:none}}
-@media(max-width:980px){.cover-grid{grid-template-columns:minmax(0,1fr);gap:36px}.facts{grid-template-columns:1fr 1fr}.facts div:nth-child(3){border-left:0;padding-left:0}.facts div:nth-child(n+3){border-top:1px solid var(--line)}}
+@media(max-width:980px){.cover-bg::after{background:linear-gradient(180deg,rgba(8,11,28,.84) 0%,rgba(8,11,28,.78) 50%,rgba(8,11,28,.6) 100%)}.cover-grid{grid-template-columns:minmax(0,1fr);gap:36px}.facts{grid-template-columns:1fr 1fr}.facts div:nth-child(3){border-left:0;padding-left:0}.facts div:nth-child(n+3){border-top:1px solid var(--line)}}
 @media(max-width:560px){.facts{grid-template-columns:1fr}.facts div{border-left:0;padding:16px 0}.facts div+div{border-top:1px solid var(--line)}}
 
 /* pseudo screens: fixed layout, scaled as a whole (see the script), no selection or interaction */
@@ -394,14 +394,27 @@ p{color:var(--ink2)}
 .pipe li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;padding:11px 12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
 .pipe .ic{width:34px;height:34px;padding:8px;border-radius:9px;background:rgba(99,127,255,.25);color:#c7d2fe}
 .pipe b{display:block;color:#fff;font-size:14.5px}.pipe span{display:block;font-size:12.5px;color:#cbd5e1;line-height:1.4}
-.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:48px;padding-top:32px;border-top:1px solid var(--line)}
-.how .ic{width:22px;height:22px;color:var(--brand)}
-.how h3{font-size:16px;margin-top:10px}.how p{font-size:14.5px;margin-top:6px}
+/* 01 what we build */
+.what-h{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:end}
+.what-h .lede{margin:0}
+.anat{margin-top:44px;padding:22px 24px 18px;border-radius:20px;background:var(--bg);border:1px solid var(--line)}
+.anat-k{display:grid;grid-template-columns:21.5% minmax(0,1fr) 20.5%;list-style:none;margin-bottom:16px}
+.anat-k li{display:flex;gap:10px;align-items:baseline;padding:10px 12px 0 0;border-top:2px solid var(--brand);margin-right:12px}
+.anat-k li:last-child{margin-right:0}
+.anat-k b{font:500 12px var(--mono);color:var(--brand)}
+.anat-k span{font-size:14px;font-weight:600;color:var(--ink);line-height:1.35}
+.anat figcaption{margin-top:14px;font-size:13px;color:var(--ink3)}
+.how{display:grid;grid-template-columns:170px repeat(3,minmax(0,1fr));margin-top:56px}
+.how-k{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);padding-top:4px}
+.how>div{padding:0 24px;border-left:1px solid var(--line)}
+.how>div:last-child{padding-right:0}
+.how h3{font-size:16px}.how p{font-size:14.5px;margin-top:8px}
+@media(max-width:880px){.what-h{grid-template-columns:1fr;gap:14px}.how{grid-template-columns:1fr}.how>div{border-left:0;border-top:1px solid var(--line);padding:18px 0}.how-k{padding-bottom:10px}}
+@media(max-width:760px){.anat{padding:14px 14px 12px;border-radius:14px}.anat-k{grid-template-columns:1fr;gap:10px}.anat-k li{margin:0}}
 @media(max-width:900px){
   .hub{grid-template-columns:1fr;gap:18px}
   .col:first-child .sys::after,.col:last-child .sys::before{display:none}
   .col{grid-template-columns:1fr 1fr}.col .ch{grid-column:1/-1}
-  .how{grid-template-columns:1fr;gap:22px}
 }
 @media(max-width:480px){.col{grid-template-columns:1fr}}
 

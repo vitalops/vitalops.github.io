@@ -49,11 +49,14 @@ __SPRITE__
 
 <!-- ───────── 01 what we build ───────── -->
 <section class="slide alt" id="what"><div class="wrap">
-  <div class="no">01 · What we build</div>
-  <h2>Each agent does one job your team does by hand today</h2>
-  <p class="lede">An agent reads what arrives, looks up the related records, applies your rules and takes the next step in your systems. When it is unsure, or an amount is above a limit you set, it passes the case to a named person with everything they need. We build it, host it and keep it working.</p>
+  <div class="what-h">
+    <div><div class="no">01 · What we build</div><h2>One agent for each manual job</h2></div>
+    <p class="lede">An agent reads what comes in, checks it against your records and rules, and takes the next step in your systems. Anything unclear, or above a limit you set, goes to a named person with the evidence attached. We build it, host it and keep it working.</p>
+  </div>
 
-  <div class="screen mt" data-w="1072" role="img" aria-label="Mock of one agent run on a transporter invoice"><div class="screen-in"><div class="vw">
+  <figure class="anat">
+  <ol class="anat-k" aria-hidden="true"><li><b>01</b><span>Reads what came in</span></li><li><b>02</b><span>Checks it against your records and rules</span></li><li><b>03</b><span>Acts in your systems, or hands it to a person</span></li></ol>
+  <div class="screen" data-w="1072" role="img" aria-label="Mock of one agent run on a transporter invoice"><div class="screen-in"><div class="vw">
 <div class="vw-bar"><span class="dots"><i></i><i></i><i></i></span><span class="vw-url"><i data-i="lock"></i>app.vitalops.ai/tarang/runs/r-20931</span><span class="vw-sp"></span></div>
 <div class="run-h"><div><span class="a-crumb">Tarang Logistics / Freight audit / Runs</span><b class="a-title">Run r-20931 · transporter invoice TI-88120</b></div><span class="pl warn">Waiting for approval</span></div>
 <div class="run">
@@ -69,12 +72,14 @@ __SPRITE__
 </div>
 <div class="run-f"><span>Took 3 s</span><span>Document model v3.2</span><span>Rules: Tarang freight contract set, rev 14</span></div>
 </div></div></div>
-  <p class="cap">One run of the freight audit agent.</p>
+  <figcaption>One run of the freight audit agent, start to finish in 3 seconds.</figcaption>
+  </figure>
 
   <div class="how">
-    <div><i data-i="network"></i><h3>Connections</h3><p>An API where there is one. Otherwise a database view, file exports, EDI or email. If a system has none of these, the agent uses its screens through a browser, as a person would. Each connection is health-checked every few minutes.</p></div>
-    <div><i data-i="scan"></i><h3>Reading documents</h3><p>Models tuned on a sample of your own files, so new layouts, stamps, handwriting, faxes and multi-page tables don't need a template. You get accuracy per field before we quote.</p></div>
-    <div><i data-i="refresh-cw"></i><h3>Upkeep</h3><p>When a sender changes its layout or a portal changes its screens, we see it in the health checks or in a rise in review items, and fix it. This is part of the monthly fee.</p></div>
+    <span class="how-k">In every agent</span>
+    <div><h3>Connections</h3><p>An API where there is one. Otherwise a database view, file exports, EDI or email. If a system has none of these, the agent uses its screens through a browser, as a person would. Each connection is health-checked every few minutes.</p></div>
+    <div><h3>Reading documents</h3><p>Models tuned on a sample of your own files, so new layouts, stamps, handwriting, faxes and multi-page tables don't need a template. You get accuracy per field before we quote.</p></div>
+    <div><h3>Upkeep</h3><p>When a sender changes its layout or a portal changes its screens, we see it in the health checks or in a rise in review items, and fix it. This is part of the monthly fee.</p></div>
   </div>
 </div></section>
 
