@@ -1,6 +1,6 @@
 """Build the /e2e pitch page: python3 src/e2e/build.py
 
-Edit page.html and e2e.css here, then run this. It writes e2e/index.html and e2e/e2e.css, inlines
+Edit page.html, industries.py and e2e.css here, then run this. It writes e2e/index.html and e2e/e2e.css, inlines
 the Lucide icons the page uses (<i data-i="name"></i>) as one SVG sprite, and runs the copy checker.
 This page is separate from the main site's generator (src/build.py) and shares nothing with it.
 """
@@ -12,6 +12,9 @@ ICONS = os.path.join(HERE, "..", "icons", "lucide")
 
 page = open(os.path.join(HERE, "page.html"), encoding="utf-8").read()
 css = open(os.path.join(HERE, "e2e.css"), encoding="utf-8").read()
+sys.path.insert(0, HERE)
+import industries  # noqa: E402
+page = page.replace("__INDUSTRIES__", industries.render())
 
 used = sorted(set(re.findall(r'<i data-i="([a-z0-9-]+)"></i>', page)))
 symbols = []

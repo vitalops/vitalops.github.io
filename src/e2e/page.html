@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>VitalOps · Operations automation</title>
-<meta name="description" content="VitalOps automates document work for trade, procurement and finance operations teams, and runs it as a service.">
+<title>VitalOps · AI agents for operations</title>
+<meta name="description" content="VitalOps builds and runs AI agents that take routine work off operations teams in manufacturing, supply chain, logistics, healthcare, insurance and finance.">
 <link rel="icon" type="image/svg+xml" href="../assets/vo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@ __SPRITE__
 <header class="bar"><div class="wrap">
   <a class="logo" href="#top"><img src="../assets/vo-mark.svg" alt="">VitalOps</a>
   <nav aria-label="Sections">
-    <a href="#today">Today</a><a href="#what">What we do</a><a href="#review">Review screen</a><a href="#record">Audit record</a><a href="#project">Project plan</a><a href="#cost">Cost</a>
+    <a href="#what">What we build</a><a href="#industries">Industries</a><a href="#review">Review screen</a><a href="#record">Audit record</a><a href="#project">Project plan</a><a href="#cost">Cost</a>
   </nav>
   <a class="btn btn-p btn-sm" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener">Book a call</a>
 </div></header>
@@ -28,66 +28,133 @@ __SPRITE__
 <!-- ───────── cover ───────── -->
 <section class="cover"><div class="wrap cover-grid">
   <div>
-    <div class="kick">VitalOps · Operations automation</div>
-    <h1>We automate the document work your operations team does by hand</h1>
-    <p class="lede">Shipping paperwork, supplier invoices, purchase orders and reconciliations. We connect to the systems you already use, read the documents as they come in, and run the process every day. Your staff only see the cases that need a decision.</p>
+    <div class="kick">VitalOps · AI agents for operations</div>
+    <h1>We build AI agents that take routine work off your operations teams</h1>
+    <p class="lede">Our agents enter orders, chase suppliers, audit freight bills, submit prior authorisations and reconcile accounts. Each one works inside the systems you already use and passes anything unclear to a person. We build them and run them for you as a monthly service.</p>
     <div class="cta">
       <a class="btn btn-p" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener"><i data-i="calendar"></i>Book a 30-minute call</a>
       <a class="btn btn-s" href="mailto:hello@vitalops.ai"><i data-i="send"></i>hello@vitalops.ai</a>
     </div>
   </div>
 
-  <figure class="hero-vis" aria-label="Illustration: three shipping documents are read and booked as one shipment record">
-    <div class="stack">
-      <div class="paper p1">
-        <div class="ph"><b>COMMERCIAL INVOICE</b><span>No. HT-2291</span></div>
-        <div class="pl"><span>Seller</span><b>Harbor Textiles Ltd</b></div>
-        <div class="pl"><span>PO</span><b class="hl">PO-48213</b></div>
-        <div class="pl"><span>Qty</span><b class="hl">1,200 ctn</b></div>
-        <div class="pl"><span>Gross wt</span><b class="hl">12,400 kg</b></div>
-        <div class="lines"><i></i><i></i><i class="s"></i></div>
-        <div class="scan"></div>
-      </div>
-      <div class="paper p2">
-        <div class="ph"><b>BILL OF LADING</b><span>NLF 77120</span></div>
-        <div class="pl"><span>Container</span><b>MSKU 448120</b></div>
-        <div class="pl"><span>Gross wt</span><b>12,400 kg</b></div>
-        <div class="lines"><i></i><i class="s"></i></div>
-      </div>
-      <div class="paper p3">
-        <div class="ph"><b>CERTIFICATE OF ORIGIN</b></div>
-        <div class="lines"><i></i><i></i><i class="s"></i><i></i></div>
-        <div class="stamp">CHAMBER OF<br>COMMERCE</div>
-      </div>
+  <figure class="feed" aria-label="Illustration: a feed of work done by agents in different industries">
+    <div class="feed-h"><span class="live"><i></i>Agent activity</span><span class="mono">sample data</span></div>
+    <div class="feed-win">
+      <ul class="feed-list">
+        <li><time>09:14</time><div><span class="fi"><i data-i="factory"></i>Manufacturing</span><p>Lot 2291 certificate: viscosity 412 cP against a limit of 400</p></div><em class="fo warn">Held for QA</em></li>
+        <li><time>09:14</time><div><span class="fi"><i data-i="truck"></i>Logistics</span><p>Carrier invoice 88120: detention charge not supported by the gate log</p></div><em class="fo bad">Disputed</em></li>
+        <li><time>09:15</time><div><span class="fi"><i data-i="stethoscope"></i>Healthcare</span><p>MRI lumbar spine: prior authorisation sent with 3 clinical notes</p></div><em class="fo ok">Submitted</em></li>
+        <li><time>09:15</time><div><span class="fi"><i data-i="boxes"></i>Supply chain</span><p>PO-48213 acknowledgement: supplier moved the ship date to 10 Dec</p></div><em class="fo warn">To buyer</em></li>
+        <li><time>09:16</time><div><span class="fi"><i data-i="landmark"></i>Finance</span><p>Payment of $12,480 matched to 3 open invoices</p></div><em class="fo ok">Posted</em></li>
+        <li><time>09:16</time><div><span class="fi"><i data-i="shield"></i>Insurance</span><p>Broker submission for Kestrel Foods: 14 locations read into the rating tool</p></div><em class="fo warn">To underwriter</em></li>
+        <li><time>09:17</time><div><span class="fi"><i data-i="factory"></i>Manufacturing</span><p>Customer PO 7781 entered, 6 lines, prices match the contract</p></div><em class="fo ok">Confirmed</em></li>
+        <li><time>09:17</time><div><span class="fi"><i data-i="stethoscope"></i>Healthcare</span><p>Referral fax read, insurance checked, patient added to the scheduling list</p></div><em class="fo ok">Done</em></li>
+      </ul>
     </div>
-    <div class="arrow" aria-hidden="true"><i data-i="chevron-right"></i></div>
-    <div class="record">
-      <div class="rh"><span class="mono">SHP-20931</span><span class="badge ok"><i data-i="circle-check"></i>Booked</span></div>
-      <dl>
-        <dt>Purchase order</dt><dd>PO-48213</dd>
-        <dt>Supplier</dt><dd>Harbor Textiles</dd>
-        <dt>Quantity</dt><dd>1,200 cartons</dd>
-        <dt>Gross weight</dt><dd>12,400 kg</dd>
-        <dt>Documents</dt><dd>4 linked</dd>
-        <dt>Checks</dt><dd>14/14 passed</dd>
-      </dl>
-      <div class="rf"><i data-i="history"></i>Every value links to its source document</div>
-    </div>
-    <figcaption>Illustration. Company names and numbers are made up.</figcaption>
+    <div class="feed-f"><span><b>1,284</b> handled today</span><span><b>97</b> sent to a person</span></div>
+    <figcaption>Illustration with sample data. Company names are made up.</figcaption>
   </figure>
 </div>
 <div class="wrap"><div class="facts">
-  <div><i data-i="users"></i><b>Who it's for</b><span>Trade, logistics, procurement and finance teams</span></div>
-  <div><i data-i="database"></i><b>What you keep</b><span>Your ERP, inboxes and portals, unchanged</span></div>
+  <div><i data-i="users"></i><b>Who it's for</b><span>Operations teams in manufacturing, supply chain, logistics, healthcare, insurance and finance</span></div>
+  <div><i data-i="database"></i><b>What you keep</b><span>Your ERP, EHR, inboxes and portals, unchanged</span></div>
   <div><i data-i="server"></i><b>Where it runs</b><span>Our servers, your cloud account or your data centre</span></div>
   <div><i data-i="package"></i><b>How you pay</b><span>Fixed-fee pilot, then a monthly fee based on volume</span></div>
 </div></div></section>
 
-<!-- ───────── 01 today ───────── -->
-<section class="slide alt" id="today"><div class="wrap">
-  <div class="no">01 · Today</div>
-  <h2>One import shipment, checked by hand</h2>
-  <p class="lede">Four documents from three senders arrive by email. Someone opens each one, finds the order, types the figures into the ERP and compares them field by field. Here is what they are comparing.</p>
+<!-- ───────── 01 what we build ───────── -->
+<section class="slide alt" id="what"><div class="wrap">
+  <div class="no">01 · What we build</div>
+  <h2>Each agent does one job your team does by hand today</h2>
+  <p class="lede">An agent reads what arrives, looks up the related records, applies your rules and takes the next step in your systems. When it is unsure, or an amount is above a limit you set, it passes the case to a named person with everything they need. We build it, host it and keep it working.</p>
+
+  <div class="hub">
+    <div class="col">
+      <span class="ch">What comes in</span>
+      <div class="sys"><i data-i="mail"></i><b>Email and shared inboxes</b></div>
+      <div class="sys"><i data-i="globe"></i><b>Customer, supplier and insurer portals</b></div>
+      <div class="sys"><i data-i="scan"></i><b>Scans, faxes and phone photos</b></div>
+      <div class="sys"><i data-i="arrow-right-left"></i><b>EDI messages and file drops</b></div>
+    </div>
+    <div class="core">
+      <span class="ch">The agent, run by VitalOps</span>
+      <ol class="pipe">
+        <li><i data-i="file-text"></i><div><b>Read</b><span>Work out what arrived and pull out the details</span></div></li>
+        <li><i data-i="search"></i><div><b>Look up</b><span>Find the order, load, patient or policy in your systems</span></div></li>
+        <li><i data-i="list-checks"></i><div><b>Check</b><span>Apply your rules, contracts and limits</span></div></li>
+        <li><i data-i="workflow"></i><div><b>Act</b><span>Update the record, reply, submit or file</span></div></li>
+        <li><i data-i="user-check"></i><div><b>Hand over</b><span>Send anything unclear to the right person</span></div></li>
+      </ol>
+    </div>
+    <div class="col">
+      <span class="ch">Where results go</span>
+      <div class="sys ok"><i data-i="database"></i><b>Your systems of record</b><span>ERP, TMS, EHR, claims</span></div>
+      <div class="sys"><i data-i="send"></i><b>Replies and submissions</b><span>to customers, suppliers, insurers</span></div>
+      <div class="sys warn"><i data-i="eye"></i><b>Review queue</b><span>cases for your staff</span></div>
+      <div class="sys"><i data-i="history"></i><b>Audit log</b><span>every step and who decided</span></div>
+    </div>
+  </div>
+
+  <div class="how">
+    <div><i data-i="network"></i><h3>Connections</h3><p>An API where there is one. Otherwise a database view, file exports, EDI or email. If a system has none of these, the agent uses its screens through a browser, as a person would. Each connection is health-checked every few minutes.</p></div>
+    <div><i data-i="scan"></i><h3>Reading documents</h3><p>Models tuned on a sample of your own files, so new layouts, stamps, handwriting, faxes and multi-page tables don't need a template. You get accuracy per field before we quote.</p></div>
+    <div><i data-i="refresh-cw"></i><h3>Upkeep</h3><p>When a sender changes its layout or a portal changes its screens, we see it in the health checks or in a rise in review items, and fix it. This is part of the monthly fee.</p></div>
+  </div>
+</div></section>
+
+<!-- ───────── 02 industries ───────── -->
+<section class="slide" id="industries"><div class="wrap">
+  <div class="no">02 · By industry</div>
+  <h2>Jobs we take on in six industries</h2>
+  <p class="lede">Three jobs per industry, with what the work looks like today, what the agent does and what stays with your people. Each tab has one sample item worked through.</p>
+  __INDUSTRIES__
+</div></section>
+
+<!-- ───────── 02 why still manual ───────── -->
+<section class="slide alt" id="why"><div class="wrap">
+  <div class="no">03 · Why it's still manual</div>
+  <h2>Most teams have tried to automate this before</h2>
+  <div class="why">
+    <div class="wcard">
+      <div class="wvis legacy" aria-hidden="true">
+        <div class="term"><span>ORDER ENTRY  SCR 04</span><span>PO NO ..... [48213   ]</span><span>SUPPLIER .. [HARB01  ]</span><span>F3=EXIT  F12=CANCEL</span></div>
+      </div>
+      <h3>The core system has no usable API</h3><p>ERPs, EHRs and policy systems are often 10 to 20 years old and heavily customised. Some can only be reached through their screens or a nightly file export.</p>
+    </div>
+    <div class="wcard">
+      <div class="wvis tmpl" aria-hidden="true">
+        <div class="tdoc"><i class="b"></i><i></i><i></i><i class="box"></i></div>
+        <div class="tdoc alt2"><i class="box"></i><i class="b"></i><i></i><i></i></div>
+        <span class="tx"><i data-i="x"></i></span>
+      </div>
+      <h3>Templates break</h3><p>Template-based OCR and RPA need a rule for each layout. A company with 300 suppliers or 40 insurers has hundreds of layouts, and they change without notice.</p>
+    </div>
+    <div class="wcard">
+      <div class="wvis exc" aria-hidden="true">
+        <label>Items</label>
+        <div class="bar2"><span style="width:78%"></span><span class="e" style="width:22%"></span></div>
+        <label>Staff time</label>
+        <div class="bar2"><span style="width:30%"></span><span class="e" style="width:70%"></span></div>
+        <div class="exk"><span><i></i>Clean</span><span><i class="e"></i>Exceptions</span></div>
+      </div>
+      <h3>Exceptions take most of the time</h3><p>Price differences, missing notes and partial shipments are a minority of items but most of the hours. A tool that stops at the first exception saves little.</p>
+    </div>
+    <div class="wcard">
+      <div class="wvis maint" aria-hidden="true">
+        <div class="login"><span>Insurer portal</span><i class="f"></i><i class="f"></i><em>Sign in</em></div>
+        <div class="login moved"><span>Insurer portal</span><em>Continue with SSO</em><i class="f"></i></div>
+      </div>
+      <h3>Nobody maintains it</h3><p>Vendors hand over a licence and IT has a backlog. When a portal changes its login page, the bot stops and staff go back to doing it by hand.</p>
+    </div>
+  </div>
+  <p class="cap">The exception bars are illustrative and show the usual pattern.</p>
+</div></section>
+
+<!-- ───────── 04 one job in detail ───────── -->
+<section class="slide" id="detail"><div class="wrap">
+  <div class="no">04 · One job in detail</div>
+  <h2>Checking the documents for one import shipment</h2>
+  <p class="lede">An example of the checking an agent takes over. Four documents from three senders arrive by email. Someone opens each one, finds the order, types the figures into the ERP and compares them field by field. Here is what they are comparing.</p>
 
   <div class="docs4">
     <div class="mini"><div class="mh"><i data-i="file-text"></i>Commercial invoice</div><span class="src">Supplier · PDF</span><div class="lines"><i></i><i class="s"></i><i></i></div></div>
@@ -112,88 +179,9 @@ __SPRITE__
   <p class="cap">Sample shipment. A real one has 20 to 40 fields to compare, and the person doing it has dozens of shipments a day.</p>
 </div></section>
 
-<!-- ───────── 02 why still manual ───────── -->
-<section class="slide" id="why"><div class="wrap">
-  <div class="no">02 · Why it's still manual</div>
-  <h2>Most teams have tried to automate this before</h2>
-  <div class="why">
-    <div class="wcard">
-      <div class="wvis legacy" aria-hidden="true">
-        <div class="term"><span>ORDER ENTRY  SCR 04</span><span>PO NO ..... [48213   ]</span><span>SUPPLIER .. [HARB01  ]</span><span>F3=EXIT  F12=CANCEL</span></div>
-      </div>
-      <h3>The ERP has no usable API</h3><p>Core systems are often 10 to 20 years old and heavily customised. Some can only be reached through their screens or a nightly file export.</p>
-    </div>
-    <div class="wcard">
-      <div class="wvis tmpl" aria-hidden="true">
-        <div class="tdoc"><i class="b"></i><i></i><i></i><i class="box"></i></div>
-        <div class="tdoc alt2"><i class="box"></i><i class="b"></i><i></i><i></i></div>
-        <span class="tx"><i data-i="x"></i></span>
-      </div>
-      <h3>Templates break</h3><p>Template-based OCR and RPA need a rule for each layout. A company with 300 suppliers has hundreds of layouts, and they change without notice.</p>
-    </div>
-    <div class="wcard">
-      <div class="wvis exc" aria-hidden="true">
-        <label>Items</label>
-        <div class="bar2"><span style="width:78%"></span><span class="e" style="width:22%"></span></div>
-        <label>Staff time</label>
-        <div class="bar2"><span style="width:30%"></span><span class="e" style="width:70%"></span></div>
-        <div class="exk"><span><i></i>Clean</span><span><i class="e"></i>Exceptions</span></div>
-      </div>
-      <h3>Exceptions take most of the time</h3><p>Mismatched quantities, missing certificates and partial shipments are a minority of items but most of the hours. A tool that stops at the first exception saves little.</p>
-    </div>
-    <div class="wcard">
-      <div class="wvis maint" aria-hidden="true">
-        <div class="login"><span>Supplier portal</span><i class="f"></i><i class="f"></i><em>Sign in</em></div>
-        <div class="login moved"><span>Supplier portal</span><em>Continue with SSO</em><i class="f"></i></div>
-      </div>
-      <h3>Nobody maintains it</h3><p>Vendors hand over a licence and IT has a backlog. When a portal changes its login page, the bot stops and staff go back to doing it by hand.</p>
-    </div>
-  </div>
-  <p class="cap">The exception bars are illustrative and show the usual pattern.</p>
-</div></section>
-
-<!-- ───────── 03 what we do ───────── -->
-<section class="slide alt" id="what"><div class="wrap">
-  <div class="no">03 · What we do</div>
-  <h2>We build the process and then run it for you</h2>
-  <p class="lede">We connect to where documents arrive and to where the results need to go. Everything in the middle is built, hosted and monitored by us.</p>
-
-  <div class="hub">
-    <div class="col">
-      <span class="ch">Where documents arrive</span>
-      <div class="sys"><i data-i="inbox"></i><b>Shared inboxes</b></div>
-      <div class="sys"><i data-i="globe"></i><b>Supplier and carrier portals</b></div>
-      <div class="sys"><i data-i="folder"></i><b>SFTP folders</b></div>
-      <div class="sys"><i data-i="arrow-right-left"></i><b>EDI messages</b></div>
-    </div>
-    <div class="core">
-      <span class="ch">Run by VitalOps</span>
-      <ol class="pipe">
-        <li><i data-i="scan"></i><div><b>Read</b><span>Classify each file and extract every field</span></div></li>
-        <li><i data-i="search"></i><div><b>Match</b><span>Find the order, shipment and supplier in your ERP</span></div></li>
-        <li><i data-i="list-checks"></i><div><b>Check</b><span>Compare documents and order, using your tolerances</span></div></li>
-        <li><i data-i="git-branch"></i><div><b>Decide</b><span>Post clean items, send the rest for review</span></div></li>
-      </ol>
-    </div>
-    <div class="col">
-      <span class="ch">Where results go</span>
-      <div class="sys ok"><i data-i="database"></i><b>Your ERP</b><span>clean items booked</span></div>
-      <div class="sys warn"><i data-i="eye"></i><b>Review screen</b><span>exceptions for your staff</span></div>
-      <div class="sys"><i data-i="history"></i><b>Audit log</b><span>every value and decision</span></div>
-      <div class="sys"><i data-i="bar-chart-3"></i><b>Weekly report</b><span>volumes, accuracy, issues</span></div>
-    </div>
-  </div>
-
-  <div class="how">
-    <div><i data-i="network"></i><h3>Connections</h3><p>An API where there is one. Otherwise a database view, file exports, EDI or email. If a system has none of these, we operate its screens through a browser, as a person would. Each connection is health-checked every few minutes.</p></div>
-    <div><i data-i="scan"></i><h3>Document reading</h3><p>Models fine-tuned on a sample of your own files, so new layouts, stamps, handwriting, multi-page tables and mixed languages don't need a template. You get accuracy per field before we quote.</p></div>
-    <div><i data-i="refresh-cw"></i><h3>Upkeep</h3><p>When a supplier changes its layout or a portal changes its screens, we see it in the health checks or in a rise in review items, and fix it. This is part of the monthly fee.</p></div>
-  </div>
-</div></section>
-
 <!-- ───────── 04 review screen ───────── -->
-<section class="slide" id="review"><div class="wrap">
-  <div class="no">04 · The review screen</div>
+<section class="slide alt" id="review"><div class="wrap">
+  <div class="no">05 · The review screen</div>
   <h2>What your staff see when something doesn't match</h2>
   <p class="lede">Flagged items wait in a queue. Each one opens with the documents side by side, the values read from them, and the reason it was flagged. The correction is used to retrain the models.</p>
 
@@ -236,9 +224,9 @@ __SPRITE__
   <p class="cap">Mock-up with sample data. Company names are made up.</p>
 </div></section>
 
-<!-- ───────── 05 record (ideas from the openvibe runtime) ───────── -->
-<section class="slide alt" id="record"><div class="wrap">
-  <div class="no">05 · The record</div>
+<!-- ───────── 06 record (ideas from the openvibe runtime) ───────── -->
+<section class="slide" id="record"><div class="wrap">
+  <div class="no">06 · The record</div>
   <h2>Every item keeps a record of who decided what</h2>
   <p class="lede">Each step is written to a log that can't be edited afterwards. For every decision it notes whether a rule, a model or a person made it.</p>
   <div class="audit" aria-label="Sample audit record for one shipment">
@@ -257,22 +245,6 @@ __SPRITE__
     <div><i data-i="rotate-ccw"></i><h3>Replay any item</h3><p>We can re-run an item months later with the same documents, model version and rules it had on the day, and get the same result. This is how we answer an auditor's question or investigate a mistake.</p></div>
     <div><i data-i="shield-check"></i><h3>A second check on payments</h3><p>Before anything that moves money or changes a supplier's bank details, a separate check compares the action with your written approval rules. Above limits you set, two people have to approve.</p></div>
     <div><i data-i="lock"></i><h3>Each document in its own sandbox</h3><p>Documents are processed in an isolated container that has no internet access and is deleted afterwards. A malicious attachment can't reach anything else.</p></div>
-  </div>
-</div></section>
-
-<!-- ───────── 06 examples ───────── -->
-<section class="slide" id="work"><div class="wrap">
-  <div class="no">06 · Examples</div>
-  <h2>Work we have automated for clients</h2>
-  <div class="ex">
-    <div class="exr"><div class="exh"><span class="k">Trade</span><h3>Import and export documents</h3></div>
-      <div class="exf"><span class="in">Invoices, packing lists, bills of lading, certificates</span><i data-i="chevron-right"></i><span class="mid">Cross-check against each other and the order</span><i data-i="chevron-right"></i><span class="out">Booked shipments and a discrepancy list for the forwarder</span></div></div>
-    <div class="exr"><div class="exh"><span class="k">Finance</span><h3>Reconciliation</h3></div>
-      <div class="exf"><span class="in">Trade records, bank statements, ledger entries</span><i data-i="chevron-right"></i><span class="mid">Match lines and find a likely cause for each break</span><i data-i="chevron-right"></i><span class="out">Cleared matches and a short list of breaks</span></div></div>
-    <div class="exr"><div class="exh"><span class="k">Procurement</span><h3>Source to pay</h3></div>
-      <div class="exf"><span class="in">Purchase requests, supplier quotes, invoices</span><i data-i="chevron-right"></i><span class="mid">Compare quotes, run reverse auctions, three-way match</span><i data-i="chevron-right"></i><span class="out">Approved orders and invoices ready to pay</span></div></div>
-    <div class="exr"><div class="exh"><span class="k">Finance</span><h3>Finance data pipelines</h3></div>
-      <div class="exf"><span class="in">ERP exports, bank feeds, spreadsheets</span><i data-i="chevron-right"></i><span class="mid">Check for missing rows, duplicates and totals that don't tie</span><i data-i="chevron-right"></i><span class="out">Clean tables for month-end close and reporting</span></div></div>
   </div>
 </div></section>
 
@@ -296,8 +268,8 @@ __SPRITE__
 <!-- ───────── 07 data ───────── -->
 <section class="slide" id="data"><div class="wrap">
   <div class="no">08 · Data and security</div>
-  <h2>Your documents stay where you decide</h2>
-  <p class="lede">We run open-weight models on servers we operate. Your documents are not sent to OpenAI, Google or any other model provider. You pick one of three places for it to run.</p>
+  <h2>Your data stays where you decide</h2>
+  <p class="lede">We run open-weight models on servers we operate. Your documents, records and customer data are not sent to OpenAI, Google or any other model provider. You pick one of three places for it to run.</p>
   <div class="dep">
     <div class="dcol">
       <div class="dbox"><span class="dl"><i data-i="server"></i>Our servers</span><div class="chips"><em>Documents</em><em>Models</em><em>Workflows</em></div></div>
@@ -312,7 +284,7 @@ __SPRITE__
       <p>On your hardware, with no internet connection if required. Your IT team runs the machines.</p>
     </div>
   </div>
-  <div class="never"><i data-i="x"></i><span>In every option, no documents go to an outside model API</span></div>
+  <div class="never"><i data-i="x"></i><span>In every option, no data goes to an outside model API</span></div>
   <div class="sec3">
     <span><i data-i="users"></i>Sign-in through your single sign-on</span>
     <span><i data-i="history"></i>Full audit log, exportable</span>
@@ -334,7 +306,7 @@ __SPRITE__
     <div class="pp main">
       <span class="pk">From go-live</span><h3>Monthly</h3>
       <p class="big">Per item, with a minimum</p>
-      <p>Priced per document, match or order. Includes:</p>
+      <p>Priced per item handled, such as an order, invoice, claim or referral. Includes:</p>
       <ul class="inc"><li><i data-i="check"></i>Hosting and models</li><li><i data-i="check"></i>Monitoring and fixes</li><li><i data-i="check"></i>Review screen and audit log</li><li><i data-i="check"></i>Weekly report</li></ul>
     </div>
   </div>
@@ -391,8 +363,8 @@ __SPRITE__
     <ul>
       <li><i data-i="file-text"></i>A short description of the process and who does it today</li>
       <li><i data-i="bar-chart-3"></i>Monthly volume, and how it changes over the year</li>
-      <li><i data-i="database"></i>The systems involved: ERP, inboxes, portals, spreadsheets</li>
-      <li><i data-i="folder"></i>Twenty or so sample documents, including the bad ones</li>
+      <li><i data-i="database"></i>The systems involved: ERP, EHR, TMS, inboxes, portals, spreadsheets</li>
+      <li><i data-i="folder"></i>Twenty or so sample cases, including the messy ones</li>
       <li><i data-i="triangle-alert"></i>What an error costs you when one gets through</li>
     </ul>
   </div>
@@ -400,5 +372,27 @@ __SPRITE__
 
 </main>
 <footer class="foot"><div class="wrap"><span>VitalOps Inc · vitalops.ai</span><a href="mailto:hello@vitalops.ai">hello@vitalops.ai</a></div></footer>
+<script>
+(function(){
+  // feed: append a hidden copy of the items so the scroll loops without a jump
+  var list=document.querySelector('.feed-list');
+  if(list){Array.prototype.slice.call(list.children).forEach(function(li){var c=li.cloneNode(true);c.className='dup';c.setAttribute('aria-hidden','true');list.appendChild(c);});}
+  // industry tabs; /e2e/#healthcare opens that tab
+  var tabs=Array.prototype.slice.call(document.querySelectorAll('.tabs-ind [role=tab]'));
+  function show(id,focus){
+    var t=document.getElementById('tab-'+id); if(!t) return false;
+    tabs.forEach(function(b){var on=b===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;document.getElementById(b.getAttribute('aria-controls')).hidden=!on;});
+    if(focus) t.focus();
+    t.scrollIntoView({block:'nearest',inline:'nearest'});
+    return true;
+  }
+  tabs.forEach(function(b,i){
+    b.addEventListener('click',function(){var id=b.getAttribute('aria-controls');show(id);history.replaceState(null,'','#'+id);});
+    b.addEventListener('keydown',function(e){var k={ArrowRight:1,ArrowLeft:-1}[e.key];if(!k)return;e.preventDefault();show(tabs[(i+k+tabs.length)%tabs.length].getAttribute('aria-controls'),true);});
+  });
+  function fromHash(){var id=location.hash.slice(1);if(show(id)){document.getElementById('industries').scrollIntoView();}}
+  window.addEventListener('hashchange',fromHash); fromHash();
+})();
+</script>
 </body>
 </html>

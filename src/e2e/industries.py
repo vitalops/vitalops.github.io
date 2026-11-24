@@ -1,0 +1,236 @@
+"""Industry tabs for the /e2e page. build.py renders this into __INDUSTRIES__.
+
+Each industry has a sample item (a mock of one case the agent handles, with made-up names and numbers)
+and three jobs. Keep the copy plain: run the build, which runs the copy checker.
+"""
+from html import escape as e
+
+INDUSTRIES = [
+    {
+        "id": "manufacturing", "icon": "factory", "name": "Manufacturing",
+        "who": "Plants and contract manufacturers: quality, customer service, planning and maintenance teams.",
+        "systems": ["ERP", "MES", "Quality system", "Maintenance system", "Customer and supplier email"],
+        "sample": {
+            "title": "CERTIFICATE OF ANALYSIS", "sub": "Resin XR-40 · Lot 2291 · from supplier email",
+            "cols": ["Test", "Result", "Spec"],
+            "rows": [
+                ("Viscosity", "412 cP", "350–400", "bad"),
+                ("Moisture", "0.08%", "max 0.10%", "ok"),
+                ("Density", "1.21 g/cm³", "1.18–1.24", "ok"),
+                ("Melt flow", "12.4", "10–14", "ok"),
+            ],
+            "trace": ["Read the certificate attached to the delivery email", "Matched it to goods receipt GR-5521 and spec RS-40 rev C", "Compared 9 values with their limits"],
+            "verdict": ("warn", "Lot held. Sent to QA with the certificate and the spec side by side."),
+        },
+        "jobs": [
+            ("Checking incoming material certificates",
+             "Quality staff open each supplier's certificate of analysis or mill test report and compare every value with the spec before a lot can be released.",
+             "Reads the certificate, finds the receipt and the spec, checks each value against its limits and releases conforming lots in the ERP.",
+             "QA decides on anything out of spec, missing or unreadable."),
+            ("Entering customer orders",
+             "Customer service retypes purchase orders from PDFs and emails into the ERP, then checks part numbers, prices and requested dates by hand.",
+             "Enters the order, maps the customer's part numbers to yours, checks prices against the contract and dates against lead times, and sends the confirmation.",
+             "Customer service handles price differences, unknown parts and dates you can't meet."),
+            ("Coding maintenance work orders",
+             "Technicians close work orders with notes like “replaced brg, motor running hot again”. Nobody codes them, so repeat failures go unnoticed.",
+             "Reads closed work orders, assigns asset, failure and cause codes, and lists assets that keep failing.",
+             "The reliability engineer decides what to do about each repeat failure."),
+        ],
+    },
+    {
+        "id": "supply-chain", "icon": "boxes", "name": "Supply chain",
+        "who": "Buyers, planners and supplier managers in companies that buy from hundreds of suppliers.",
+        "systems": ["ERP", "Planning system", "Supplier portals", "Supplier email", "Sanctions lists"],
+        "sample": {
+            "title": "ORDER ACKNOWLEDGEMENT", "sub": "Supplier reply to PO-48213 · line 10, bearing 6205-2RS",
+            "cols": ["Field", "Our PO", "Supplier"],
+            "rows": [
+                ("Quantity", "500", "500", "ok"),
+                ("Unit price", "$2.40", "$2.55", "bad"),
+                ("Ship date", "3 Dec", "10 Dec", "bad"),
+                ("Incoterms", "FCA", "FCA", "ok"),
+            ],
+            "trace": ["Read the reply in the purchasing inbox", "Compared 6 lines with PO-48213", "Found that work order WO-7731 needs this part on 8 Dec"],
+            "verdict": ("warn", "Sent to the buyer. Two changes, and the new date delays a work order."),
+        },
+        "jobs": [
+            ("Checking order acknowledgements",
+             "Suppliers confirm orders by email or portal, often with a changed date, quantity or price. Buyers are meant to compare each one with the PO, and many replies are never read.",
+             "Reads every acknowledgement, compares it line by line with the PO, updates confirmed dates in the ERP and chases suppliers who haven't replied.",
+             "The buyer sees only changed lines, with the orders they affect."),
+            ("Following up late deliveries",
+             "Planners work through a long list of late and at-risk lines each morning and email suppliers one at a time for a new date.",
+             "Asks each supplier for a date, records the answer, and shows which production and customer orders are affected.",
+             "The planner decides whether to expedite, buy elsewhere or reschedule."),
+            ("Onboarding new suppliers",
+             "New suppliers send tax forms, bank details, insurance and quality certificates in any order, and someone chases the missing pieces for weeks.",
+             "Checks each document for completeness and expiry dates, screens the company against sanctions lists, chases what's missing and sets up the vendor record.",
+             "Two people approve any new or changed bank details."),
+        ],
+    },
+    {
+        "id": "logistics", "icon": "truck", "name": "Logistics",
+        "who": "Freight forwarders, 3PLs, carriers and the transport teams of shippers.",
+        "systems": ["TMS", "WMS", "Carrier portals", "Rate tables", "Driver apps and email"],
+        "sample": {
+            "title": "CARRIER INVOICE 88120", "sub": "Load L-30417 · Dallas to Memphis",
+            "cols": ["Charge", "Billed", "Check"],
+            "rows": [
+                ("Linehaul", "$1,850", "matches contract", "ok"),
+                ("Fuel surcharge", "$592", "matches weekly index", "ok"),
+                ("Detention, 3 h", "$225", "gate log shows 1 h 40 min", "bad"),
+                ("Liftgate", "$95", "not ordered", "bad"),
+            ],
+            "trace": ["Matched the invoice to load L-30417 in the TMS", "Checked rates against the carrier contract", "Pulled gate times from the warehouse system"],
+            "verdict": ("bad", "Disputed $320 with the carrier, with the gate log attached."),
+        },
+        "jobs": [
+            ("Auditing freight invoices",
+             "Carrier invoices come with fuel surcharges and extra charges for detention, liftgates and redelivery. Checking each one against the contract takes time, so many are paid as billed.",
+             "Matches each invoice to the load and the contracted rate, checks every extra charge against gate times and delivery notes, and disputes unsupported ones.",
+             "Your team approves disputes above an amount you set."),
+            ("Closing out deliveries",
+             "Signed delivery notes come back as phone photos. Billing waits until someone matches each one to a load and writes up any shortage or damage noted on it.",
+             "Reads the delivery note, matches it to the load, records shortages and damage written on it, and releases the load for invoicing.",
+             "Claims for shortage and damage stay with your claims team."),
+            ("Answering quote requests",
+             "Shippers email rate requests with lanes, weights and dates written in free text. Sales reps retype them into the TMS before they can price.",
+             "Pulls out lane, weight, size and dates, prices standard lanes from your rate tables and drafts the reply.",
+             "Reps handle unusual freight and anything below your margin floor."),
+        ],
+    },
+    {
+        "id": "healthcare", "icon": "stethoscope", "name": "Healthcare",
+        "who": "Hospitals, clinic groups and specialty practices: patient access and revenue cycle teams.",
+        "systems": ["EHR", "Practice management", "Insurer portals", "Fax and e-fax", "Remittance files"],
+        "sample": {
+            "title": "PRIOR AUTHORISATION REQUEST", "sub": "MRI lumbar spine (CPT 72148) · Insurer criteria",
+            "cols": ["Criterion", "Found in record"],
+            "rows": [
+                ("6 weeks of conservative care", "Physio notes, 12 Sep to 30 Oct", "ok"),
+                ("Neurological finding", "Clinic note, 4 Nov", "ok"),
+                ("Prior X-ray", "Lumbar X-ray, 18 Sep", "ok"),
+                ("Ordering provider in network", "Yes", "ok"),
+            ],
+            "trace": ["Saw the MRI order in the EHR work queue", "Looked up the insurer's rules for this procedure", "Attached 3 notes and filled the insurer's form"],
+            "verdict": ("ok", "Submitted on the insurer portal. Status is checked daily until a decision."),
+        },
+        "jobs": [
+            ("Prior authorisations",
+             "Staff check whether a procedure needs the insurer's approval, gather clinical notes, fill in each insurer's form or portal, then call back to check on it.",
+             "Checks the insurer's rules for the procedure, pulls the relevant notes from the record, submits the request and tracks it until the insurer decides.",
+             "Clinical questions go to the clinician. Denials go to your appeals team."),
+            ("Working denied claims",
+             "Denials come back as codes in remittance files. Staff look up each one, work out whether it can be fixed, and rework or appeal it before the insurer's deadline.",
+             "Groups denials by reason, corrects clerical errors such as a wrong member ID, resubmits, and drafts appeal letters with the supporting records.",
+             "A coder or the appeals team approves every correction and appeal."),
+            ("Taking in referrals",
+             "Referrals still arrive by fax. Someone reads each one, finds or creates the patient, checks insurance eligibility and calls to schedule.",
+             "Reads the referral, matches the patient, checks eligibility with the insurer, asks the referring office for anything missing and adds the patient to the scheduling list.",
+             "Schedulers book the visit. Clinical triage stays with clinicians."),
+        ],
+    },
+    {
+        "id": "insurance", "icon": "shield", "name": "Insurance",
+        "who": "Carriers, MGAs and brokers: underwriting, claims and account management teams.",
+        "systems": ["Policy admin", "Rating tools", "Claims system", "Broker email", "Document stores"],
+        "sample": {
+            "title": "BROKER SUBMISSION", "sub": "Kestrel Foods · commercial property · 6 attachments",
+            "cols": ["Item", "Read from"],
+            "rows": [
+                ("14 locations, $48.2M insured value", "Schedule of values, Excel", "ok"),
+                ("5 years of losses, 2 claims", "Loss runs, PDF", "ok"),
+                ("Food processing, in appetite", "Your appetite guide", "ok"),
+                ("Sprinkler details for 3 sites", "Not provided", "bad"),
+            ],
+            "trace": ["Read the broker email and 6 attachments", "Built the risk record in the rating tool", "Checked it against your appetite guide"],
+            "verdict": ("warn", "Ready for an underwriter. Asked the broker for the missing sprinkler details."),
+        },
+        "jobs": [
+            ("Clearing new submissions",
+             "Brokers send ACORD forms, schedules of values and loss runs in every format. Assistants key them into the rating tool before an underwriter can look at the risk.",
+             "Reads every attachment, builds the risk record, checks it against your appetite and lists what's missing.",
+             "The underwriter decides whether to quote and at what price."),
+            ("Opening new claims",
+             "First notice of loss arrives by email with photos, police reports and repair estimates. Handlers open the claim, find the policy and request missing documents by hand.",
+             "Opens the claim, finds the policy, checks the cover dates, sorts the claim by type and size, and routes it to the right adjuster.",
+             "Adjusters decide on cover and payment."),
+            ("Checking issued policies",
+             "Account managers compare each issued policy with the quote and binder, form by form, to catch wrong limits and missing endorsements.",
+             "Compares every limit, deductible, form and endorsement and lists the differences.",
+             "The account manager sends the correction request."),
+        ],
+    },
+    {
+        "id": "finance", "icon": "landmark", "name": "Finance",
+        "who": "Payables, receivables and accounting teams, in any industry.",
+        "systems": ["ERP and ledger", "Bank feeds", "AP inbox", "Customer remittances", "Spreadsheets"],
+        "sample": {
+            "title": "CUSTOMER PAYMENT", "sub": "Arden Steel · $12,480.00 · remittance by email",
+            "cols": ["Invoice", "Open", "Paid"],
+            "rows": [
+                ("INV-3310", "$5,200", "$5,200", "ok"),
+                ("INV-3318", "$4,880", "$4,880", "ok"),
+                ("INV-3325", "$2,550", "$2,400", "bad"),
+            ],
+            "trace": ["Read the remittance email and the bank line", "Matched the payment to 3 open invoices", "Found a $150 deduction marked PRICE ADJ"],
+            "verdict": ("warn", "Payment posted. The $150 deduction went to collections with the remittance note."),
+        },
+        "jobs": [
+            ("Processing supplier invoices",
+             "AP staff key invoices from PDFs and match them to the order and the goods receipt. Mismatches sit in someone's inbox.",
+             "Reads the invoice, matches it to the PO and receipt, posts it when they agree and explains the difference when they don't.",
+             "AP approves exceptions. Two people approve any bank detail change."),
+            ("Applying customer payments",
+             "Payments arrive with the remittance in an email, a PDF or a line of bank text. Short payments and deductions are matched by hand.",
+             "Matches each payment to invoices, including partial payments and deductions, and posts it.",
+             "Collections decides on disputed deductions."),
+            ("Month-end reconciliations",
+             "Bank, intercompany and sub-ledger reconciliations are done in spreadsheets in the last days of the month.",
+             "Matches lines every day, and for each break proposes a likely cause with the entries behind it.",
+             "The controller reviews the breaks and signs off."),
+        ],
+    },
+]
+
+
+def render():
+    tabs, panels = [], []
+    for i, ind in enumerate(INDUSTRIES):
+        sel = "true" if i == 0 else "false"
+        tabs.append(f'<button role="tab" id="tab-{ind["id"]}" aria-controls="{ind["id"]}" aria-selected="{sel}"><i data-i="{ind["icon"]}"></i>{e(ind["name"])}</button>')
+        s = ind["sample"]
+        head = "".join(f"<th>{e(c)}</th>" for c in s["cols"])
+        rows = []
+        for r in s["rows"]:
+            *cells, st = r
+            icon = "check" if st == "ok" else "triangle-alert"
+            tds = "".join(f"<td>{e(c)}</td>" for c in cells)
+            rows.append(f'<tr class="{st}">{tds}<td class="st"><i data-i="{icon}"></i></td></tr>')
+        trace = "".join(f"<li>{e(t)}</li>" for t in s["trace"])
+        vk, vt = s["verdict"]
+        vicon = {"ok": "circle-check", "warn": "user-check", "bad": "send"}[vk]
+        sample = (
+            f'<figure class="xm" aria-label="Sample item: {e(s["title"].capitalize())}">'
+            f'<div class="xm-doc"><div class="xm-h"><b>{e(s["title"])}</b><span>{e(s["sub"])}</span></div>'
+            f'<table><thead><tr>{head}<th></th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
+            f'<ol class="xm-tr">{trace}</ol>'
+            f'<div class="xm-v {vk}"><i data-i="{vicon}"></i><span>{e(vt)}</span></div>'
+            f'<figcaption>Sample item. Names and numbers are made up.</figcaption></figure>'
+        )
+        jobs = "".join(
+            f'<article class="job"><h4>{e(t)}</h4>'
+            f'<div class="jr today"><span class="jl"><i data-i="clock"></i>Today</span><p>{e(a)}</p></div>'
+            f'<div class="jr agent"><span class="jl"><i data-i="bot"></i>The agent</span><p>{e(b)}</p></div>'
+            f'<div class="jr person"><span class="jl"><i data-i="user-check"></i>Your team</span><p>{e(c)}</p></div></article>'
+            for t, a, b, c in ind["jobs"]
+        )
+        chips = "".join(f"<em>{e(x)}</em>" for x in ind["systems"])
+        hidden = "" if i == 0 else " hidden"
+        panels.append(
+            f'<div class="ind" role="tabpanel" id="{ind["id"]}" aria-labelledby="tab-{ind["id"]}"{hidden}>'
+            f'<div class="ind-h"><span class="ind-ic"><i data-i="{ind["icon"]}"></i></span><div><h3>{e(ind["name"])}</h3><p>{e(ind["who"])}</p></div>'
+            f'<div class="ind-sys"><span>Systems we connect to</span><div>{chips}</div></div></div>'
+            f'<div class="ind-b">{sample}<div class="jobs">{jobs}</div></div></div>'
+        )
+    return f'<div class="tabs-ind" role="tablist" aria-label="Industries">{"".join(tabs)}</div>' + "".join(panels)
