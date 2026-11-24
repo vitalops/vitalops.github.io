@@ -151,9 +151,11 @@ def render():
         img, who, lic, src = PHOTOS[ind["id"]]
         credit = f'<a class="ph-c" href="{src}" target="_blank" rel="noopener" aria-label="Photo credit: {e(who)}, {lic}"><i data-i="info"></i><span>Photo: {e(who)}, {lic}</span></a>' if src else ""
         hidden = "" if i == 0 else " hidden"
+        photo = f'<div class="ind-ph"><img src="img/{img}" alt="" loading="lazy">{credit}</div>' if SHOW_PHOTOS else ""
+        nocls = "" if SHOW_PHOTOS else " nophoto"
         panels.append(
             f'<div class="ind" role="tabpanel" id="{ind["id"]}" aria-labelledby="tab-{ind["id"]}"{hidden}>'
-            f'<div class="ind-h{"" if SHOW_PHOTOS else " nophoto"}">' + (f'<div class="ind-ph"><img src="img/{img}" alt="" loading="lazy">{credit}</div>' if SHOW_PHOTOS else "") + '
+            f'<div class="ind-h{nocls}">{photo}'
             f'<div class="ind-t"><span class="ind-ic"><i data-i="{ind["icon"]}"></i></span><h3>{e(ind["name"])}</h3><p>{e(ind["who"])}</p>'
             f'<div class="ind-sys"><span>Systems we connect to</span><div>{chips}</div></div></div></div>'
             f'<div class="screen mt" data-w="1072" role="img" aria-label="Mock of the VitalOps app for {e(ind["name"].lower())}"><div class="screen-in">{SCREENS[ind["id"]]()}</div></div>'
