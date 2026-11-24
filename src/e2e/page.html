@@ -37,7 +37,8 @@ __SPRITE__
     </div>
   </div>
 
-  <figure class="feed" aria-label="Illustration: a feed of work done by agents in different industries">
+  <figure class="feed-fig" aria-label="Illustration: a feed of work done by agents in different industries">
+  <div class="screen" data-w="560"><div class="screen-in feed">
     <div class="feed-h"><span class="live"><i></i>Agent activity</span><span class="mono">sample data</span></div>
     <div class="feed-win">
       <ul class="feed-list">
@@ -52,6 +53,7 @@ __SPRITE__
       </ul>
     </div>
     <div class="feed-f"><span><b>1,284</b> handled today</span><span><b>97</b> sent to a person</span></div>
+  </div></div>
     <figcaption>Illustration with sample data. Company names are made up.</figcaption>
   </figure>
 </div>
@@ -184,7 +186,7 @@ __SPRITE__
   <h2>What your staff see when something doesn't match</h2>
   <p class="lede">Flagged items wait in a queue. Each one opens with the documents side by side, the values read from them, and the reason it was flagged. The correction is used to retrain the models.</p>
 
-  <div class="app" aria-label="Mock of the review screen with sample data">
+  <div class="screen mt" data-w="1072" role="img" aria-label="Mock of the review screen with sample data"><div class="screen-in app">
     <div class="app-top"><span class="dots"><i></i><i></i><i></i></span><span class="mono">review.vitalops · import documents</span><span class="who">Signed in as Priya, AP team</span></div>
     <div class="app-body">
       <aside class="queue">
@@ -219,7 +221,7 @@ __SPRITE__
         <p class="note">Likely cause: digits transposed on the scanned page. The decision and the reviewer's name are saved to the audit log.</p>
       </div>
     </div>
-  </div>
+  </div></div>
   <p class="cap">Mock-up with sample data. Company names are made up.</p>
 </div></section>
 
@@ -228,7 +230,7 @@ __SPRITE__
   <div class="no">06 · The record</div>
   <h2>Every item keeps a record of who decided what</h2>
   <p class="lede">Each step is written to a log that can't be edited afterwards. For every decision it notes whether a rule, a model or a person made it.</p>
-  <div class="audit" aria-label="Sample audit record for one shipment">
+  <div class="screen mt" data-w="1072" role="img" aria-label="Sample audit record for one shipment"><div class="screen-in audit">
     <div class="au-h"><b>SHP-20931 · Harbor Textiles Ltd</b><span class="mono">sample record</span></div>
     <ol class="au">
       <li><time>09:02</time><span class="ev">Received 4 documents from the imports inbox</span><em class="by sys">System</em></li>
@@ -239,7 +241,7 @@ __SPRITE__
       <li class="ok"><time>11:40</time><span class="ev">Chose 12,400 kg and added a note for the supplier</span><em class="by per">Priya, AP team</em></li>
       <li class="ok"><time>11:40</time><span class="ev">Booked shipment SHP-20931 in the ERP</span><em class="by sys">System</em></li>
     </ol>
-  </div>
+  </div></div>
   <div class="trio">
     <div><i data-i="rotate-ccw"></i><h3>Replay any item</h3><p>We can re-run an item months later with the same documents, model version and rules it had on the day, and get the same result. This is how we answer an auditor's question or investigate a mistake.</p></div>
     <div><i data-i="shield-check"></i><h3>A second check on payments</h3><p>Before anything that moves money or changes a supplier's bank details, a separate check compares the action with your written approval rules. Above limits you set, two people have to approve.</p></div>
@@ -310,7 +312,7 @@ __SPRITE__
     </div>
   </div>
 
-  <div class="rep" aria-label="Mock of the weekly report with sample data">
+  <div class="screen mt" data-w="1072" role="img" aria-label="Mock of the weekly report with sample data"><div class="screen-in rep">
     <div class="rep-h"><b>Weekly report · import documents</b><span class="mono">sample data</span></div>
     <div class="kpis">
       <div><span>Documents received</span><b>2,318</b></div>
@@ -321,19 +323,19 @@ __SPRITE__
     <div class="chart">
       <div class="ct"><b>Share of items sent for review, by week since go-live</b></div>
       <div class="bars" role="img" aria-label="Sample data: share sent for review falls from 38 percent in week 1 to 14 percent in week 8">
-        <div class="bc" style="--v:38" title="Week 1: 38%"><span>38%</span></div>
-        <div class="bc" style="--v:31" title="Week 2: 31%"></div>
-        <div class="bc" style="--v:27" title="Week 3: 27%"></div>
-        <div class="bc" style="--v:22" title="Week 4: 22%"></div>
-        <div class="bc" style="--v:19" title="Week 5: 19%"></div>
-        <div class="bc" style="--v:17" title="Week 6: 17%"></div>
-        <div class="bc" style="--v:15" title="Week 7: 15%"></div>
-        <div class="bc" style="--v:14" title="Week 8: 14%"><span>14%</span></div>
+        <div class="bc" style="--v:38"><span>38%</span></div>
+        <div class="bc" style="--v:31"></div>
+        <div class="bc" style="--v:27"></div>
+        <div class="bc" style="--v:22"></div>
+        <div class="bc" style="--v:19"></div>
+        <div class="bc" style="--v:17"></div>
+        <div class="bc" style="--v:15"></div>
+        <div class="bc" style="--v:14"><span>14%</span></div>
       </div>
       <div class="bx"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
     </div>
-    <p class="rep-n">Sample figures to show the layout. We give you real targets only after measuring your documents.</p>
-  </div>
+  </div></div>
+  <p class="cap">Sample figures to show the layout. We give you real targets only after measuring your documents.</p>
 </div></section>
 
 <!-- ───────── 09 clients ───────── -->
@@ -376,6 +378,13 @@ __SPRITE__
   // feed: append a hidden copy of the items so the scroll loops without a jump
   var list=document.querySelector('.feed-list');
   if(list){Array.prototype.slice.call(list.children).forEach(function(li){var c=li.cloneNode(true);c.className='dup';c.setAttribute('aria-hidden','true');list.appendChild(c);});}
+  // pseudo screens: laid out at a fixed width (data-w), then scaled to fit like a video
+  var screens=Array.prototype.slice.call(document.querySelectorAll('.screen'));
+  function fit(sc){var w=+sc.getAttribute('data-w'),inn=sc.firstElementChild,k=sc.clientWidth/w;inn.style.width=w+'px';inn.style.transform='scale('+k+')';sc.style.height=(inn.offsetHeight*k)+'px';}
+  screens.forEach(fit);
+  if(window.ResizeObserver){var ro=new ResizeObserver(function(es){es.forEach(function(en){fit(en.target);});});screens.forEach(function(sc){ro.observe(sc);});}
+  else window.addEventListener('resize',function(){screens.forEach(fit);});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){screens.forEach(fit);});
   // industry tabs; /e2e/#healthcare opens that tab
   var tabs=Array.prototype.slice.call(document.querySelectorAll('.tabs-ind [role=tab]'));
   function show(id,focus){
