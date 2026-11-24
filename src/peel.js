@@ -6,14 +6,12 @@
   var banner = document.querySelector('.banner');
 
   var phone = matchMedia('(max-width:600px)');
-  var REST = phone.matches ? 44 : 60, HOVER = REST + 12, TIP = 96;
+  var REST = phone.matches ? 32 : 42, HOVER = REST + 10, TIP = 96;
   var SHARE = 0.4, ROLL = phone.matches ? 44 : 70;  // how much of the banner peels, and how wide the fold rolls up
-  var FEED = [['Manufacturing', 'Lot 2291 certificate: viscosity 412 cP against a limit of 400', 'warn', 'Held for QA'],
-    ['Logistics', 'Carrier invoice 88120: detention charge not supported by the gate log', 'bad', 'Disputed'],
-    ['Healthcare', 'MRI lumbar spine: prior authorisation sent with 3 clinical notes', 'ok', 'Submitted'],
-    ['Supply chain', 'PO-48213: supplier moved the ship date to 10 Dec', 'warn', 'To buyer'],
-    ['Finance', 'Payment of $12,480 matched to 3 open invoices', 'ok', 'Posted']].map(function (f) {
-    return '<li><div><span>' + f[0] + '</span><p>' + f[1] + '</p></div><em class="' + f[2] + '">' + f[3] + '</em></li>';
+  var base = new URL('../peel/', document.currentScript.src).href;
+  var TILES = [['manufacturing', 'Manufacturing'], ['supply-chain', 'Supply chain'], ['logistics', 'Logistics'],
+    ['healthcare', 'Healthcare'], ['insurance', 'Insurance'], ['finance', 'Finance']].map(function (t) {
+    return '<a href="e2e/#' + t[0] + '"><img src="' + base + t[0] + '.webp" alt="" loading="lazy"><span>' + t[1] + '</span></a>';
   }).join('');
   var front = banner && banner.querySelector('.banner-front');
   if (!banner) return;
@@ -25,8 +23,8 @@
   back.innerHTML = '<div class="rip-in"><div class="rip-bar"><span class="rip-k">The other side of VitalOps</span>' +
     '<button type="button" class="rip-close">Close</button></div>' +
     '<h2>AI agents for operations</h2>' +
-    '<p class="rip-about">We also build agents that take routine work off operations teams in manufacturing, logistics, supply chain, healthcare, insurance and finance. They work inside your systems and hand anything unclear to a person.</p>' +
-    '<ul class="rip-feed">' + FEED + '</ul>' +
+    '<p class="rip-about">We also build agents that do routine operations work in manufacturing, supply chain, logistics, healthcare, insurance and finance. They work inside your systems and hand anything unclear to a person.</p>' +
+    '<div class="rip-tiles">' + TILES + '</div>' +
     '<a class="rip-go" href="e2e/">See the agents at work<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>';
   banner.insertBefore(back, front || null);
 
