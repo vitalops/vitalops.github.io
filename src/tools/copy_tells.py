@@ -90,6 +90,19 @@ def check(path):
         if len(parts) == 3 and all(len(p.split()) <= 2 for p in parts):
             hits.append(("slogan triad", h, h))
     find("emoji", r"[\U0001F300-\U0001FAFF☀-➿]", texts, 0)
+    # from the LLM tells checklist (2026-11-24): framing, filler and structure
+    find("page self-reference", r"\b(?:below|above),? you(?:'ll| will)\b|\bthis (?:page|section|tab)\b|\beach (?:tab|card|section|panel|step|row) (?:shows|lists|covers|walks|opens)\b|\bthe following\b|\bscroll (?:down|to)\b|\bhere is (?:what|how)\b|\ban example of\b", texts)
+    find("counting", r"\b(?:two|three|four|five|six|seven) (?:ways|things|steps|reasons|pillars|principles|benefits)\b|\bper industry\b", texts)
+    find("serves as", r"\b(?:serves?|stands?|functions?) as\b", texts)
+    find("signpost", r"\b(?:in short|in summary|in conclusion|bottom line|put simply|at the end of the day|ultimately|it's worth noting|notably|importantly|moreover|furthermore|additionally|that said)\b", texts)
+    find("explainer opener", r"(?:^|[.!?]\s+)(?:that's why|this means|which means|think of it (?:as|like))\b", texts)
+    find("denial string", r"(?:^|[.!?]\s+)Not (?:a|an|another|just)\b|\bno \w+(?: \w+)?, no\b", texts)
+    find("with X, Y and Z", r"\bwith (?:what [^,.]+|[\w-]+), [\w-]+(?: [\w-]+)?,? and [\w-]+", texts)
+    find("benefit tail", r",\s+(?:helping|giving|allowing|letting|making|freeing|saving|keeping)\b|\bso (?:you|your \w+) can\b", texts)
+    find("hedge", r"\b(?:can help|helps? (?:you|teams?)|aims? to|potentially|may help)\b", texts)
+    find("adverb", r"\b(?:quietly|effortlessly|fundamentally|significantly|completely|entirely|every single)\b", texts)
+    find("grand word", r"\b(?:tapestry|testament|cornerstone|underscor\w*|showcas\w*|vibrant|unparalleled|unprecedented|reimagin\w*|redefin\w*|the future of|a new era|next level|all[- ]in[- ]one|single source of truth|trusted by|in minutes|by design|on a mission)\b", texts)
+    find("symbol", r"[↔≈…]", texts, 0)  # → is allowed inside the app screens
     # fragments: ignore short labels (buttons, list headings, numbers) that are not sentences
     hits = [h for h in hits if not (h[0] == "fragment" and len(h[2].split()) <= 4 and not h[2].endswith((".", "!")))]
     return hits
