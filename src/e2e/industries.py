@@ -122,6 +122,8 @@ INDUSTRIES = [
 ]
 
 
+SHOW_PHOTOS = False  # photos are off until we have good, modern ones
+
 PHOTOS = {  # id: (file in e2e/img, credit, licence, source page)
     "manufacturing": ("manufacturing.webp", "Jorge Royan", "CC BY-SA 3.0", "https://commons.wikimedia.org/wiki/File:India_-_Varanasi_electric_fan_factory_-_1464.jpg"),
     "supply-chain": ("supply-chain.webp", "Prabhat1729", "CC BY-SA 4.0", "https://commons.wikimedia.org/wiki/File:CWC_Godown,_Bamanheri_operated_by_Food_Corporation_of_India_for_stocking_foodgrains.jpg"),
@@ -151,7 +153,7 @@ def render():
         hidden = "" if i == 0 else " hidden"
         panels.append(
             f'<div class="ind" role="tabpanel" id="{ind["id"]}" aria-labelledby="tab-{ind["id"]}"{hidden}>'
-            f'<div class="ind-h"><div class="ind-ph"><img src="img/{img}" alt="" loading="lazy">{credit}</div>'
+            f'<div class="ind-h{"" if SHOW_PHOTOS else " nophoto"}">' + (f'<div class="ind-ph"><img src="img/{img}" alt="" loading="lazy">{credit}</div>' if SHOW_PHOTOS else "") + '
             f'<div class="ind-t"><span class="ind-ic"><i data-i="{ind["icon"]}"></i></span><h3>{e(ind["name"])}</h3><p>{e(ind["who"])}</p>'
             f'<div class="ind-sys"><span>Systems we connect to</span><div>{chips}</div></div></div></div>'
             f'<div class="screen mt" data-w="1072" role="img" aria-label="Mock of the VitalOps app for {e(ind["name"].lower())}"><div class="screen-in">{SCREENS[ind["id"]]()}</div></div>'
