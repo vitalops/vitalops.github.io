@@ -552,7 +552,7 @@ def home():
     hero = phero("racks-teal", "AI inference engineering",
                  "Faster, cheaper inference for <em>open-weight models</em>",
                  "We help teams plan, tune and run open-weight models on their own hardware, from GPU clusters to Jetson boards. Every change is tested against your evals before it ships.",
-                 [("3.3×", "throughput on the same GPUs in a sample run"), ("−69%", "lower cost per million tokens"), ("−55%", "lower p99 time to first token"), ("84.1", "accuracy, kept above an 83.5 threshold")],
+                 [],
                  [("btn-w", BOOK, "Book an inference review", "calendar", True), ("btn-g", "lab/", "Try the live demos", "play", False)],
                  shot=g["carousel"]([g["SCREEN_HERO"], g["SCREEN_IDE"]], "Optimize · the runs list · a run ships to production as the clip plays"))
     # the hero's corner peels back to the agents side of VitalOps (src/peel.js, src/peel.css)
