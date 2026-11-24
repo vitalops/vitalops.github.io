@@ -155,8 +155,8 @@ def hero():
         t = ind["jobs"][k][0]
         bgs.append(f'<img src="img/hero-{iid}.webp" alt=""{" class=\"on\"" if first else ""}>')
         slides.append(f'<div class="hc-slide{" on" if first else ""}" data-n="{n}"{"" if first else " aria-hidden=\"true\" inert"}>'
-                      f'<div class="screen" data-w="860" role="img" aria-label="Mock of the VitalOps app: {e(t.lower())}"><div class="screen-in">{SCREENS[iid][k]()}</div></div></div>')
-        chips.append(f'<button type="button" data-n="{n}" data-cap="{e(t)}"{" class=\"on\" aria-current=\"true\"" if first else ""}>'
+                      f'<div class="screen" data-w="1100" role="img" aria-label="Mock of the VitalOps app: {e(t.lower())}"><div class="screen-in">{SCREENS[iid][k]()}</div></div></div>')
+        chips.append(f'<button type="button" data-n="{n}" aria-label="{e(ind["name"])}" data-cap="{e(t)}"{" class=\"on\" aria-current=\"true\"" if first else ""}>'
                      f'<i data-i="{ind["icon"]}"></i><span>{e(ind["name"])}</span><b class="pg"></b></button>')
     first_t = by[HERO[0][0]]["jobs"][HERO[0][1]][0]
     bg = f'<div class="cover-bg" aria-hidden="true">{"".join(bgs)}</div>'
