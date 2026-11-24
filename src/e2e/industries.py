@@ -159,6 +159,6 @@ def render():
             f'<div class="ind-h{nocls}">{photo}'
             f'<div class="ind-t"><span class="ind-ic"><i data-i="{ind["icon"]}"></i></span><h3>{e(ind["name"])}</h3><p>{e(ind["who"])}</p>'
             f'<div class="ind-sys"><span>Systems we connect to</span><div>{chips}</div></div></div></div>'
-            f'<div class="jobs">{jobs}</div><p class="cap">Screens are mock-ups. Names and figures are made up.</p></div>'
+            f'<div class="jobs">{jobs}</div></div>'
         )
     return f'<div class="tabs-ind" role="tablist" aria-label="Industries">{"".join(tabs)}</div>' + "".join(panels)
