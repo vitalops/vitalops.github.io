@@ -357,31 +357,74 @@ __SPRITE__
   if(window.ResizeObserver){var ro=new ResizeObserver(function(es){es.forEach(function(en){fit(en.target);});});screens.forEach(function(sc){ro.observe(sc);});}
   window.addEventListener('resize',function(){screens.forEach(fit);});
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){screens.forEach(fit);});
-  // cover carousel: a screen per industry with its photo behind. The chip's progress bar is the timer:
-  // when its animation ends we move on. Hover, focus or scrolling away pauses it.
+  // cover carousel: a screen per industry with its photo behind. The motion, drag and hover peek are the
+  // main site's carousel (assets/js/site.js); here the chips can also jump to any slide.
   var hc=document.querySelector('.hc');
-  if(hc){
-    var sl=[].slice.call(hc.querySelectorAll('.hc-slide')),ch=[].slice.call(hc.querySelectorAll('.hc-chips button')),
-        bg=[].slice.call(document.querySelectorAll('.cover-bg img')),cap=hc.querySelector('.hc-cap'),num=hc.querySelector('.hc-n'),cur=0;
-    function go(j){
-      j=(j+sl.length)%sl.length;if(j===cur)return;
-      sl.forEach(function(s,k){s.classList.toggle('on',k===j);s.classList.toggle('was',k===cur);if(k===j){s.removeAttribute('aria-hidden');s.inert=false;}else{s.setAttribute('aria-hidden','true');s.inert=true;}});
+  if(hc)(function(){
+    var car=hc.querySelector('.hc-stage'),slides=[].slice.call(car.querySelectorAll('.hc-slide')),N=slides.length,i=0,busy=false,W=car.clientWidth,GAP=1.04,T=7000;
+    var ch=[].slice.call(hc.querySelectorAll('.hc-chips button')),bg=[].slice.call(document.querySelectorAll('.cover-bg img')),cap=hc.querySelector('.hc-cap'),num=hc.querySelector('.hc-n');
+    var dragX=null,dragT=0,dragging=false,side=1,pendingAuto=false,tmr=null,paused=false,holdUntil=0,holdTmr=null,d0={ry:0,tz:0,peek:0,s:.86,o:.45},hov=null;
+    var RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+    function pad(n){return (n<10?'0':'')+n;}
+    function inView(){var r=car.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight;}
+    function pose(el,x,sc,op,instant,ry,tz){el.style.transition=instant===true?'none':instant==='fast'?'transform .45s ease,opacity .45s ease':'';el.style.transform='translateX('+x.toFixed(1)+'px) translateZ('+(tz||0)+'px) rotateY('+(ry||0)+'deg) scale('+sc.toFixed(3)+')';el.style.opacity=op.toFixed(3);if(instant===true){el.offsetWidth;el.style.transition='';}}
+    function park(k,s){slides[k]._side=s;pose(slides[k],s*W*GAP,.86,.45,true);}
+    function retract(){slides.forEach(function(s,k){if(k!==i)pose(s,(s._side||1)*W*GAP,.86,.45,'fast');});}
+    function layout(){W=car.clientWidth;slides.forEach(function(s,k){s.classList.toggle('on',k===i);if(k===i)pose(s,0,1,1,true);else park(k,1);});}
+    function mark(j){
+      slides.forEach(function(s,k){if(k===j){s.removeAttribute('aria-hidden');s.inert=false;}else{s.setAttribute('aria-hidden','true');s.inert=true;}});
       bg.forEach(function(b,k){b.classList.toggle('on',k===j);});
       ch.forEach(function(c,k){c.classList.toggle('on',k===j);if(k===j)c.setAttribute('aria-current','true');else c.removeAttribute('aria-current');});
-      cap.textContent=ch[j].getAttribute('data-cap');num.textContent=(j<9?'0':'')+(j+1)+' / '+(sl.length<10?'0':'')+sl.length;cur=j;
+      cap.textContent=ch[j].getAttribute('data-cap');num.textContent=pad(j+1)+' / '+pad(N);
     }
-    ch.forEach(function(c,k){c.addEventListener('click',function(){go(k);});
-      c.querySelector('.pg').addEventListener('animationend',function(){if(c.classList.contains('on'))go(cur+1);});});
-    hc.addEventListener('keydown',function(e){var d={ArrowRight:1,ArrowLeft:-1}[e.key];if(d){e.preventDefault();go(cur+d);ch[cur].focus();}});
-    function hold(on){hc.classList.toggle('paused',on);}
-    hc.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')hold(true);});
-    hc.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')hold(false);});
-    hc.addEventListener('focusin',function(){hold(true);});hc.addEventListener('focusout',function(){hold(false);});
-    var x0=null,stage=hc.querySelector('.hc-stage');
-    stage.addEventListener('pointerdown',function(e){x0=e.clientX;});
-    stage.addEventListener('pointerup',function(e){if(x0!==null&&Math.abs(e.clientX-x0)>40)go(cur+(e.clientX<x0?1:-1));x0=null;});
-    if(window.IntersectionObserver)new IntersectionObserver(function(es){hc.classList.toggle('away',!es[0].isIntersecting);}).observe(hc);
-  }
+    // hover: lift the screen a little; near an edge, tilt and peek the neighbour
+    function setHover(z){
+      if(z===hov)return;hov=z;var a=slides[i];
+      if(z===null){pose(a,0,1,1,'fast');retract();return;}
+      pose(a,0,1.004,1,'fast',z*5,12);
+      if(z===0){retract();return;}
+      var nb=(i+z+N)%N;slides.forEach(function(s,k){if(k!==i&&k!==nb)pose(s,(s._side||1)*W*GAP,.86,.45,'fast');});
+      if(slides[nb]._side!==z)park(nb,z);pose(slides[nb],z*W*(GAP-.16),.9,.7,'fast');
+    }
+    car.addEventListener('pointermove',function(e){if(e.pointerType!=='mouse'||dragX!==null||busy)return;var r=car.getBoundingClientRect(),px=(e.clientX-r.left)/r.width;setHover(px<.18?-1:px>.82?1:0);});
+    car.addEventListener('pointerenter',function(e){if(e.pointerType!=='mouse')return;paused=true;clearTimeout(tmr);});
+    car.addEventListener('pointerleave',function(e){if(dragX!==null)return;setHover(null);if(e.pointerType==='mouse'){paused=false;pendingAuto=false;holdUntil=Date.now()+5000;arm();}});
+    function arm(){clearTimeout(tmr);if(RM)return;tmr=setTimeout(function(){if(!inView()){arm();return;}auto();},T);}
+    function auto(){if(dragX!==null||paused){pendingAuto=true;return;}var left=holdUntil-Date.now();if(left>0){clearTimeout(holdTmr);holdTmr=setTimeout(auto,left);return;}go(1,false);}
+    function go(dir,fromDrag,j){
+      if(busy||N<2)return;if(j===undefined)j=(i+dir+N)%N;if(j===i)return;busy=true;clearTimeout(tmr);
+      var from=slides[i],to=slides[j];hov=null;
+      if(!fromDrag)park(j,dir);
+      from.classList.remove('on');from.classList.add('leaving');to.classList.add('on');
+      from._side=-dir;pose(to,0,1,1,false);pose(from,-dir*W*GAP,.86,.45,false);
+      i=j;pendingAuto=false;mark(j);
+      setTimeout(function(){from.classList.remove('leaving');busy=false;arm();},740);
+    }
+    ch.forEach(function(c,k){c.addEventListener('click',function(){go(k>i?1:-1,false,k);});});
+    hc.addEventListener('keydown',function(e){if(e.key==='ArrowRight'){go(1,false);e.preventDefault();}else if(e.key==='ArrowLeft'){go(-1,false);e.preventDefault();}});
+    hc.addEventListener('focusin',function(){paused=true;clearTimeout(tmr);});hc.addEventListener('focusout',function(e){if(!hc.contains(e.relatedTarget)){paused=false;arm();}});
+    layout();arm();window.addEventListener('resize',function(){if(!busy&&dragX===null)layout();});
+    // drag or swipe: the neighbour peeks in from the side as you pull
+    car.addEventListener('pointerdown',function(e){if(busy||e.button)return;dragX=e.clientX;dragT=e.timeStamp;dragging=false;clearTimeout(tmr);try{car.setPointerCapture(e.pointerId);}catch(x){}});
+    car.addEventListener('pointermove',function(e){
+      if(dragX===null)return;var dx=e.clientX-dragX;
+      if(!dragging){if(Math.abs(dx)<=6)return;dragging=true;car.classList.add('dragging');side=dx<0?1:-1;
+        var peeking=(hov===side);d0={ry:hov?hov*5:0,tz:hov!==null?12:0,peek:peeking?.16:0,s:peeking?.9:.86,o:peeking?.7:.45};
+        if(!peeking){if(hov&&N>2)pose(slides[(i+hov+N)%N],hov*W*GAP,.86,.45,'fast');park((i+side+N)%N,side);}
+        hov=null;}
+      var ns=dx<0?1:-1;if(ns!==side){side=ns;d0.peek=0;d0.s=.86;d0.o=.45;park((i+side+N)%N,side);}
+      var p=Math.max(-1,Math.min(1,dx/W)),a=Math.abs(p),f=Math.max(0,1-a/.2),nb=slides[(i+side+N)%N];
+      pose(slides[i],dx,1-.14*a,1-.55*a,true,d0.ry*f,d0.tz*f);pose(nb,side*W*(GAP-d0.peek)+dx,d0.s+(1-d0.s)*a,d0.o+(1-d0.o)*a,true);
+    });
+    function endDrag(e){
+      if(dragX===null)return;var dx=e.clientX-dragX,dt=Math.max(1,e.timeStamp-dragT),v=Math.abs(dx)/dt;dragX=null;car.classList.remove('dragging');
+      if(dragging){dragging=false;var nb=(i+side+N)%N;
+        if(Math.abs(dx)/W>.18||v>.6){go(side,true);return;}
+        pose(slides[i],0,1,1,false);pose(slides[nb],side*W*GAP,.86,.45,false);}
+      if(pendingAuto){pendingAuto=false;setTimeout(auto,700);}else arm();
+    }
+    car.addEventListener('pointerup',endDrag);car.addEventListener('pointercancel',endDrag);
+  })();
   // industry tabs; /e2e/#healthcare opens that tab
   var tabs=Array.prototype.slice.call(document.querySelectorAll('.tabs-ind [role=tab]'));
   function show(id,focus){
