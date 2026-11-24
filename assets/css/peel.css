@@ -5,9 +5,9 @@
 .peel.pulling{cursor:grabbing}
 .peel:focus-visible{outline:none}
 .peel-under{position:absolute;inset:0;pointer-events:auto;color:#fff;clip-path:polygon(0 0,100% 0,100% 100%)}
-.peel-under svg{position:absolute;top:6px;right:6px;width:22px;height:22px}
+.peel-under svg{position:absolute;top:4px;right:4px;width:15px;height:15px}
 /* a wink shortly after the page loads, and on every hover or keyboard focus */
-.rip-robot{position:absolute;top:6px;right:6px;z-index:4;width:22px;height:22px;color:#fff;pointer-events:none}
+.rip-robot{position:absolute;top:4px;right:4px;z-index:1;width:15px;height:15px;color:#fff;pointer-events:none}
 .rip-robot svg{display:block;width:100%;height:100%}
 .peel .eye-r,.rip-robot .eye-r{transform-box:fill-box;transform-origin:center;animation:peel-wink .5s ease-in-out 2.5s}
 .peel:focus-visible .eye-r,.peel:focus-visible~.rip-robot .eye-r{animation:peel-wink-again .5s ease-in-out}
@@ -49,4 +49,4 @@
 .rip-go:hover{background:#1e293b}
 .rip-go svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .rip-go:focus-visible{outline:2px solid #fff;outline-offset:2px}
-@media(max-width:600px){.peel-under svg{top:4px;right:4px;width:16px;height:16px}.rip-robot{top:4px;right:4px;width:16px;height:16px}.rip-about{font-size:12.5px}.rip-tiles{gap:6px}.rip-tiles span{font-size:9.5px}}
+@media(max-width:600px){.peel-under svg{top:3px;right:3px;width:11px;height:11px}.rip-robot{top:3px;right:3px;width:11px;height:11px}.rip-about{font-size:12.5px}.rip-tiles{gap:6px}.rip-tiles span{font-size:9.5px}}
