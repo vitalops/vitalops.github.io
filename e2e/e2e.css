@@ -56,7 +56,7 @@ p{color:var(--ink2)}
 .cover-bg{position:absolute;inset:0;z-index:-1}
 .cover-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.04);transition:opacity 1.2s ease,transform 9s linear}
 .cover-bg img.on{opacity:1;transform:scale(1.12)}
-.cover-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,11,28,.94) 0%,rgba(8,11,28,.86) 38%,rgba(8,11,28,.6) 70%,rgba(8,11,28,.5) 100%),linear-gradient(0deg,rgba(8,11,28,.85) 0%,rgba(8,11,28,0) 30%)}
+.cover-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,11,28,.86) 0%,rgba(8,11,28,.68) 36%,rgba(8,11,28,.3) 68%,rgba(8,11,28,.22) 100%),linear-gradient(0deg,rgba(8,11,28,.55) 0%,rgba(8,11,28,0) 26%)}
 .cover-grid{display:grid;grid-template-columns:minmax(0,.68fr) minmax(0,1.32fr);gap:44px;align-items:center}
 .cover .kick{font:500 13px var(--mono);color:#a5b4fc;letter-spacing:.05em;text-transform:uppercase}
 .cover h1{margin-top:14px;color:#fff;font-size:clamp(32px,3.8vw,50px);line-height:1.05;letter-spacing:-.03em}
