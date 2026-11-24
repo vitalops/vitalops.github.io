@@ -70,32 +70,23 @@ __SPRITE__
   <h2>Each agent does one job your team does by hand today</h2>
   <p class="lede">An agent reads what arrives, looks up the related records, applies your rules and takes the next step in your systems. When it is unsure, or an amount is above a limit you set, it passes the case to a named person with everything they need. We build it, host it and keep it working.</p>
 
-  <div class="hub">
-    <div class="col">
-      <span class="ch">What comes in</span>
-      <div class="sys"><i data-i="mail"></i><b>Email and shared inboxes</b></div>
-      <div class="sys"><i data-i="globe"></i><b>Customer, supplier and insurer portals</b></div>
-      <div class="sys"><i data-i="scan"></i><b>Scans, faxes and phone photos</b></div>
-      <div class="sys"><i data-i="arrow-right-left"></i><b>EDI messages and file drops</b></div>
-    </div>
-    <div class="core">
-      <span class="ch">The agent, run by VitalOps</span>
-      <ol class="pipe">
-        <li><i data-i="file-text"></i><div><b>Read</b><span>Work out what arrived and pull out the details</span></div></li>
-        <li><i data-i="search"></i><div><b>Look up</b><span>Find the order, load, patient or policy in your systems</span></div></li>
-        <li><i data-i="list-checks"></i><div><b>Check</b><span>Apply your rules, contracts and limits</span></div></li>
-        <li><i data-i="workflow"></i><div><b>Act</b><span>Update the record, reply, submit or file</span></div></li>
-        <li><i data-i="user-check"></i><div><b>Hand over</b><span>Send anything unclear to the right person</span></div></li>
-      </ol>
-    </div>
-    <div class="col">
-      <span class="ch">Where results go</span>
-      <div class="sys ok"><i data-i="database"></i><b>Your systems of record</b><span>ERP, TMS, EHR, claims</span></div>
-      <div class="sys"><i data-i="send"></i><b>Replies and submissions</b><span>to customers, suppliers, insurers</span></div>
-      <div class="sys warn"><i data-i="eye"></i><b>Review queue</b><span>cases for your staff</span></div>
-      <div class="sys"><i data-i="history"></i><b>Audit log</b><span>every step and who decided</span></div>
-    </div>
-  </div>
+  <div class="screen mt" data-w="1072" role="img" aria-label="Mock of one agent run on a carrier invoice"><div class="screen-in"><div class="vw">
+<div class="vw-bar"><span class="dots"><i></i><i></i><i></i></span><span class="vw-url"><i data-i="lock"></i>app.vitalops.ai/corvel/runs/r-20931</span><span class="vw-sp"></span></div>
+<div class="run-h"><div><span class="a-crumb">Corvel Distribution / Freight audit / Runs</span><b class="a-title">Run r-20931 · carrier invoice 88120</b></div><span class="pl warn">Waiting for approval</span></div>
+<div class="run">
+ <div class="run-in"><span class="d-k">Came in</span>
+  <div class="mailc"><b>Invoice 88120</b><span>billing@redline-freight.example · 09:14</span><p>Please find attached our invoice for load L-30417.</p><div class="attc"><div class="thumb"><i></i><i></i><i class="s"></i><i></i><i class="s"></i></div><div><b>invoice-88120.pdf</b><span>2 pages, scanned</span></div></div></div>
+ </div>
+ <div class="run-tr"><span class="d-k">Steps</span><ol><li class="st-read"><time>09:14:02</time><span class="rs">Read</span><span class="rt">Classified invoice-88120.pdf as a carrier invoice and read 4 charges, total $2,762</span><em class="by mod">Model</em></li><li class="st-look"><time>09:14:03</time><span class="rs">Look up</span><span class="rt">Found load L-30417 in the TMS and rate confirmation RC-9921</span><em class="by sys">System</em></li><li class="st-look"><time>09:14:03</time><span class="rs">Look up</span><span class="rt">Pulled gate times for DC-4, in 10:05 and out 11:45</span><em class="by sys">System</em></li><li class="st-check"><time>09:14:04</time><span class="rs">Check</span><span class="rt">Linehaul $1,850 and fuel $592 match the contract</span><em class="by rule">Rule</em></li><li class="st-check"><time>09:14:04</time><span class="rs">Check</span><span class="rt">Detention $225 is not owed. On site 1 h 40 min with 2 h free</span><em class="by rule">Rule</em></li><li class="st-check"><time>09:14:04</time><span class="rs">Check</span><span class="rt">Liftgate $95 was not ordered. Delivery was to dock door 12</span><em class="by rule">Rule</em></li><li class="st-act"><time>09:14:05</time><span class="rs">Act</span><span class="rt">Approved $2,442 for payment in the ERP and drafted a dispute for $320</span><em class="by sys">System</em></li><li class="st-hand"><time>09:14:05</time><span class="rs">Hand over</span><span class="rt">Disputes over $250 need approval. Sent to D. Ruiz in AP</span><em class="by rule">Rule</em></li></ol></div>
+ <div class="run-out"><span class="d-k">Result</span>
+  <div class="ro"><i data-i="database"></i><div><b>ERP</b><span>$2,442 approved to pay, $320 on hold</span></div></div>
+  <div class="ro w"><i data-i="user-check"></i><div><b>D. Ruiz, AP</b><span>Dispute draft waiting for approval</span></div></div>
+  <div class="ro"><i data-i="history"></i><div><b>Audit log</b><span>8 steps with sources attached</span></div></div>
+ </div>
+</div>
+<div class="run-f"><span>Took 3 s</span><span>Document model v3.2</span><span>Rules: Corvel freight contract set, rev 14</span></div>
+</div></div></div>
+  <p class="cap">One run of the freight audit agent. Names and figures are made up.</p>
 
   <div class="how">
     <div><i data-i="network"></i><h3>Connections</h3><p>An API where there is one. Otherwise a database view, file exports, EDI or email. If a system has none of these, the agent uses its screens through a browser, as a person would. Each connection is health-checked every few minutes.</p></div>
@@ -380,10 +371,13 @@ __SPRITE__
   if(list){Array.prototype.slice.call(list.children).forEach(function(li){var c=li.cloneNode(true);c.className='dup';c.setAttribute('aria-hidden','true');list.appendChild(c);});}
   // pseudo screens: laid out at a fixed width (data-w), then scaled to fit like a video
   var screens=Array.prototype.slice.call(document.querySelectorAll('.screen'));
-  function fit(sc){var w=+sc.getAttribute('data-w'),inn=sc.firstElementChild,k=sc.clientWidth/w;inn.style.width=w+'px';inn.style.transform='scale('+k+')';sc.style.height=(inn.offsetHeight*k)+'px';}
+  // scale to the container width, but never taller than the window (minus the sticky bar), centred
+  function fit(sc){var w=+sc.getAttribute('data-w'),inn=sc.firstElementChild;inn.style.width=w+'px';
+    var h=inn.offsetHeight,cw=sc.clientWidth,maxH=window.innerHeight-58-32,k=Math.min(cw/w,maxH/h);
+    inn.style.transform='translateX('+((cw-w*k)/2)+'px) scale('+k+')';sc.style.height=(h*k)+'px';}
   screens.forEach(fit);
   if(window.ResizeObserver){var ro=new ResizeObserver(function(es){es.forEach(function(en){fit(en.target);});});screens.forEach(function(sc){ro.observe(sc);});}
-  else window.addEventListener('resize',function(){screens.forEach(fit);});
+  window.addEventListener('resize',function(){screens.forEach(fit);});
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){screens.forEach(fit);});
   // industry tabs; /e2e/#healthcare opens that tab
   var tabs=Array.prototype.slice.call(document.querySelectorAll('.tabs-ind [role=tab]'));

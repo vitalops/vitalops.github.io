@@ -343,6 +343,34 @@ p{color:var(--ink2)}
 }
 @media(max-width:480px){.col{grid-template-columns:1fr}}
 
+/* 01 agent run window */
+.run-h{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+.run-h .pl{font-size:11px;padding:2px 9px}
+.run{display:grid;grid-template-columns:230px minmax(0,1fr) 220px}
+.run>div{padding:12px 14px}
+.run-in,.run-tr{border-right:1px solid var(--line)}
+.run-in{background:#fcfdfe}
+.mailc{border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#fff}
+.mailc>b{display:block;font-size:12px}.mailc>span{font-size:10px;color:var(--ink3)}
+.mailc p{font-size:11px;color:var(--ink2);margin:6px 0 8px}
+.attc{display:flex;gap:8px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:7px;background:#f8fafc}
+.attc b{display:block;font-size:10.5px}.attc span{font-size:10px;color:var(--ink3)}
+.thumb{width:30px;height:40px;background:var(--docbg);border:1px solid #e7e2d6;border-radius:2px;padding:4px 3px;display:grid;gap:3px;align-content:start;transform:rotate(-2deg)}
+.thumb i{height:2px;background:#d9d3c4}.thumb i.s{width:60%}
+.run-tr ol{list-style:none}
+.run-tr li{display:grid;grid-template-columns:58px 66px minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line2);font-size:11.5px}
+.run-tr li:last-child{border-bottom:0}
+.run-tr time{font:10.5px var(--mono);color:var(--ink4)}
+.rs{font:500 10px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--ink3)}
+.rt{color:var(--ink)}
+.run-tr li.st-hand{background:var(--warn50);margin:0 -6px;padding:5px 6px;border-radius:6px}
+.run-tr .by{font-size:10px;padding:1px 7px}
+.ro{display:grid;grid-template-columns:auto 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--line2)}
+.ro .ic{width:15px;height:15px;color:var(--ink3);margin-top:1px}
+.ro b{display:block;font-size:11.5px}.ro span{font-size:10.5px;color:var(--ink3)}
+.ro.w .ic{color:var(--warn)}
+.run-f{display:flex;gap:18px;padding:7px 16px;border-top:1px solid var(--line);background:#f8fafc;font:10px var(--mono);color:var(--ink3)}
+
 /* 04 review app */
 .app{border-radius:16px;border:1px solid #cbd5e1;background:var(--paper);box-shadow:0 40px 80px -40px rgba(15,23,42,.45);overflow:hidden}
 .app-top{display:flex;align-items:center;gap:14px;padding:10px 14px;background:#f1f4f9;border-bottom:1px solid var(--line);font-size:12px;color:var(--ink3)}
