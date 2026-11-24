@@ -1,0 +1,53 @@
+/* The home hero's peeling corner and the agents panel behind it (src/peel.js). */
+.i-robot{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.i-robot .eye{fill:currentColor;stroke:none}
+.peel{position:absolute;top:0;right:0;z-index:3;display:block;padding:0;border:0;background:none;cursor:grab;pointer-events:none;touch-action:none;user-select:none;-webkit-user-select:none}
+.peel[hidden]{display:none}
+.peel.pulling{cursor:grabbing}
+.peel:focus-visible{outline:none}
+.peel-under{position:absolute;inset:0;pointer-events:auto;color:#fff;clip-path:polygon(0 0,100% 0,100% 100%)}
+.peel-under svg{position:absolute;top:6px;right:6px;width:22px;height:22px}
+/* a wink shortly after the page loads, and on every hover or keyboard focus */
+.rip-robot{position:absolute;top:6px;right:6px;z-index:4;width:22px;height:22px;color:#fff;pointer-events:none}
+.rip-robot svg{display:block;width:100%;height:100%}
+.peel .eye-r,.rip-robot .eye-r{transform-box:fill-box;transform-origin:center;animation:peel-wink .5s ease-in-out 2.5s}
+.peel:focus-visible .eye-r,.peel:focus-visible~.rip-robot .eye-r{animation:peel-wink-again .5s ease-in-out}
+@media(hover:hover){.peel:hover .eye-r,.peel:hover~.rip-robot .eye-r{animation:peel-wink-again .5s ease-in-out}}
+@keyframes peel-wink{0%,100%{transform:none}35%,65%{transform:scaleY(.12)}}
+@keyframes peel-wink-again{0%,100%{transform:none}35%,65%{transform:scaleY(.12)}}
+@media(prefers-reduced-motion:reduce){.peel .eye-r,.rip-robot .eye-r,.peel:hover .eye-r,.peel:hover~.rip-robot .eye-r,.peel:focus-visible .eye-r,.peel:focus-visible~.rip-robot .eye-r{animation:none}}
+.peel-hit{position:absolute;inset:0;pointer-events:auto;clip-path:polygon(0 0,100% 100%,0 100%)}
+.peel-label{position:absolute;top:calc(100% + 8px);right:12px;padding:5px 10px;border-radius:7px;background:#0f172a;color:#e2e8f0;font:600 12.5px Inter,system-ui,-apple-system,"Segoe UI",sans-serif;white-space:nowrap;box-shadow:0 8px 20px -8px rgba(0,0,0,.6);opacity:0;transition:opacity .12s;pointer-events:none}
+.peel:focus-visible .peel-label{opacity:1}
+@media(hover:hover){.peel:hover .peel-label{opacity:1}}
+.peel.pulling .peel-label{opacity:0}
+/* the fold, drawn by agent.js; --crease is how far the crease is from the corner */
+.rip-flap{position:absolute;inset:0;z-index:2;pointer-events:none;filter:drop-shadow(-3px 4px 7px rgba(0,0,0,.55))}
+.rip-flap i{position:absolute;inset:0;background:linear-gradient(225deg,#59637a var(--crease),#c6cedb calc(var(--crease) + 12px),#8c96aa calc(var(--crease) + 44px),#59637a calc(var(--crease) + 70px))}
+/* behind the banner */
+.banner{position:relative}
+.banner-front{position:relative;isolation:isolate}
+.phero.banner::after{display:none}
+.banner-front::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(7,10,24,.94) 0%,rgba(7,10,24,.82) 42%,rgba(7,10,24,.45) 100%),linear-gradient(0deg,rgba(7,10,24,.85) 0%,rgba(7,10,24,0) 40%)}
+.rip-back{position:absolute;inset:0;scroll-margin-top:200px;background:radial-gradient(120% 90% at 100% 0%,#6d83ff 0%,#3f5cf6 45%,#2f45c4 100%);color:#fff}
+.banner.is-open .rip-in{z-index:1}
+.banner.is-open .banner-front{cursor:pointer}
+.rip-in{position:absolute;display:flex;flex-direction:column;gap:10px}
+.rip-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none}
+.rip-k{font:500 11.5px "DM Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:#dbe5ff}
+.rip-close{border:0;background:rgba(255,255,255,.16);color:#fff;font:600 12px Inter,system-ui,sans-serif;padding:5px 10px;border-radius:7px;cursor:pointer}
+.rip-close:hover{background:rgba(255,255,255,.26)}
+.rip-close:not(:focus-visible){position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.rip-in h2{margin:0;color:#fff;font-size:clamp(20px,2vw,26px);font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.rip-about{margin:0;font-size:13.5px;line-height:1.5;color:#e0e7ff}
+.rip-feed{list-style:none;margin:2px 0 0;padding:0;flex:none;overflow:hidden;display:grid;align-content:start;gap:6px}
+.rip-feed li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.96);color:#0f172a}
+.rip-feed span{display:block;font:500 10px "DM Mono",ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase;color:#64748b}
+.rip-feed p{margin:1px 0 0;font-size:12.5px;line-height:1.35}
+.rip-feed em{font-style:normal;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;white-space:nowrap;border:1px solid}
+.rip-feed em.ok{background:#ecfdf5;color:#047857;border-color:#a7f3d0}.rip-feed em.warn{background:#fffbeb;color:#b45309;border-color:#fde68a}.rip-feed em.bad{background:#fff1f2;color:#be123c;border-color:#fecdd3}
+.rip-go{flex:none;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;background:#0f172a;color:#fff!important;font:600 14px Inter,system-ui,sans-serif;text-decoration:none!important}
+.rip-go:hover{background:#1e293b}
+.rip-go svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rip-go:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:600px){.peel-under svg{top:4px;right:4px;width:16px;height:16px}.rip-robot{top:4px;right:4px;width:16px;height:16px}.rip-about{font-size:12.5px}.rip-feed li:nth-child(n+3){display:none}}
+.rip-feed li:nth-child(n+4){display:none}

@@ -555,6 +555,10 @@ def home():
                  [("3.3×", "throughput on the same GPUs in a sample run"), ("−69%", "lower cost per million tokens"), ("−55%", "lower p99 time to first token"), ("84.1", "accuracy, kept above an 83.5 threshold")],
                  [("btn-w", BOOK, "Book an inference review", "calendar", True), ("btn-g", "lab/", "Try the live demos", "play", False)],
                  shot=g["carousel"]([g["SCREEN_HERO"], g["SCREEN_IDE"]], "Optimize · the runs list · a run ships to production as the clip plays"))
+    # the hero's corner peels back to the agents side of VitalOps (src/peel.js, src/peel.css)
+    hero = hero.replace('<section class="phero has-shot">', '<section class="phero has-shot banner"><div class="banner-front">', 1)
+    hero = hero[:hero.rindex("</section>")] + "</div></section>"
+    hero += f'<link rel="stylesheet" href="{{R}}{asset("assets/css/peel.css")}"><script src="{{R}}{asset("assets/js/peel.js")}" defer></script>'
     prods = {k: dict(v) for k, v in PRODUCTS.items()}
     blurbs = {"plan": "Estimates throughput, latency and cost for each GPU option, using your traffic.",
               "optimize": "Finds the fastest engine settings, quantisation and kernels that still pass your evals.",
@@ -685,6 +689,8 @@ def write_assets():
     css = g["CSS"].replace('url("assets/', 'url("../')
     open(os.path.join(ROOT, "assets/css/vo.css"), "w").write(css)
     open(os.path.join(ROOT, "assets/css/pages.css"), "w").write(open(os.path.join(HERE, "pages.css")).read())
+    open(os.path.join(ROOT, "assets/css/peel.css"), "w").write(open(os.path.join(HERE, "peel.css")).read())
+    open(os.path.join(ROOT, "assets/js/peel.js"), "w").write(open(os.path.join(HERE, "peel.js")).read())
     html = g["HTML"]
     i = html.index("</footer>") + len("</footer>"); j = html.index("</body>")
     scripts = re.findall(r"<script>(.*?)</script>", html[i:j], re.S)
