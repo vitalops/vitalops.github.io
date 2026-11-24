@@ -26,35 +26,17 @@ __SPRITE__
 <main id="top">
 
 <!-- ───────── cover ───────── -->
-<section class="cover"><div class="wrap cover-grid">
-  <div>
+<section class="cover">__HERO_BG__<div class="wrap cover-grid">
+  <div class="cover-copy">
     <div class="kick">VitalOps</div>
     <h1>AI agents for operations</h1>
-    <p class="lede">Our agents enter orders, chase suppliers, audit freight bills, submit prior authorisations and reconcile accounts. Each one works inside the systems you already use and passes anything unclear to a person. We build them and run them for you as a monthly service.</p>
+    <p class="lede">Our agents enter orders, chase suppliers, audit transporter bills, handle cashless claims and reconcile accounts. Each one works inside the systems you already use and passes anything unclear to a person. We build them and run them for you as a monthly service.</p>
     <div class="cta">
       <a class="btn btn-p" href="https://calendly.com/abhijith-vitalops/30min" target="_blank" rel="noopener"><i data-i="calendar"></i>Book a 30-minute call</a>
-      <a class="btn btn-s" href="mailto:hello@vitalops.ai"><i data-i="send"></i>hello@vitalops.ai</a>
+      <a class="btn btn-s" href="#industries"><i data-i="arrow-down"></i>See all 15 jobs</a>
     </div>
   </div>
-
-  <figure class="feed-fig" aria-label="Illustration: a feed of work done by agents in different industries">
-  <div class="screen" data-w="560"><div class="screen-in feed">
-    <div class="feed-h"><span class="live"><i></i>Agent activity</span></div>
-    <div class="feed-win">
-      <ul class="feed-list">
-        <li><time>09:14</time><div><span class="fi"><i data-i="factory"></i>Manufacturing</span><p>Lot 2291 certificate: viscosity 412 cP against a limit of 400</p></div><em class="fo warn">Held for QA</em></li>
-        <li><time>09:14</time><div><span class="fi"><i data-i="truck"></i>Logistics</span><p>Transporter invoice 88120: halting charge not supported by the gate log</p></div><em class="fo bad">Disputed</em></li>
-        <li><time>09:15</time><div><span class="fi"><i data-i="stethoscope"></i>Healthcare</span><p>Cashless pre-auth for IP-8812 sent to Sunrise TPA with the cost estimate</p></div><em class="fo ok">Submitted</em></li>
-        <li><time>09:15</time><div><span class="fi"><i data-i="boxes"></i>Supply chain</span><p>PO-48213 acknowledgement: supplier moved the ship date to 10 Dec</p></div><em class="fo warn">To buyer</em></li>
-        <li><time>09:16</time><div><span class="fi"><i data-i="landmark"></i>Finance</span><p>NEFT of ₹12,46,737 matched to 3 invoices and TDS</p></div><em class="fo ok">Posted</em></li>
-        <li><time>09:16</time><div><span class="fi"><i data-i="boxes"></i>Supply chain</span><p>New supplier Kiran Castings: GST certificate expired, new copy asked for</p></div><em class="fo warn">Chased</em></li>
-        <li><time>09:17</time><div><span class="fi"><i data-i="factory"></i>Manufacturing</span><p>Customer PO 7781 entered, 6 lines, prices match the contract</p></div><em class="fo ok">Confirmed</em></li>
-        <li><time>09:17</time><div><span class="fi"><i data-i="stethoscope"></i>Healthcare</span><p>Discharge bill for IP-8779 checked: room rent limit, family told ₹31,150</p></div><em class="fo warn">To billing</em></li>
-      </ul>
-    </div>
-    <div class="feed-f"><span><b>1,284</b> handled today</span><span><b>97</b> sent to a person</span></div>
-  </div></div>
-  </figure>
+  __HERO_CAR__
 </div>
 <div class="wrap"><div class="facts">
   <div><i data-i="users"></i><b>Who it's for</b><span>Operations teams in manufacturing, supply chain, logistics, healthcare and finance</span></div>
@@ -363,9 +345,6 @@ __SPRITE__
 <footer class="foot"><div class="wrap"><span>VitalOps Inc · vitalops.ai</span><a href="mailto:hello@vitalops.ai">hello@vitalops.ai</a></div></footer>
 <script>
 (function(){
-  // feed: append a hidden copy of the items so the scroll loops without a jump
-  var list=document.querySelector('.feed-list');
-  if(list){Array.prototype.slice.call(list.children).forEach(function(li){var c=li.cloneNode(true);c.className='dup';c.setAttribute('aria-hidden','true');list.appendChild(c);});}
   // pseudo screens: laid out at a fixed width (data-w), then scaled to fit like a video
   var screens=Array.prototype.slice.call(document.querySelectorAll('.screen'));
   // scale to the container width, but never taller than the window (minus the sticky bar), centred
@@ -376,6 +355,31 @@ __SPRITE__
   if(window.ResizeObserver){var ro=new ResizeObserver(function(es){es.forEach(function(en){fit(en.target);});});screens.forEach(function(sc){ro.observe(sc);});}
   window.addEventListener('resize',function(){screens.forEach(fit);});
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){screens.forEach(fit);});
+  // cover carousel: a screen per industry with its photo behind. The chip's progress bar is the timer:
+  // when its animation ends we move on. Hover, focus or scrolling away pauses it.
+  var hc=document.querySelector('.hc');
+  if(hc){
+    var sl=[].slice.call(hc.querySelectorAll('.hc-slide')),ch=[].slice.call(hc.querySelectorAll('.hc-chips button')),
+        bg=[].slice.call(document.querySelectorAll('.cover-bg img')),cap=hc.querySelector('.hc-cap'),num=hc.querySelector('.hc-n'),cur=0;
+    function go(j){
+      j=(j+sl.length)%sl.length;if(j===cur)return;
+      sl.forEach(function(s,k){s.classList.toggle('on',k===j);s.classList.toggle('was',k===cur);if(k===j){s.removeAttribute('aria-hidden');s.inert=false;}else{s.setAttribute('aria-hidden','true');s.inert=true;}});
+      bg.forEach(function(b,k){b.classList.toggle('on',k===j);});
+      ch.forEach(function(c,k){c.classList.toggle('on',k===j);if(k===j)c.setAttribute('aria-current','true');else c.removeAttribute('aria-current');});
+      cap.textContent=ch[j].getAttribute('data-cap');num.textContent=(j<9?'0':'')+(j+1)+' / '+(sl.length<10?'0':'')+sl.length;cur=j;
+    }
+    ch.forEach(function(c,k){c.addEventListener('click',function(){go(k);});
+      c.querySelector('.pg').addEventListener('animationend',function(){if(c.classList.contains('on'))go(cur+1);});});
+    hc.addEventListener('keydown',function(e){var d={ArrowRight:1,ArrowLeft:-1}[e.key];if(d){e.preventDefault();go(cur+d);ch[cur].focus();}});
+    function hold(on){hc.classList.toggle('paused',on);}
+    hc.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')hold(true);});
+    hc.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')hold(false);});
+    hc.addEventListener('focusin',function(){hold(true);});hc.addEventListener('focusout',function(){hold(false);});
+    var x0=null,stage=hc.querySelector('.hc-stage');
+    stage.addEventListener('pointerdown',function(e){x0=e.clientX;});
+    stage.addEventListener('pointerup',function(e){if(x0!==null&&Math.abs(e.clientX-x0)>40)go(cur+(e.clientX<x0?1:-1));x0=null;});
+    if(window.IntersectionObserver)new IntersectionObserver(function(es){hc.classList.toggle('away',!es[0].isIntersecting);}).observe(hc);
+  }
   // industry tabs; /e2e/#healthcare opens that tab
   var tabs=Array.prototype.slice.call(document.querySelectorAll('.tabs-ind [role=tab]'));
   function show(id,focus){

@@ -140,3 +140,28 @@ def render():
             f'<div class="jobs">{jobs}</div></div>'
         )
     return f'<div class="tabs-ind" role="tablist" aria-label="Industries">{"".join(tabs)}</div>' + "".join(panels)
+
+
+# The cover: one screen per industry, cycling, with that industry's photo behind it.
+HERO = [("manufacturing", 0), ("supply-chain", 0), ("logistics", 0), ("healthcare", 1), ("finance", 1)]  # (industry, job)
+
+
+def hero():
+    from screens import SCREENS
+    by = {i["id"]: i for i in INDUSTRIES}
+    bgs, slides, chips = [], [], []
+    for n, (iid, k) in enumerate(HERO):
+        ind, first = by[iid], n == 0
+        t = ind["jobs"][k][0]
+        bgs.append(f'<img src="img/hero-{iid}.webp" alt=""{" class=\"on\"" if first else ""}>')
+        slides.append(f'<div class="hc-slide{" on" if first else ""}" data-n="{n}"{"" if first else " aria-hidden=\"true\" inert"}>'
+                      f'<div class="screen" data-w="860" role="img" aria-label="Mock of the VitalOps app: {e(t.lower())}"><div class="screen-in">{SCREENS[iid][k]()}</div></div></div>')
+        chips.append(f'<button type="button" data-n="{n}" data-cap="{e(t)}"{" class=\"on\" aria-current=\"true\"" if first else ""}>'
+                     f'<i data-i="{ind["icon"]}"></i><span>{e(ind["name"])}</span><b class="pg"></b></button>')
+    first_t = by[HERO[0][0]]["jobs"][HERO[0][1]][0]
+    bg = f'<div class="cover-bg" aria-hidden="true">{"".join(bgs)}</div>'
+    car = (f'<div class="hc" role="group" aria-roledescription="carousel" aria-label="The agents at work, one screen per industry">'
+           f'<div class="hc-stage">{"".join(slides)}</div>'
+           f'<div class="hc-bar"><span class="hc-cap" aria-live="polite">{e(first_t)}</span><span class="hc-n">01 / {len(HERO):02d}</span></div>'
+           f'<div class="hc-chips">{"".join(chips)}</div></div>')
+    return bg, car

@@ -15,6 +15,8 @@ css = open(os.path.join(HERE, "e2e.css"), encoding="utf-8").read()
 sys.path.insert(0, HERE)
 import industries  # noqa: E402
 page = page.replace("__INDUSTRIES__", industries.render())
+hero_bg, hero_car = industries.hero()
+page = page.replace("__HERO_BG__", hero_bg).replace("__HERO_CAR__", hero_car)
 
 used = sorted(set(re.findall(r'<i data-i="([a-z0-9-]+)"></i>', page)))
 symbols = []

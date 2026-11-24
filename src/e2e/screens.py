@@ -261,7 +261,7 @@ def lg_audit():
 </tbody></table>
 <div class="d-g2 mt">
  <div class="d-box"><span class="d-k">Time at the Nagpur DC, from the gate log</span>
-  <div class="gl"><div class="gl-free" style="left:4%;width:84%"><span>Free time 24 h</span></div><div class="gl-on" style="left:4%;width:23%"></div><b style="left:4%">In 10:05</b><b class="r" style="left:27%">Out 16:45</b></div>
+  <div class="gl"><div class="gl-free" style="left:4%;width:84%"><span>Free time 24 h</span></div><div class="gl-on" style="left:4%;width:23%"></div><b style="left:4%">In 10:05</b><b style="left:29%">Out 16:45</b></div>
   <p>The truck left the same day, well inside the free time, so no halting charge is owed.</p></div>
  <div class="d-box"><span class="d-k">Payment</span><div class="pay"><div><span>Billed</span><b>₹53,590</b></div><div><span>Approved to pay</span><b class="ok">₹49,290</b></div><div><span>Held</span><b class="bad">₹4,300</b></div></div><p class="d-m">The transporter has 14 days to respond under the contract.</p></div>
 </div>
