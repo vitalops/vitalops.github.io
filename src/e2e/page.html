@@ -48,43 +48,46 @@ __SPRITE__
 </dl></div></section>
 
 <!-- ───────── 01 what we build ───────── -->
-<section class="slide alt" id="what"><div class="wrap">
-  <div class="what-h">
-    <div><div class="no">01 · What we build</div><h2>One agent for each manual job</h2></div>
+<section class="slide alt" id="what"><div class="wrap what-grid">
+  <div class="what-l">
+    <div class="no">01 · What we build</div>
+    <h2>One agent for each manual job</h2>
     <p class="lede">It works the same queue your team works today. Anything unclear, or above a limit you set, goes to a person.</p>
+    <ol class="wsteps">
+      <li><button type="button" class="on" aria-current="true"><b>01</b><span>Reads what came in<em>An email, PDF, portal or EDI message. It finds the records that go with it.</em></span></button></li>
+      <li><button type="button"><b>02</b><span>Checks it<em>Against your contracts, records and rules, line by line.</em></span></button></li>
+      <li><button type="button"><b>03</b><span>Acts, or asks a person<em>Posts in your systems. Exceptions go to a named person.</em></span></button></li>
+    </ol>
   </div>
-
-  <div class="ag" role="img" aria-label="One agent run: it reads a transporter invoice, checks four charges against the contract and the gate log, approves ₹49,290 in the ERP and sends a ₹4,300 dispute to AP for approval.">
-    <div class="ag-col">
-      <div class="ag-k"><b>01</b>Reads what came in</div>
-      <div class="ag-card ag-mail" data-a style="--d:0s">
-        <span class="am-from"><i data-i="mail"></i>billing@konkanroadlines.example</span>
-        <b>Invoice TI-88120</b>
-        <span class="am-txt">Please find attached our invoice for LR 30417.</span>
-        <span class="am-att"><i data-i="file-text"></i>invoice-88120.pdf</span>
-      </div>
-      <p class="ag-n">Finds the load and the rate contract</p>
-    </div>
-    <div class="ag-col">
-      <div class="ag-k"><b>02</b>Checks every charge</div>
-      <ul class="ag-card ag-checks">
-        <li class="ok" data-a style="--d:.5s"><i data-i="check"></i><span>Freight</span><b>₹46,500</b></li>
-        <li class="ok" data-a style="--d:.8s"><i data-i="check"></i><span>Diesel escalation</span><b>₹2,790</b></li>
-        <li class="bad" data-a style="--d:1.1s"><i data-i="x"></i><span>Halting <em>left the same day</em></span><b>₹2,500</b></li>
-        <li class="bad" data-a style="--d:1.4s"><i data-i="x"></i><span>Unloading <em>not in the contract</em></span><b>₹1,800</b></li>
-      </ul>
-      <p class="ag-n">Against the contract and the gate log</p>
-    </div>
-    <div class="ag-col">
-      <div class="ag-k"><b>03</b>Acts, or asks a person</div>
-      <div class="ag-card ag-out">
-        <div class="ao ok" data-a style="--d:2s"><i data-i="database"></i><div><span>ERP</span><b>₹49,290 approved to pay</b></div></div>
-        <div class="ao warn" data-a style="--d:2.4s"><i data-i="user-check"></i><div><span>D. Rane, AP</span><b>₹4,300 dispute to approve</b></div></div>
-      </div>
-      <p class="ag-n">Disputes over ₹2,500 need a person</p>
-    </div>
+  <div class="hc wc" role="group" aria-roledescription="carousel" aria-label="One agent run on a transporter invoice, step by step">
+    <div class="hc-clip"><div class="hc-stage">
+<div class="hc-slide on"><div class="screen" data-w="600" role="img" aria-label="Step 1: the agent reads the transporter invoice and finds the load, rate contract and gate log"><div class="screen-in"><div class="vw wv">
+<div class="vw-bar"><span class="dots"><i></i><i></i><i></i></span><span class="vw-url"><i data-i="lock"></i>app.vitalops.ai/tarang/runs/r-20931</span><span class="vw-sp"></span></div>
+<div class="run-h"><div><span class="a-crumb">Tarang Logistics / Freight audit / Run r-20931</span><b class="a-title">Transporter invoice TI-88120</b></div><span class="pl gray">Step 1 of 3</span></div>
+<div class="wbody"><div class="mailc"><b>Invoice TI-88120</b><span>billing@konkanroadlines.example · 09:14</span><p>Please find attached our invoice for LR 30417.</p><div class="attc"><div class="thumb"><i></i><i></i><i class="s"></i><i></i><i class="s"></i></div><div><b>invoice-88120.pdf</b><span>2 pages, scanned · 4 charges, total ₹53,590</span></div></div></div>
+<span class="d-k">Looked up</span>
+<div class="wl"><div><i data-i="database"></i><b>LR 30417</b><span>TMS · Bhiwandi to Nagpur, delivered 21 Nov</span></div><div><i data-i="file-text"></i><b>Rate contract RC-9921</b><span>Konkan Roadlines · rev 14</span></div><div><i data-i="clock"></i><b>Gate log, Nagpur DC</b><span>In 10:05, out 16:45 the same day</span></div></div></div></div></div></div></div>
+<div class="hc-slide" aria-hidden="true" inert><div class="screen" data-w="600" role="img" aria-label="Step 2: the agent checks each charge against the contract and the gate log"><div class="screen-in"><div class="vw wv">
+<div class="vw-bar"><span class="dots"><i></i><i></i><i></i></span><span class="vw-url"><i data-i="lock"></i>app.vitalops.ai/tarang/runs/r-20931</span><span class="vw-sp"></span></div>
+<div class="run-h"><div><span class="a-crumb">Tarang Logistics / Freight audit / Run r-20931</span><b class="a-title">Transporter invoice TI-88120</b></div><span class="pl gray">Step 2 of 3</span></div>
+<div class="wbody"><table class="d-t wt"><thead><tr><th>Charge</th><th>Billed</th><th>Evidence</th><th></th></tr></thead><tbody>
+<tr><td>Freight</td><td>₹46,500</td><td>Rate contract RC-9921</td><td><span class="pl ok">OK</span></td></tr>
+<tr><td>Diesel escalation 6%</td><td>₹2,790</td><td>Diesel clause, price on 1 Nov</td><td><span class="pl ok">OK</span></td></tr>
+<tr class="bad"><td>Halting, 1 day</td><td>₹2,500</td><td>Gate log: on site 6 h 40 min, 24 h free</td><td><span class="pl bad">Not owed</span></td></tr>
+<tr class="bad"><td>Unloading</td><td>₹1,800</td><td>Contract: unloading by consignee</td><td><span class="pl bad">Not owed</span></td></tr>
+</tbody></table>
+<div class="wpay"><div><span>Billed</span><b>₹53,590</b></div><div><span>To pay</span><b class="ok">₹49,290</b></div><div><span>To dispute</span><b class="bad">₹4,300</b></div></div></div></div></div></div></div>
+<div class="hc-slide" aria-hidden="true" inert><div class="screen" data-w="600" role="img" aria-label="Step 3: the agent approves ₹49,290 in the ERP and sends a ₹4,300 dispute to AP for approval"><div class="screen-in"><div class="vw wv">
+<div class="vw-bar"><span class="dots"><i></i><i></i><i></i></span><span class="vw-url"><i data-i="lock"></i>app.vitalops.ai/tarang/runs/r-20931</span><span class="vw-sp"></span></div>
+<div class="run-h"><div><span class="a-crumb">Tarang Logistics / Freight audit / Run r-20931</span><b class="a-title">Transporter invoice TI-88120</b></div><span class="pl warn">Waiting for approval</span></div>
+<div class="wbody"><div class="wo ok"><i data-i="database"></i><div><b>ERP</b><span>₹49,290 approved for payment, ₹4,300 on hold</span></div><span class="pl ok">Done</span></div>
+<div class="wo warn"><i data-i="user-check"></i><div><b>D. Rane, AP</b><span>Disputes over ₹2,500 need a person. Draft waiting for approval.</span></div><span class="pl warn">Waiting</span></div>
+<div class="d-draft"><div class="dr-h"><span>To: billing@konkanroadlines.example</span><span>Draft</span></div><p>Invoice TI-88120 for LR 30417: we are paying ₹49,290 and disputing ₹4,300. The truck left our Nagpur DC the same day, and our contract puts unloading on the consignee.</p></div>
+<div class="wlog"><i data-i="history"></i>8 steps logged with their sources · took 3 s</div></div></div></div></div></div>
+    </div></div>
   </div>
-
+</div>
+<div class="wrap">
   <div class="how">
     <span class="how-k">In every agent</span>
     <div><h3>Connections</h3><p>An API, database, file drop, EDI or email. A browser when a system has nothing else.</p></div>
@@ -372,15 +375,12 @@ __SPRITE__
   if(window.ResizeObserver){var ro=new ResizeObserver(function(es){es.forEach(function(en){fit(en.target);});});screens.forEach(function(sc){ro.observe(sc);});}
   window.addEventListener('resize',function(){screens.forEach(fit);});
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){screens.forEach(fit);});
-  // cover carousel: a screen per industry with its photo behind. The motion, drag and hover peek are the
-  // main site's carousel (assets/js/site.js); here the chips can also jump to any slide.
-  var hc=document.querySelector('.hc');
-  if(hc)(function(){
-    var car=hc.querySelector('.hc-stage'),slides=[].slice.call(car.querySelectorAll('.hc-slide')),N=slides.length,i=0,busy=false,W=car.clientWidth,GAP=1.04,T=7000;
-    var ch=[].slice.call(hc.querySelectorAll('.hc-chips button')),bg=[].slice.call(document.querySelectorAll('.cover-bg img')),cap=hc.querySelector('.hc-cap'),num=hc.querySelector('.hc-n');
+  // screen carousels (the cover and section 01). The motion, drag and hover peek are the main site's
+  // carousel (assets/js/site.js); onMark updates whatever sits around it, and go(k) jumps to slide k.
+  function carousel(hc,T,onMark){
+    var car=hc.querySelector('.hc-stage'),slides=[].slice.call(car.querySelectorAll('.hc-slide')),N=slides.length,i=0,busy=false,W=car.clientWidth,GAP=1.04;
     var dragX=null,dragT=0,dragging=false,side=1,pendingAuto=false,tmr=null,paused=false,holdUntil=0,holdTmr=null,d0={ry:0,tz:0,peek:0,s:.86,o:.45},hov=null;
     var RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
-    function pad(n){return (n<10?'0':'')+n;}
     function inView(){var r=car.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight;}
     function pose(el,x,sc,op,instant,ry,tz){el.style.transition=instant===true?'none':instant==='fast'?'transform .45s ease,opacity .45s ease':'';el.style.transform='translateX('+x.toFixed(1)+'px) translateZ('+(tz||0)+'px) rotateY('+(ry||0)+'deg) scale('+sc.toFixed(3)+')';el.style.opacity=op.toFixed(3);if(instant===true){el.offsetWidth;el.style.transition='';}}
     function park(k,s){slides[k]._side=s;pose(slides[k],s*W*GAP,.86,.45,true);}
@@ -388,9 +388,7 @@ __SPRITE__
     function layout(){W=car.clientWidth;slides.forEach(function(s,k){s.classList.toggle('on',k===i);if(k===i)pose(s,0,1,1,true);else park(k,1);});}
     function mark(j){
       slides.forEach(function(s,k){if(k===j){s.removeAttribute('aria-hidden');s.inert=false;}else{s.setAttribute('aria-hidden','true');s.inert=true;}});
-      bg.forEach(function(b,k){b.classList.toggle('on',k===j);});
-      ch.forEach(function(c,k){c.classList.toggle('on',k===j);if(k===j)c.setAttribute('aria-current','true');else c.removeAttribute('aria-current');});
-      cap.textContent=ch[j].getAttribute('data-cap');num.textContent=pad(j+1)+' / '+pad(N);
+      onMark(j,N);
     }
     // hover: lift the screen a little; near an edge, tilt and peek the neighbour
     function setHover(z){
@@ -415,7 +413,6 @@ __SPRITE__
       i=j;pendingAuto=false;mark(j);
       setTimeout(function(){from.classList.remove('leaving');busy=false;arm();},740);
     }
-    ch.forEach(function(c,k){c.addEventListener('click',function(){go(k>i?1:-1,false,k);});});
     hc.addEventListener('keydown',function(e){if(e.key==='ArrowRight'){go(1,false);e.preventDefault();}else if(e.key==='ArrowLeft'){go(-1,false);e.preventDefault();}});
     hc.addEventListener('focusin',function(){paused=true;clearTimeout(tmr);});hc.addEventListener('focusout',function(e){if(!hc.contains(e.relatedTarget)){paused=false;arm();}});
     layout();arm();window.addEventListener('resize',function(){if(!busy&&dragX===null)layout();});
@@ -439,11 +436,22 @@ __SPRITE__
       if(pendingAuto){pendingAuto=false;setTimeout(auto,700);}else arm();
     }
     car.addEventListener('pointerup',endDrag);car.addEventListener('pointercancel',endDrag);
-  })();
-  // 01: play the agent run when it scrolls into view, and again each time it comes back
-  var ag=document.querySelector('.ag');
-  if(ag){if(!window.IntersectionObserver||matchMedia('(prefers-reduced-motion:reduce)').matches)ag.classList.add('play');
-    else new IntersectionObserver(function(es){es.forEach(function(en){if(en.intersectionRatio>=.5)ag.classList.add('play');else if(!en.isIntersecting)ag.classList.remove('play');});},{threshold:[0,.5]}).observe(ag);}
+    return function(k){go(k>i?1:-1,false,k);};
+  }
+  function pad(n){return (n<10?'0':'')+n;}
+  function current(list,j){list.forEach(function(c,k){c.classList.toggle('on',k===j);if(k===j)c.setAttribute('aria-current','true');else c.removeAttribute('aria-current');});}
+  var hc=document.querySelector('.cover .hc');
+  if(hc){
+    var ch=[].slice.call(hc.querySelectorAll('.hc-chips button')),bg=[].slice.call(document.querySelectorAll('.cover-bg img')),cap=hc.querySelector('.hc-cap'),num=hc.querySelector('.hc-n');
+    var goHero=carousel(hc,7000,function(j,N){bg.forEach(function(b,k){b.classList.toggle('on',k===j);});current(ch,j);cap.textContent=ch[j].getAttribute('data-cap');num.textContent=pad(j+1)+' / '+pad(N);});
+    ch.forEach(function(c,k){c.addEventListener('click',function(){goHero(k);});});
+  }
+  var wc=document.querySelector('.wc');
+  if(wc){
+    var st=[].slice.call(document.querySelectorAll('.wsteps button'));
+    var goWhat=carousel(wc,6000,function(j){current(st,j);});
+    st.forEach(function(b,k){b.addEventListener('click',function(){goWhat(k);});});
+  }
   // industry tabs; /e2e/#healthcare opens that tab
   var tabs=Array.prototype.slice.call(document.querySelectorAll('.tabs-ind [role=tab]'));
   function show(id,focus){

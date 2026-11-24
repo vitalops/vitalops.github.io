@@ -397,38 +397,42 @@ p{color:var(--ink2)}
 /* 01 what we build */
 .what-h{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:end}
 .what-h .lede{margin:0}
-/* the agent run in three steps */
-.ag{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:44px;margin-top:40px;padding:28px 32px 30px;border:1px solid var(--line);border-radius:20px;background:var(--bg);user-select:none;-webkit-user-select:none}
-.ag-col{position:relative;min-width:0;display:flex;flex-direction:column}
-.ag-col+.ag-col::before{content:"";position:absolute;left:-28px;top:calc(50% + 6px);width:10px;height:10px;border-top:1.5px solid var(--ink4);border-right:1.5px solid var(--ink4);transform:rotate(45deg)}
-.ag-k{display:flex;gap:10px;align-items:baseline;font-size:15px;font-weight:600;color:var(--ink);margin-bottom:12px}
-.ag-k b{font:500 12px var(--mono);color:var(--brand)}
-.ag-card{flex:1;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 14px 28px -22px rgba(15,23,42,.4)}
-.ag-n{margin-top:10px;font-size:13px;color:var(--ink3)}
-.ag .ic{width:15px;height:15px;flex:none}
-.ag-mail{display:flex;flex-direction:column;gap:6px;font-size:13.5px}
-.am-from{display:flex;align-items:center;gap:6px;font:12px var(--mono);color:var(--ink3);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.ag-mail b{font-size:15px;color:var(--ink)}
-.am-txt{color:var(--ink2)}
-.am-att{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:#f8fafc;font:12px var(--mono);color:var(--ink2)}
-.ag-checks{list-style:none;padding:6px 16px}
-.ag-checks li{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line2);font-size:13.5px;color:var(--ink)}
-.ag-checks li:last-child{border-bottom:0}
-.ag-checks li.ok .ic{color:var(--ok)}
-.ag-checks li.bad .ic{color:var(--bad)}
-.ag-checks em{display:block;font-style:normal;font-size:12px;color:var(--ink3)}
-.ag-checks b{font:500 13px var(--mono)}
-.ag-checks li.bad b{color:var(--bad);text-decoration:line-through;text-decoration-thickness:1px}
-.ag-out{display:flex;flex-direction:column;gap:10px}
-.ao{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;border:1px solid var(--line)}
-.ao span{display:block;font-size:12px;color:var(--ink3)}
-.ao b{display:block;font-size:14px;color:var(--ink)}
-.ao.ok{background:var(--ok50);border-color:var(--ok200)}.ao.ok .ic{color:var(--ok)}
-.ao.warn{background:var(--warn50);border-color:var(--warn200)}.ao.warn .ic{color:var(--warn)}
-.ag [data-a]{opacity:0;transform:translateY(6px);transition:opacity .45s ease,transform .45s ease}
-.ag.play [data-a]{opacity:1;transform:none;transition-delay:var(--d)}
-@media(prefers-reduced-motion:reduce){.ag [data-a]{transition:none}}
-@media(max-width:880px){.ag{grid-template-columns:1fr;gap:28px;padding:20px}.ag-col+.ag-col::before{left:50%;top:-20px;transform:translateX(-50%) rotate(135deg)}}
+/* section 01: steps on the left, the run as a screen carousel on the right */
+.what-grid{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:56px;align-items:center}
+.what-l .lede{margin-top:14px}
+.wsteps{list-style:none;margin-top:28px;border-top:1px solid var(--line)}
+.wsteps li{border-bottom:1px solid var(--line)}
+.wsteps button{position:relative;display:flex;gap:14px;width:100%;padding:16px 0 16px 16px;border:0;background:none;text-align:left;font:inherit;cursor:pointer;color:var(--ink3)}
+.wsteps button::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:2px;border-radius:2px;background:transparent;transition:background .3s}
+.wsteps button.on::before{background:var(--brand)}
+.wsteps b{font:500 12px var(--mono);color:var(--ink4);padding-top:3px}
+.wsteps button.on b{color:var(--brand)}
+.wsteps span{font-size:16px;font-weight:600;color:var(--ink3);transition:color .3s}
+.wsteps button.on span,.wsteps button:hover span{color:var(--ink)}
+.wsteps em{display:block;font-style:normal;font-weight:400;font-size:14px;line-height:1.5;color:var(--ink3);margin-top:3px}
+.wsteps button:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
+.wc .vw.wv{height:400px;display:flex;flex-direction:column;box-shadow:0 22px 40px -26px rgba(15,23,42,.35)}
+.wc .hc-clip{padding:28px 28px 64px;margin:-28px -28px -64px}
+.wbody{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;padding:14px 16px}
+.wl{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:9px}
+.wl div{display:grid;grid-template-columns:16px auto 1fr;gap:8px;align-items:center;padding:8px 11px;border-bottom:1px solid var(--line2);font-size:11.5px}
+.wl div:last-child{border-bottom:0}
+.wl .ic{width:14px;height:14px;color:var(--brand)}
+.wl span{color:var(--ink3);text-align:right}
+.wt td,.wt th{padding:8px 6px}
+.wt tr.bad td{background:var(--bad50)}
+.wpay{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto}
+.wpay div{padding:9px 11px;border:1px solid var(--line);border-radius:9px}
+.wpay span{display:block;font-size:10.5px;color:var(--ink3)}.wpay b{font-size:16px}
+.wpay .ok{color:var(--ok)}.wpay .bad{color:var(--bad)}
+.wo{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-radius:9px;border:1px solid var(--line)}
+.wo .ic{width:16px;height:16px}
+.wo b{display:block;font-size:12.5px}.wo span{font-size:11.5px;color:var(--ink2)}
+.wo.ok{background:var(--ok50);border-color:var(--ok200)}.wo.ok .ic{color:var(--ok)}
+.wo.warn{background:var(--warn50);border-color:var(--warn200)}.wo.warn .ic{color:var(--warn)}
+.wlog{display:flex;align-items:center;gap:6px;margin-top:auto;font:10.5px var(--mono);color:var(--ink3)}
+.wlog .ic{width:13px;height:13px}
+@media(max-width:980px){.what-grid{grid-template-columns:1fr;gap:32px}}
 .how{display:grid;grid-template-columns:170px repeat(3,minmax(0,1fr));margin-top:56px}
 .how-k{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);padding-top:4px}
 .how>div{padding:0 24px;border-left:1px solid var(--line)}
