@@ -64,40 +64,21 @@ INDUSTRIES = [
     },
     {
         "id": "healthcare", "icon": "stethoscope", "name": "Healthcare",
-        "who": "Hospitals, clinic groups and specialty practices: patient access and revenue cycle teams.",
-        "systems": ["EHR", "Practice management", "Insurer portals", "Fax and e-fax", "Remittance files"],
+        "who": "Hospitals and hospital chains: insurance desk, billing and revenue teams.",
+        "systems": ["Hospital information system", "TPA and insurer portals", "NHCX", "Insurance desk email", "Bank statements"],
         "jobs": [
-            ("Prior authorisations",
-             "Staff check whether a procedure needs the insurer's approval, gather clinical notes, fill in each insurer's form or portal, then call back to check on it.",
-             "Checks the insurer's rules for the procedure, pulls the relevant notes from the record, submits the request and tracks it until the insurer decides.",
-             "Clinical questions go to the clinician. Denials go to your appeals team."),
-            ("Working denied claims",
-             "Denials come back as codes in remittance files. Staff look up each one, work out whether it can be fixed, and rework or appeal it before the insurer's deadline.",
-             "Groups denials by reason, corrects clerical errors such as a wrong member ID, resubmits, and drafts appeal letters with the supporting records.",
-             "A coder or the appeals team approves every correction and appeal."),
-            ("Taking in referrals",
-             "Referrals still arrive by fax. Someone reads each one, finds or creates the patient, checks insurance eligibility and calls to schedule.",
-             "Reads the referral, matches the patient, checks eligibility with the insurer, asks the referring office for anything missing and adds the patient to the scheduling list.",
-             "Schedulers book the visit. Clinical triage stays with clinicians."),
-        ],
-    },
-    {
-        "id": "insurance", "icon": "shield", "name": "Insurance",
-        "who": "Carriers, MGAs and brokers: underwriting, claims and account management teams.",
-        "systems": ["Policy admin", "Rating tools", "Claims system", "Broker email", "Document stores"],
-        "jobs": [
-            ("Clearing new submissions",
-             "Brokers send ACORD forms, schedules of values and loss runs in every format. Assistants key them into the rating tool before an underwriter can look at the risk.",
-             "Reads every attachment, builds the risk record, checks it against your appetite and lists what's missing.",
-             "The underwriter decides whether to quote and at what price."),
-            ("Opening new claims",
-             "First notice of loss arrives by email with photos, police reports and repair estimates. Handlers open the claim, find the policy and request missing documents by hand.",
-             "Opens the claim, finds the policy, checks the cover dates, sorts the claim by type and size, and routes it to the right adjuster.",
-             "Adjusters decide on cover and payment."),
-            ("Checking issued policies",
-             "Account managers compare each issued policy with the quote and binder, form by form, to catch wrong limits and missing endorsements.",
-             "Compares every limit, deductible, form and endorsement and lists the differences.",
-             "The account manager sends the correction request."),
+            ("Cashless pre-authorisation",
+             "The insurance desk fills a different pre-auth form for each TPA, attaches notes and a cost estimate, uploads it, then answers queries while the patient waits to be admitted.",
+             "Checks the policy, fills the TPA's form from the hospital record, submits it and answers routine queries with reports already in the system.",
+             "Doctors answer clinical queries. The desk tells the patient about anything the policy won't cover."),
+            ("Cashless discharge",
+             "Once the discharge summary is signed, staff send the final bill to the TPA and wait hours for approval. The patient waits too, and the bed stays full.",
+             "Sends the final bill and reports as soon as the summary is signed, and works out deductions for room rent limits and non-payable items so the family hears early.",
+             "Billing explains deductions to the family and asks the TPA for more cover when needed."),
+            ("Reconciling claim settlements",
+             "Insurers pay many claims in one bank transfer. Accounts match each payment to claims by hand, and wrong deductions are rarely challenged.",
+             "Matches each payment to its claims, reads the settlement letters, checks every deduction against your tariff agreement and the policy, and drafts disputes.",
+             "The revenue team approves each dispute before it goes out."),
         ],
     },
     {
@@ -122,16 +103,13 @@ INDUSTRIES = [
 ]
 
 
-SHOW_PHOTOS = False  # photos are off until we have good, modern ones
+SHOW_PHOTOS = True
 
-PHOTOS = {  # id: (file in e2e/img, credit, licence, source page)
-    "manufacturing": ("manufacturing.webp", "Jorge Royan", "CC BY-SA 3.0", "https://commons.wikimedia.org/wiki/File:India_-_Varanasi_electric_fan_factory_-_1464.jpg"),
-    "supply-chain": ("supply-chain.webp", "Prabhat1729", "CC BY-SA 4.0", "https://commons.wikimedia.org/wiki/File:CWC_Godown,_Bamanheri_operated_by_Food_Corporation_of_India_for_stocking_foodgrains.jpg"),
-    "logistics": ("logistics.webp", "Andrew Thomas", "CC BY-SA 2.0", "https://commons.wikimedia.org/wiki/File:Truck,_Mumbai_-_India,_April_12_2014._(14101792825).jpg"),
-    "healthcare": ("healthcare.webp", "Barry Pousman", "CC BY 2.0", "https://commons.wikimedia.org/wiki/File:My_nurses_at_the_hospital_in_Pondi_(6290972608).jpg"),
-    "insurance": ("insurance.webp", "Dil Shad Roshan", "CC BY-SA 4.0", "https://commons.wikimedia.org/wiki/File:Flooded-home-companypady-2018-kerala-floods.jpg"),
-    "finance": ("finance.webp", "VitalOps", "", ""),
+PHOTOS = {  # id: file in e2e/img. All from Unsplash, whose licence needs no credit; we show one anyway.
+    "manufacturing": "manufacturing.webp", "supply-chain": "supply-chain.webp", "logistics": "logistics.webp",
+    "healthcare": "healthcare.webp", "finance": "finance.webp",
 }
+PHOTO_POS = {"finance": "65% 0"}  # where to anchor the crop, when the middle is wrong
 
 
 def render():
@@ -149,10 +127,10 @@ def render():
             for k, (t, a, b, c) in enumerate(ind["jobs"])
         )
         chips = "".join(f"<em>{e(x)}</em>" for x in ind["systems"])
-        img, who, lic, src = PHOTOS[ind["id"]]
-        credit = f'<a class="ph-c" href="{src}" target="_blank" rel="noopener" aria-label="Photo credit: {e(who)}, {lic}"><i data-i="info"></i><span>Photo: {e(who)}, {lic}</span></a>' if src else ""
+        img = PHOTOS[ind["id"]]
+        credit = '<span class="ph-c" tabindex="0" aria-label="Photo from Unsplash"><i data-i="info"></i><span>Photo: Unsplash</span></span>'
         hidden = "" if i == 0 else " hidden"
-        photo = f'<div class="ind-ph"><img src="img/{img}" alt="" loading="lazy">{credit}</div>' if SHOW_PHOTOS else ""
+        photo = f'<div class="ind-ph"><img src="img/{img}" alt="" loading="lazy"{f' style="object-position:{PHOTO_POS[ind["id"]]}"' if ind["id"] in PHOTO_POS else ""}>{credit}</div>' if SHOW_PHOTOS else ""
         nocls = "" if SHOW_PHOTOS else " nophoto"
         panels.append(
             f'<div class="ind" role="tabpanel" id="{ind["id"]}" aria-labelledby="tab-{ind["id"]}"{hidden}>'

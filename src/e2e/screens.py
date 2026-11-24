@@ -175,61 +175,6 @@ def lg_audit():
                ["Invoice", "Carrier", "Load", "Billed"], rows, detail, "Read carrier portal 4 min ago")
 
 
-def hc_auth():
-    rows = [
-        ("J. Alvarez", "MRI lumbar spine", "Northstar Health", "2 Dec", pill("ok", "Submitted"), True),
-        ("R. Chen", "Knee arthroscopy", "Cobalt Mutual", "4 Dec", pill("warn", "PT notes missing"), False),
-        ("D. Hughes", "MRI shoulder", "Northstar Health", "3 Dec", pill("gray", "No auth needed"), False),
-        ("P. Moreau", "Lumbar fusion", "Unity Plan", "9 Dec", pill("bad", "Peer review asked"), False),
-        ("S. Patel", "CT abdomen", "Cobalt Mutual", "1 Dec", pill("ok", "Approved"), False),
-        ("L. Brooks", "Hip injection", "Unity Plan", "5 Dec", pill("warn", "Form updated by insurer"), False),
-        ("A. Novak", "MRI knee", "Northstar Health", "8 Dec", pill("ok", "Approved"), False),
-    ]
-    detail = f'''<div class="d-h"><div><b>J. Alvarez · MRN 204118 · MRI lumbar spine (CPT 72148)</b><span>Ordered by Dr. K. Imani · scheduled 2 Dec · Northstar Health PPO</span></div>{pill("ok", "Submitted")}</div>
-<div class="steps"><div class="on"><i></i><b>Order seen</b><span>25 Nov 16:40</span></div><div class="on"><i></i><b>Insurer rules checked</b><span>Auth required</span></div><div class="on"><i></i><b>Notes attached</b><span>3 documents</span></div><div class="on"><i></i><b>Submitted</b><span>26 Nov 09:15 · PA-55120</span></div><div class="nx"><i></i><b>Decision</b><span>expected by 29 Nov</span></div></div>
-<div class="crit">
- <div class="cr"><span class="cr-n">{pill("ok", "Met")}<b>Six weeks of conservative treatment</b></span><q>Physical therapy twice weekly since 12 Sep. No improvement in radicular pain.</q><em>Physio note, 30 Oct</em></div>
- <div class="cr"><span class="cr-n">{pill("ok", "Met")}<b>Neurological finding on exam</b></span><q>Decreased sensation in left L5 dermatome, EHL weakness 4/5.</q><em>Clinic note, Dr. Imani, 4 Nov</em></div>
- <div class="cr"><span class="cr-n">{pill("ok", "Met")}<b>Plain X-ray in the last 6 months</b></span><q>Mild disc space narrowing at L4-5, no fracture.</q><em>Lumbar X-ray report, 18 Sep</em></div>
-</div>
-<div class="d-g2 mt">
- <div class="d-box"><span class="d-k">Submission</span><p>Northstar provider portal, reference <b>PA-55120</b>. Form NS-IMG-2 with the 3 notes above. The agent checks the status each morning.</p></div>
- <div class="d-box"><span class="d-k">If the insurer asks for more</span><p>Clinical questions go to Dr. Imani's inbox. A denial goes to the appeals queue with this record attached.</p></div>
-</div>
-<div class="d-acts"><span class="b1">Open in EHR</span><span>View submission</span><span>Notify scheduler</span></div>'''
-    return app("app.vitalops.ai/riverside/prior-auth", "Riverside Orthopaedics", "Prior authorisations",
-               [("Worklist", "38"), ("Approved", "212"), ("Waiting on insurer", "41"), ("Insurer rules", "64"), ("Providers", ""), ("Audit log", ""), ("Reports", ""), ("Settings", "")],
-               [("Orders needing auth", "38", ""), ("Submitted today", "22", "ok"), ("Waiting on insurer", "41", "warn"), ("Due within 48 h", "6", "bad")],
-               ["Patient", "Procedure", "Insurer", "Date"], rows, detail, "Checked EHR work queue 3 min ago")
-
-
-def in_subs():
-    rows = [
-        ("Kestrel Foods", "Harlow &amp; Pike", "$48.2M", pill("warn", "1 item asked"), True),
-        ("Ardent Storage", "Mayfield Risk", "$12.6M", pill("bad", "Out of appetite"), False),
-        ("Lyle Hotels", "Harlow &amp; Pike", "$91.0M", pill("ok", "Ready"), False),
-        ("Brook Dental", "Ostin Brokers", "$4.1M", pill("warn", "Loss runs too old"), False),
-        ("Corran Plastics", "Mayfield Risk", "$22.7M", pill("gray", "Duplicate"), False),
-        ("Tessel Logistics", "Ostin Brokers", "$31.4M", pill("ok", "Ready"), False),
-        ("Penrose Schools", "Harlow &amp; Pike", "$56.0M", pill("ok", "Ready"), False),
-    ]
-    sov = [("1", "Fresno", "Masonry", "1998", "Yes", "$11.4M", 0), ("2", "Modesto", "Steel frame", "2006", "Yes", "$8.9M", 0),
-           ("4", "Tulare", "Steel frame", "2011", "not given", "$4.2M", 1), ("7", "Salinas", "Masonry", "1987", "Yes", "$3.6M", 0),
-           ("9", "Visalia", "Tilt-up", "2015", "not given", "$2.8M", 1), ("12", "Merced", "Steel frame", "2003", "not given", "$2.1M", 1)]
-    st = "".join(f'<tr><td>{a}</td><td>{b}</td><td>{c}</td><td>{d}</td><td class="{"dif" if m else ""}">{e}</td><td>{f}</td></tr>' for a, b, c, d, e, f, m in sov)
-    detail = (dh("Kestrel Foods · commercial property", "From Harlow &amp; Pike, 08:31 · 6 attachments · 14 locations · draft quote Q-77812", "warn", "Waiting on broker")
-        + '<span class="d-k">Locations from SOV_Kestrel_2026.xlsx, 6 of 14</span>'
-        + f'<table class="d-t"><thead><tr><th>Loc</th><th>City</th><th>Construction</th><th>Built</th><th>Sprinklers</th><th>Value</th></tr></thead><tbody>{st}</tbody></table>'
-        + '<div class="cks"><div class="ck ok"><i data-i="check"></i><span>Food processing, in appetite</span></div><div class="ck ok"><i data-i="check"></i><span>Largest site $11.4M, limit $15M</span></div>'
-        + '<div class="ck ok"><i data-i="check"></i><span>2 claims in 5 years, $310k</span></div><div class="ck warn"><i data-i="triangle-alert"></i><span>Sprinklers missing for 3 sites</span></div></div>'
-        + draft("a.pike@harlowpike.example", "Sent 08:36", "Thanks for the Kestrel Foods submission. Please send sprinkler details for locations 4, 9 and 12 so we can quote all 14 sites.")
-        + acts("Send to underwriter", "Decline", "Open draft quote"))
-    return app("app.vitalops.ai/westmark/submissions", "Westmark Specialty", "Submission intake",
-               [("New submissions", "34"), ("Quote ready", "18"), ("Out of appetite", "9"), ("Appetite guide", ""), ("Brokers", ""), ("Audit log", ""), ("Reports", ""), ("Settings", "")],
-               [("Submissions today", "34", ""), ("Ready for underwriter", "18", "ok"), ("Waiting on broker", "7", "warn"), ("Out of appetite", "9", "bad")],
-               ["Insured", "Broker", "Value"], rows, detail, "Read submissions inbox 2 min ago")
-
-
 def fi_cash():
     rows = [
         ("ACH 77120", "Arden Steel", "$12,480.00", pill("warn", "Posted · $150 deduction"), True),
@@ -257,7 +202,6 @@ def fi_cash():
                [("Bank lines", "412"), ("Posted", "371"), ("Deductions", "26"), ("Unapplied", "15"), ("Customers", ""), ("Audit log", ""), ("Reports", ""), ("Settings", "")],
                [("Payments today", "412", ""), ("Matched and posted", "371", "ok"), ("Deductions", "26", "warn"), ("Unapplied cash", "$41,880", "bad")],
                ["Bank line", "Customer", "Amount"], rows, detail, "Read bank file 6 min ago")
-
 
 
 # ── manufacturing ──
@@ -411,107 +355,6 @@ def lg_quote():
                [], rows, detail, "Read quotes inbox 30 s ago")
 
 
-# ── healthcare ──
-def hc_denials():
-    rows = [
-        ("CLM-88412", "M. Torres", "CO-16 · $1,240", pill("ok", "Corrected, resent"), True),
-        ("CLM-88409", "K. Wu", "CO-197 · $3,880", pill("warn", "Appeal drafted"), False),
-        ("CLM-88401", "B. Grant", "CO-50 · $6,420", pill("bad", "Needs clinician"), False),
-        ("CLM-88398", "L. Brooks", "CO-29 · $410", pill("gray", "Past deadline"), False),
-        ("CLM-88392", "A. Novak", "CO-16 · $980", pill("ok", "Corrected, resent"), False),
-        ("CLM-88390", "S. Patel", "CO-97 · $220", pill("warn", "To coder"), False),
-    ]
-    bars = [("CO-16 missing or wrong info", 41), ("CO-197 no authorisation", 22), ("CO-50 medical necessity", 14), ("CO-97 bundled", 11), ("CO-29 filed late", 6)]
-    bh = "".join(f'<div class="hb"><span>{l}</span><i style="width:{v * 2}%"></i><b>{v}</b></div>' for l, v in bars)
-    detail = (dh("CLM-88412 · M. Torres · knee arthroscopy", "Cobalt Mutual · billed $1,240 · denied 20 Nov · appeal deadline 19 Jan", "ok", "Resubmitted")
-        + table(["Field", "On the claim", "Insurer's records", ""], [["Member ID", ("CBM 4471 2209", "dif"), "CBM 4471 2290", ("Fixed", "okc")], ["Date of birth", "14 Mar 1979", "14 Mar 1979", ""], ["Plan", "Cobalt PPO", "Cobalt PPO", ""]])
-        + '<p class="d-p">Denial CO-16: the claim has missing or wrong information. The agent checked eligibility with the insurer, found the member ID typed with two digits swapped, corrected it and resubmitted the claim at 09:12.</p>'
-        + '<div class="d-g2">' + box("Denials this month by reason", f'<div class="hbars">{bh}</div>') + box("Where they went", "<p><b>58</b> clerical, corrected and resubmitted<br><b>27</b> appeals drafted for the appeals team<br><b>9</b> sent to coders<br><b>6</b> past the filing deadline</p>") + "</div>"
-        + acts("Open claim", "Undo correction"))
-    return app("app.vitalops.ai/riverside/denials", "Riverside Orthopaedics", "Denied claims",
-               [("Open", "31"), ("Resubmitted", "58"), ("Appeals", "27"), ("", ""), ("", ""), ("", ""), ("", ""), ("", "")],
-               [("Denials this month", "94", ""), ("Fixed and resubmitted", "58", "ok"), ("Appeals drafted", "27", "warn"), ("Value recovered", "$212,400", "ok")],
-               [], rows, detail, "Read remittance file 20 min ago")
-
-
-def hc_referral():
-    rows = [
-        ("FAX 11:02", "From Lakeside Family Med.", "3 pages", pill("warn", "MRI report asked"), True),
-        ("FAX 10:47", "From Dr. Haines", "2 pages", pill("ok", "On scheduling list"), False),
-        ("FAX 10:30", "From Northgate Clinic", "5 pages", pill("ok", "On scheduling list"), False),
-        ("FAX 10:12", "Unknown sender", "1 page", pill("bad", "Unreadable"), False),
-        ("FAX 09:55", "From Lakeside Family Med.", "2 pages", pill("ok", "On scheduling list"), False),
-    ]
-    fax = ('<div class="faxp"><div class="fx-h">FAX · LAKESIDE FAMILY MEDICINE · 24 NOV 11:01 · P 1/3</div><b>REFERRAL TO ORTHOPAEDICS</b>'
-           '<div class="dd-r"><span>Patient</span><b>Tomas Reyes</b></div><div class="dd-r"><span>DOB</span><b>02/07/1986</b></div>'
-           '<div class="dd-r"><span>Insurance</span><b>Northstar PPO NS-55871</b></div><div class="fx-t">Reason: L knee pain 6 wks after fall, locking. MRI done 18 Nov, suspect meniscal tear. Please see at your earliest slot.</div><div class="pp-sig">Dr. A. Cole</div></div>')
-    detail = (dh("Referral · Tomas Reyes", "Fax from Lakeside Family Medicine, 3 pages · received 11:02", "warn", "Waiting on MRI report")
-        + '<div class="d-g2">' + f'<div>{fax}</div>'
-        + '<div class="d-col"><span class="d-k">Done by the agent</span>'
-        + '<div class="ck2 ok"><i data-i="check"></i><b>Patient</b><span>New record MRN 205530 created in the EHR</span></div>'
-        + '<div class="ck2 ok"><i data-i="check"></i><b>Insurance</b><span>Active, specialist visit $40 copay, no referral number needed</span></div>'
-        + '<div class="ck2 ok"><i data-i="check"></i><b>Urgency</b><span>Routine, seen within 2 weeks by your rule for knee injuries</span></div>'
-        + '<div class="ck2 warn"><i data-i="triangle-alert"></i><b>MRI report</b><span>Mentioned but not attached, asked for by fax at 11:04</span></div>'
-        + '<div class="ck2 ok"><i data-i="check"></i><b>Scheduling list</b><span>Added for Dr. Imani, sports knee clinic</span></div>'
-        + "</div></div>" + acts("Open in EHR", "Call referring office", "Mark urgent"))
-    return app("app.vitalops.ai/riverside/referrals", "Riverside Orthopaedics", "Referral intake",
-               [("New", "8"), ("On scheduling list", "46"), ("Missing info", "5"), ("", ""), ("", ""), ("", ""), ("", ""), ("", "")],
-               [("Referrals today", "59", ""), ("Ready for scheduling", "46", "ok"), ("Waiting on referrer", "5", "warn"), ("Average time to list", "4 min", "ok")],
-               [], rows, detail, "Read e-fax 1 min ago")
-
-
-# ── insurance ──
-def in_fnol():
-    rows = [
-        ("CLM-20931", "Lyle Hotels", "Water damage · $40k to $80k", pill("ok", "With adjuster"), True),
-        ("CLM-20930", "Penrose Schools", "Theft · under $10k", pill("ok", "Fast track"), False),
-        ("CLM-20928", "Tessel Logistics", "Fire · over $250k", pill("bad", "Large loss team"), False),
-        ("CLM-20925", "Brook Dental", "Water damage", pill("warn", "Policy lapsed"), False),
-        ("CLM-20922", "Kestrel Foods", "Equipment breakdown", pill("ok", "With adjuster"), False),
-    ]
-    photos = '<div class="phs"><i class="p1"></i><i class="p2"></i><i class="p3"></i><i class="p4"></i></div>'
-    detail = (dh("CLM-20931 · Lyle Hotels, Fresno", "Email from the broker, 07:12 · 9 photos, plumber's report · loss date 22 Nov", "ok", "Assigned to J. Park")
-        + '<div class="d-g2">' + box("What arrived", photos + "<p>Burst pipe on the 3rd floor, water through 6 guest rooms below. The plumber's report says a fitting failed.</p>")
-        + '<div class="d-col"><span class="d-k">Checked against policy PR-55120</span>'
-        + '<div class="ck2 ok"><i data-i="check"></i><b>In force</b><span>1 Jan to 31 Dec, premium paid</span></div>'
-        + '<div class="ck2 ok"><i data-i="check"></i><b>Cause covered</b><span>Sudden water discharge, form CP 10 30</span></div>'
-        + '<div class="ck2 ok"><i data-i="check"></i><b>Deductible</b><span>$10,000 per occurrence</span></div>'
-        + '<div class="ck2 warn"><i data-i="triangle-alert"></i><b>Business income</b><span>6 rooms closed, BI cover applies after 72 h</span></div>'
-        + "</div></div>"
-        + '<div class="d-g2">' + box("Sized and routed", "<p>Estimated $40k to $80k from rooms affected and your water damage history. Routed to J. Park, property adjuster for the Central Valley, who has 14 open claims.</p>")
-        + draft("claims@harlowpike.example", "Sent 07:16", "Claim CLM-20931 is open and with adjuster J. Park. Please send the repair estimate and the list of closed rooms with dates, so business income can be worked out.") + "</div>"
-        + acts("Open claim", "Change adjuster"))
-    return app("app.vitalops.ai/westmark/new-claims", "Westmark Specialty", "New claims",
-               [("New today", "27"), ("Assigned", "24"), ("Coverage questions", "3"), ("", ""), ("", ""), ("", ""), ("", ""), ("", "")],
-               [("Claims opened today", "27", ""), ("Opened without a person", "24", "ok"), ("Coverage questions", "3", "warn"), ("Average time to assign", "4 min", "ok")],
-               [], rows, detail, "Read claims inbox 1 min ago")
-
-
-def in_policy():
-    rows = [
-        ("POL-77120", "Kestrel Foods", "Property", pill("bad", "3 differences"), True),
-        ("POL-77118", "Lyle Hotels", "Property", pill("ok", "Matches binder"), False),
-        ("POL-77115", "Tessel Logistics", "Package", pill("warn", "1 difference"), False),
-        ("POL-77111", "Penrose Schools", "Property", pill("ok", "Matches binder"), False),
-        ("POL-77109", "Brook Dental", "Package", pill("ok", "Matches binder"), False),
-    ]
-    rowsd = [["Building limit, loc 1", "$11,400,000", "$11,400,000", ("Same", "okc")],
-             ["Wind and hail deductible", "1%", ("2%", "dif"), ("Differs", "dif")],
-             ["Business income", "12 months", "12 months", ("Same", "okc")],
-             ["CP 04 05 Ordinance or law", "Included", ("Missing", "dif"), ("Differs", "dif")],
-             ["CP 10 30 Special causes of loss", "Included", "Included", ("Same", "okc")],
-             ["Additional insured, Ardent Bank", "Lender loss payable", ("Mortgagee", "dif"), ("Differs", "dif")],
-             ["Premium", "$184,200", "$184,200", ("Same", "okc")]]
-    detail = (dh("POL-77120 · Kestrel Foods · commercial property", "Issued policy 92 pages, read against binder BND-5512 · effective 1 Jan", "bad", "3 differences")
-        + table(["Item", "Binder", "Issued policy", ""], rowsd)
-        + draft("policy-services@westmark.example", "Drafted by the agent", "Please correct POL-77120 before it goes to the broker. The wind and hail deductible should be 1%, endorsement CP 04 05 is missing, and Ardent Bank should be shown as lender loss payable, as bound on BND-5512.")
-        + acts("Send correction request", "Mark as checked", "Open both documents"))
-    return app("app.vitalops.ai/westmark/policy-checking", "Westmark Specialty", "Policy checking",
-               [("To check", "14"), ("Matches", "96"), ("Differences", "6"), ("", ""), ("", ""), ("", ""), ("", ""), ("", "")],
-               [("Policies checked this week", "116", ""), ("Matched the binder", "96", "ok"), ("With differences", "6", "bad"), ("Pages read", "8,940", "")],
-               [], rows, detail, "Read issued policies 15 min ago")
-
-
 # ── finance ──
 def fi_ap():
     rows = [
@@ -558,6 +401,97 @@ def fi_close():
                [], rows, detail, "Matched bank file 08:00")
 
 
+# ── healthcare (India: cashless claims through TPAs) ──
+HOSP = ("Meridian Multispeciality Hospital", "app.vitalops.ai/meridian")
+
+
+def hc_preauth():
+    rows = [
+        ("IP-8812", "S. Deshpande", "Lap. cholecystectomy", "Sunrise TPA", pill("ok", "Query answered"), True),
+        ("IP-8810", "A. Iyer", "Cataract, right eye", "Indus General", pill("ok", "Approved"), False),
+        ("IP-8809", "M. Shaikh", "Knee arthroscopy", "Harbour TPA", pill("warn", "Note needed"), False),
+        ("IP-8807", "R. Nair", "Angioplasty", "Sagar Health", pill("ok", "Submitted"), False),
+        ("IP-8806", "P. Gupta", "Hernia repair", "Sunrise TPA", pill("bad", "Waiting period"), False),
+        ("IP-8804", "K. Reddy", "Dengue, medical", "Harbour TPA", pill("ok", "Approved"), False),
+        ("IP-8801", "V. Joshi", "Hysterectomy", "Indus General", pill("ok", "Submitted"), False),
+    ]
+    est = table(["Estimate", "Days", "Amount"], [
+        ["Room, twin sharing", "3", "₹13,500"], ["Surgeon and OT", "", "₹52,000"], ["Anaesthesia", "", "₹12,000"],
+        ["Investigations", "", "₹9,600"], ["Medicines and consumables", "", "₹21,300"], ["Total", "", "₹1,08,400", "@tot"]])
+    detail = (dh("IP-8812 · S. Deshpande · laparoscopic cholecystectomy", "Dr. N. Kulkarni · admission 26 Nov · Indus General Health Optima via Sunrise TPA", "ok", "Query answered")
+        + '<div class="steps"><div class="on"><i></i><b>Admission note</b><span>24 Nov 17:05</span></div><div class="on"><i></i><b>Policy checked</b><span>Covered</span></div>'
+        '<div class="on"><i></i><b>Form sent</b><span>24 Nov 17:21</span></div><div class="on"><i></i><b>TPA query</b><span>25 Nov 10:02</span></div><div class="nx"><i></i><b>Approval</b><span>expected today</span></div></div>'
+        + '<div class="d-g2">' + f'<div><span class="d-k">Cost estimate sent</span>{est}</div>'
+        + '<div class="d-col"><span class="d-k">Policy</span>'
+        '<div class="ck2 ok"><i data-i="check"></i><b>Sum insured</b><span>₹5,00,000, ₹4,62,000 left this year</span></div>'
+        '<div class="ck2 ok"><i data-i="check"></i><b>Room rent limit</b><span>₹5,000 a day, twin sharing is ₹4,500</span></div>'
+        '<div class="ck2 ok"><i data-i="check"></i><b>2 year wait for gallbladder</b><span>Policy since March 2023, met</span></div>'
+        '<div class="ck2 ok"><i data-i="check"></i><b>Co-pay</b><span>None on this policy</span></div></div></div>'
+        + '<div class="crit"><div class="cr"><span class="cr-n">' + pill("ok", "Answered 10:09") + '<b>TPA query: send ultrasound report and how long the symptoms have lasted</b></span>'
+        '<q>Ultrasound abdomen, 22 Nov: multiple gallstones, largest 11 mm. OPD note, 18 Nov: pain after meals for 3 months.</q><em>Both from the hospital record, uploaded to the Sunrise portal</em></div></div>'
+        + acts("Open in HIS", "View TPA portal", "Message desk"))
+    return app(f"{HOSP[1]}/pre-auth", HOSP[0], "Cashless pre-authorisation",
+               [("Worklist", "27"), ("Approved", "164"), ("TPA queries", "9"), ("Policies", ""), ("TPAs", ""), ("Audit log", ""), ("Reports", ""), ("Settings", "")],
+               [("Planned admissions", "27", ""), ("Sent within 30 min", "25", "ok"), ("Open TPA queries", "9", "warn"), ("Not covered", "2", "bad")],
+               ["Admission", "Patient", "Procedure", "TPA"], rows, detail, "Read admission notes 2 min ago")
+
+
+def hc_discharge():
+    rows = [
+        ("IP-8779", "L. Fernandes", "Bed 412", pill("warn", "₹31,150 to pay"), True),
+        ("IP-8781", "H. Singh", "Bed 207", pill("ok", "Approved"), False),
+        ("IP-8783", "T. Menon", "Bed 318", pill("ok", "Sent to TPA"), False),
+        ("IP-8776", "D. Bose", "Bed 109", pill("gray", "Summary not signed"), False),
+        ("IP-8785", "N. Pillai", "Bed 221", pill("ok", "Approved"), False),
+        ("IP-8772", "F. Ansari", "Bed 330", pill("warn", "More cover asked"), False),
+    ]
+    bill = table(["Bill item", "Billed", "Payable", ""], [
+        ["Room, single, 4 days", "₹18,000", ("₹12,000", "dif"), "limit"],
+        ["Nursing", "₹6,000", ("₹4,000", "dif"), "pro rata"],
+        ["Doctor visits", "₹8,400", ("₹5,600", "dif"), "pro rata"],
+        ["Surgeon and OT", "₹54,000", ("₹36,000", "dif"), "pro rata"],
+        ["Medicines and consumables", "₹14,200", "₹14,200", ""],
+        ["Investigations", "₹9,800", "₹9,800", ""],
+        ["Gloves, masks, admission kit", "₹2,350", ("₹0", "dif"), "not payable"],
+        ["Total", "₹1,12,750", "₹81,600", "", "@tot"]])
+    detail = (dh("IP-8779 · L. Fernandes · appendicectomy", "Discharge summary signed 10:12 · Sagar Health via Harbour TPA · pre-auth ₹90,000", "warn", "Family told")
+        + '<div class="steps"><div class="on"><i></i><b>Summary signed</b><span>10:12</span></div><div class="on"><i></i><b>Bill checked</b><span>10:18</span></div>'
+        '<div class="on"><i></i><b>Sent to TPA</b><span>10:21 · 9 files</span></div><div class="on"><i></i><b>Family told</b><span>10:40</span></div><div class="nx"><i></i><b>Final approval</b><span>usually 2 h</span></div></div>'
+        + bill
+        + box("Why the family pays ₹31,150", "<p>The policy pays room rent up to <b>₹3,000 a day</b>. The patient chose a ₹4,500 room, so the insurer pays two thirds of room-linked charges. Billing told the family at 10:40.</p>", "mt")
+        + acts("Open bill", "Ask TPA for more cover", "View files sent"))
+    return app(f"{HOSP[1]}/discharge", HOSP[0], "Cashless discharge",
+               [("Discharges today", "23"), ("Approved", "15"), ("With TPA", "6"), ("Room limits", ""), ("TPAs", ""), ("Audit log", ""), ("Reports", ""), ("Settings", "")],
+               [("Discharges today", "23", ""), ("Sent within 15 min", "21", "ok"), ("Waiting on TPA", "6", "warn"), ("Average wait", "1 h 50 m", "")],
+               ["Admission", "Patient", "Bed"], rows, detail, "Read signed summaries 1 min ago")
+
+
+def hc_settle():
+    rows = [
+        ("NEFT 8841", "Indus General", "12 claims", "₹9,77,600", pill("warn", "1 dispute drafted"), True),
+        ("NEFT 8838", "Sagar Health", "7 claims", "₹4,12,650", pill("ok", "Matched"), False),
+        ("NEFT 8836", "Harbour TPA", "3 claims", "₹1,96,000", pill("warn", "Letter missing"), False),
+        ("NEFT 8831", "Indus General", "9 claims", "₹6,70,120", pill("ok", "Matched"), False),
+        ("NEFT 8829", "Sunrise TPA", "1 claim", "₹38,400", pill("bad", "No claim found"), False),
+        ("NEFT 8826", "Sagar Health", "5 claims", "₹2,88,900", pill("ok", "Matched"), False),
+    ]
+    lines = table(["Claim", "Claimed", "Paid", "Deduction", "Reason given", "Check"], [
+        ["CL-50412", "₹1,45,000", "₹1,38,200", ("₹6,800", "dif"), "Package rate", ("Wrong", "dif")],
+        ["CL-50398", "₹74,900", "₹72,550", "₹2,350", "Non-payable items", ("Correct", "okc")],
+        ["CL-50377", "₹62,400", "₹56,160", "₹6,240", "10% co-pay", ("Correct", "okc")],
+        ["9 more", "₹7,10,690", "₹7,10,690", "₹0", "", ("Correct", "okc")],
+        ["Total", "₹9,92,990", "₹9,77,600", "₹15,390", "", "", "@tot"]])
+    detail = (dh("NEFT 8841 · Indus General · ₹9,77,600", "Bank credit 24 Nov · 12 settlement letters from the insurer's email, 23 Nov", "warn", "Dispute to approve")
+        + lines
+        + '<div class="d-g2 mt">' + box("Package rate, CL-50412", "<p>Knee arthroscopy is <b>₹1,45,000</b> in the tariff agreed with Indus General from 1 Apr 2026. They paid the old 2025 rate.</p>")
+        + draft("claims@indusgeneral.example", "Draft", "Claim CL-50412 was settled at the 2025 package rate. Our 2026 tariff, annexure B page 4, sets knee arthroscopy at ₹1,45,000. Please pay the balance of ₹6,800.")
+        + "</div>" + acts("Approve and send", "Edit draft", "Accept deduction"))
+    return app(f"{HOSP[1]}/settlements", HOSP[0], "Claim settlements",
+               [("Payments", "38"), ("Matched", "31"), ("Disputes", "5"), ("Tariffs", ""), ("Insurers", ""), ("Audit log", ""), ("Reports", ""), ("Settings", "")],
+               [("Settled this month", "₹1.42 Cr", ""), ("Matched to claims", "31 of 38", "ok"), ("Wrong deductions", "₹1,18,400", "warn"), ("Recovered", "₹86,200", "ok")],
+               ["Payment", "Insurer", "Claims", "Amount"], rows, detail, "Read bank statement 08:00")
+
+
 SCREENS = {"manufacturing": [mfg_certs, mfg_orders, mfg_maint], "supply-chain": [sc_acks, sc_late, sc_onboard],
-           "logistics": [lg_audit, lg_pod, lg_quote], "healthcare": [hc_auth, hc_denials, hc_referral],
-           "insurance": [in_subs, in_fnol, in_policy], "finance": [fi_ap, fi_cash, fi_close]}
+           "logistics": [lg_audit, lg_pod, lg_quote], "healthcare": [hc_preauth, hc_discharge, hc_settle],
+           "finance": [fi_ap, fi_cash, fi_close]}

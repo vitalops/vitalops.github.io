@@ -10,7 +10,7 @@
   var SHARE = 0.4, ROLL = phone.matches ? 44 : 70;  // how much of the banner peels, and how wide the fold rolls up
   var base = new URL('../peel/', document.currentScript.src).href;
   var TILES = [['manufacturing', 'Manufacturing'], ['supply-chain', 'Supply chain'], ['logistics', 'Logistics'],
-    ['healthcare', 'Healthcare'], ['insurance', 'Insurance'], ['finance', 'Finance']].map(function (t) {
+    ['healthcare', 'Healthcare'], ['finance', 'Finance']].map(function (t) {
     return '<a href="e2e/#' + t[0] + '"><img src="' + base + t[0] + '.webp" alt="" loading="lazy"><span>' + t[1] + '</span></a>';
   }).join('');
   var front = banner && banner.querySelector('.banner-front');
@@ -23,7 +23,7 @@
   back.innerHTML = '<div class="rip-in"><div class="rip-bar"><span class="rip-k">The other side of VitalOps</span>' +
     '<button type="button" class="rip-close">Close</button></div>' +
     '<h2>AI agents for operations</h2>' +
-    '<p class="rip-about">We also build agents that do routine operations work in manufacturing, supply chain, logistics, healthcare, insurance and finance. They work inside your systems and hand anything unclear to a person.</p>' +
+    '<p class="rip-about">We also build agents that do routine operations work in manufacturing, supply chain, logistics, healthcare and finance. They work inside your systems and hand anything unclear to a person.</p>' +
     '<div class="rip-tiles">' + TILES + '</div>' +
     '<a class="rip-go" href="e2e/">See the agents at work<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>';
   banner.insertBefore(back, front || null);
