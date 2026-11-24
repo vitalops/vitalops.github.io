@@ -106,7 +106,10 @@ p{color:var(--ink2)}
 .ind-h{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);border:1px solid var(--line);border-radius:16px;background:var(--paper);overflow:hidden}
 .ind-ph{position:relative;min-height:240px}
 .ind-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.ph-c{position:absolute;left:8px;bottom:8px;font-size:10.5px;color:#fff;background:rgba(15,23,42,.55);padding:2px 7px;border-radius:6px}
+.ph-c{position:absolute;left:8px;bottom:8px;display:flex;align-items:center;gap:6px;height:22px;padding:0 4px;border-radius:11px;color:#fff;background:rgba(15,23,42,.5);font-size:11px;text-decoration:none!important}
+.ph-c .ic{width:14px;height:14px}
+.ph-c span{display:none;white-space:nowrap;padding-right:5px}
+.ph-c:hover span,.ph-c:focus-visible span{display:inline}
 .ind-t{padding:24px 26px;display:grid;align-content:center;gap:6px}
 .ind-ic{display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:var(--brand50);color:var(--brand)}
 .ind-ic .ic{width:21px;height:21px}

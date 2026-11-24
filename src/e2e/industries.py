@@ -147,7 +147,7 @@ def render():
         )
         chips = "".join(f"<em>{e(x)}</em>" for x in ind["systems"])
         img, who, lic, src = PHOTOS[ind["id"]]
-        credit = f'<a class="ph-c" href="{src}" target="_blank" rel="noopener">Photo: {e(who)}, {lic}</a>' if src else ""
+        credit = f'<a class="ph-c" href="{src}" target="_blank" rel="noopener" aria-label="Photo credit: {e(who)}, {lic}"><i data-i="info"></i><span>Photo: {e(who)}, {lic}</span></a>' if src else ""
         hidden = "" if i == 0 else " hidden"
         panels.append(
             f'<div class="ind" role="tabpanel" id="{ind["id"]}" aria-labelledby="tab-{ind["id"]}"{hidden}>'
