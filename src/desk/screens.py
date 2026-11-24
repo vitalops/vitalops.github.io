@@ -1,4 +1,4 @@
-"""App screens for the industry tabs on /e2e. Each one is a mock of the VitalOps review app for one job,
+"""App screens for the industry tabs on /desk. Each one is a mock of the VitalOps review app for one job,
 showing a real case the agent has worked through. Names, numbers and companies are made up.
 
 Rendered at a fixed layout and scaled as a whole on the page (like a screen recording).

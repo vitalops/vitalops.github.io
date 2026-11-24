@@ -1,6 +1,6 @@
-"""Build the /e2e pitch page: python3 src/e2e/build.py
+"""Build the VitalOps Desk page at /desk: python3 src/desk/build.py
 
-Edit page.html, industries.py and e2e.css here, then run this. It writes e2e/index.html and e2e/e2e.css, inlines
+Edit page.html, industries.py and desk.css here, then run this. It writes desk/index.html and desk/desk.css, inlines
 the Lucide icons the page uses (<i data-i="name"></i>) as one SVG sprite, and runs the copy checker.
 This page is separate from the main site's generator (src/build.py) and shares nothing with it.
 """
@@ -11,7 +11,7 @@ ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 ICONS = os.path.join(HERE, "..", "icons", "lucide")
 
 page = open(os.path.join(HERE, "page.html"), encoding="utf-8").read()
-css = open(os.path.join(HERE, "e2e.css"), encoding="utf-8").read()
+css = open(os.path.join(HERE, "desk.css"), encoding="utf-8").read()
 sys.path.insert(0, HERE)
 import industries  # noqa: E402
 page = page.replace("__INDUSTRIES__", industries.render())
@@ -33,9 +33,9 @@ sprite = f'<svg width="0" height="0" style="position:absolute" aria-hidden="true
 page = re.sub(r'<i data-i="([a-z0-9-]+)"></i>', r'<svg class="ic" aria-hidden="true"><use href="#i-\1"/></svg>', page)
 page = page.replace("__SPRITE__", sprite).replace("__CSSV__", hashlib.sha1(css.encode()).hexdigest()[:10])
 
-out = os.path.join(ROOT, "e2e")
+out = os.path.join(ROOT, "desk")
 os.makedirs(out, exist_ok=True)
 open(os.path.join(out, "index.html"), "w", encoding="utf-8").write(page)
-open(os.path.join(out, "e2e.css"), "w", encoding="utf-8").write(css)
-print(f"e2e: {len(used)} icons")
+open(os.path.join(out, "desk.css"), "w", encoding="utf-8").write(css)
+print(f"desk: {len(used)} icons")
 sys.exit(subprocess.call([sys.executable, os.path.join(ROOT, "src", "tools", "copy_tells.py"), os.path.join(out, "index.html")]))

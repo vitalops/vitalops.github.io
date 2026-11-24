@@ -1,4 +1,4 @@
-"""Industry tabs for the /e2e page. build.py renders this into __INDUSTRIES__.
+"""Industry tabs for the /desk page. build.py renders this into __INDUSTRIES__.
 
 Each industry has a photo, an app screen (screens.py) and three jobs. Keep the copy plain: run the build, which runs the copy checker.
 """
@@ -105,7 +105,7 @@ INDUSTRIES = [
 
 SHOW_PHOTOS = True
 
-PHOTOS = {  # id: file in e2e/img. All from Unsplash, whose licence needs no credit; we show one anyway.
+PHOTOS = {  # id: file in desk/img. All from Unsplash, whose licence needs no credit; we show one anyway.
     "manufacturing": "manufacturing.webp", "supply-chain": "supply-chain.webp", "logistics": "logistics.webp",
     "healthcare": "healthcare.webp", "finance": "finance.webp",
 }

@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>VitalOps · AI agents for operations</title>
-<meta name="description" content="VitalOps builds and runs AI agents that take routine work off operations teams in manufacturing, supply chain, logistics, healthcare and finance.">
+<title>VitalOps Desk · AI agents for operations</title>
+<meta name="description" content="VitalOps Desk: AI agents that do routine operations work in manufacturing, supply chain, logistics, healthcare and finance.">
 <link rel="icon" type="image/svg+xml" href="../assets/vo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="e2e.css?v=__CSSV__">
+<link rel="stylesheet" href="desk.css?v=__CSSV__">
 </head>
 <body>
 __SPRITE__
 
 <header class="bar"><div class="wrap">
-  <a class="logo" href="#top"><img src="../assets/vo-mark.svg" alt="">VitalOps</a>
+  <a class="logo" href="#top"><img src="../assets/vo-mark.svg" alt="">VitalOps<span class="logo-p">Desk</span></a>
   <nav aria-label="Sections">
     <a href="#what">What we build</a><a href="#industries">Industries</a><a href="#review">Review screen</a><a href="#record">Audit record</a><a href="#project">Project plan</a><a href="#cost">Cost</a>
   </nav>
@@ -28,7 +28,7 @@ __SPRITE__
 <!-- ───────── cover ───────── -->
 <section class="cover">__HERO_BG__<div class="wrap cover-grid">
   <div class="cover-copy">
-    <div class="kick">VitalOps</div>
+    <div class="kick">VitalOps Desk</div>
     <h1>AI agents for operations</h1>
     <p class="lede">Software agents that enter orders, chase suppliers, check transporter bills and reconcile bank accounts. They work in the systems you already have, and ask your team when they aren't sure.</p>
     <div class="cta">
@@ -452,7 +452,7 @@ __SPRITE__
     var goWhat=carousel(wc,6000,function(j){current(st,j);});
     st.forEach(function(b,k){b.addEventListener('click',function(){goWhat(k);});});
   }
-  // industry tabs; /e2e/#healthcare opens that tab
+  // industry tabs; /desk/#healthcare opens that tab
   var tabs=Array.prototype.slice.call(document.querySelectorAll('.tabs-ind [role=tab]'));
   function show(id,focus){
     var t=document.getElementById('tab-'+id); if(!t) return false;

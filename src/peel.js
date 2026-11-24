@@ -1,5 +1,5 @@
 // The home hero's top right corner peels back to show the other side of VitalOps: AI agents for
-// operations, with a link to /e2e. Adapted from the scramjit and cimo sites' Prompt for Agents.
+// operations, with a link to /desk (VitalOps Desk). Adapted from the scramjit and cimo sites' Prompt for Agents.
 (function () {
   var ROBOT = '<svg class="i-robot" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4"/><circle cx="12" cy="3" r=".6"/><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M1.5 12.5v3M22.5 12.5v3M9 16h6"/><circle class="eye" cx="9" cy="11.5" r="1.2"/><circle class="eye eye-r" cx="15" cy="11.5" r="1.2"/></svg>';
   var LABEL = '<span class="peel-label">AI agents for operations</span>';
@@ -11,7 +11,7 @@
   var base = new URL('../peel/', document.currentScript.src).href;
   var TILES = [['manufacturing', 'Manufacturing'], ['supply-chain', 'Supply chain'], ['logistics', 'Logistics'],
     ['healthcare', 'Healthcare'], ['finance', 'Finance']].map(function (t) {
-    return '<a href="e2e/#' + t[0] + '"><img src="' + base + t[0] + '.webp" alt="" loading="lazy"><span>' + t[1] + '</span></a>';
+    return '<a href="desk/#' + t[0] + '"><img src="' + base + t[0] + '.webp" alt="" loading="lazy"><span>' + t[1] + '</span></a>';
   }).join('');
   var front = banner && banner.querySelector('.banner-front');
   if (!banner) return;
@@ -20,12 +20,12 @@
   back.className = 'rip-back';
   back.id = 'agents';
   back.inert = true;
-  back.innerHTML = '<div class="rip-in"><div class="rip-bar"><span class="rip-k">The other side of VitalOps</span>' +
+  back.innerHTML = '<div class="rip-in"><div class="rip-bar"><span class="rip-k">VitalOps Desk</span>' +
     '<button type="button" class="rip-close">Close</button></div>' +
     '<h2>AI agents for operations</h2>' +
     '<p class="rip-about">We also build agents that do routine operations work in manufacturing, supply chain, logistics, healthcare and finance. They work inside your systems and hand anything unclear to a person.</p>' +
     '<div class="rip-tiles">' + TILES + '</div>' +
-    '<a class="rip-go" href="e2e/">See the agents at work<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>';
+    '<a class="rip-go" href="desk/">See VitalOps Desk<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>';
   banner.insertBefore(back, front || null);
 
   var flap = document.createElement('div');

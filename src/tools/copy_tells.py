@@ -1,6 +1,6 @@
 """Flag copy that reads as machine-written.
 
-Usage: python3 src/tools/copy_tells.py e2e/index.html [more.html ...]
+Usage: python3 src/tools/copy_tells.py desk/index.html [more.html ...]
 
 Checks the visible text of a page (scripts, styles and <blockquote> client quotes are skipped, since
 quotes are the client's own words). Exit code 1 if anything is found.

@@ -25,6 +25,7 @@ p{color:var(--ink2)}
 .bar{position:sticky;top:0;z-index:20;background:rgba(245,246,250,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .bar .wrap{display:flex;align-items:center;justify-content:space-between;height:58px;gap:16px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink);font-size:16px}
+.logo-p{margin-left:-4px;font-weight:500;color:var(--ink4)}
 .logo:hover{text-decoration:none}.logo img{width:26px;height:26px}
 .bar nav{display:flex;gap:18px;font-size:14px}.bar nav a{color:var(--ink3)}
 @media(max-width:900px){.bar nav{display:none}}
